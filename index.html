@@ -333,7 +333,7 @@
 
           <div class="info-panel active" id="info-panel-apropos">
             <h2 style="margin-top:0">🏆 Tournoi Manager</h2>
-            <p style="color:var(--text2)">Version actuelle : <strong>V1.9.12</strong></p>
+            <p style="color:var(--text2)">Version actuelle : <strong>V1.9.13</strong></p>
             <div class="divider"></div>
             <h3>Notes légales</h3>
             <p style="color:var(--text2);font-size:0.9rem;line-height:1.6">
@@ -3147,6 +3147,14 @@ function resetTournamentToWaiting(){
     false
   );
 }
+
+window.addEventListener('beforeunload', function(e){
+  if(S.tournaments && S.tournaments.length > 0){
+    e.preventDefault();
+    e.returnValue = '';
+    return '';
+  }
+});
 
 init();
 </script>
