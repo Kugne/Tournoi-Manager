@@ -335,7 +335,7 @@
 
           <div class="info-panel active" id="info-panel-apropos">
             <h2 style="margin-top:0">🏆 Tournoi Manager</h2>
-            <p style="color:var(--text2)">Version actuelle : <strong>V1.9.17</strong></p>
+            <p style="color:var(--text2)">Version actuelle : <strong>V1.9.23</strong></p>
             <div class="divider"></div>
             <h3>Licence</h3>
             <p style="color:var(--text2);font-size:0.9rem;line-height:1.6">
@@ -460,7 +460,7 @@
             <p style="color:var(--text2);font-size:0.9rem">Définitions des termes utilisés dans l'application.</p>
             <table class="data-table">
               <thead><tr><th>Terme</th><th>Définition</th></tr></thead>
-              <tbody><tr><td><strong>Faction</strong></td><td>Camp ou armée choisi par un joueur au sein d'un système de jeu (ex : Space Marines, Orks).</td></tr><tr><td><strong>Allégeance</strong></td><td>Regroupement de plusieurs factions apparentées (ex : « Order » regroupe Space Marines et Blood Angels). Sert à éviter des affrontements trop proches.</td></tr><tr><td><strong>Match miroir</strong></td><td>Rencontre entre deux joueurs de la même faction. Peut être évité via le critère « Pas de miroir ».</td></tr><tr><td><strong>Compo</strong></td><td>Score de composition de liste (souvent noté sur 1000 ou 2000 selon le format), utilisé comme critère d'appariement optionnel.</td></tr><tr><td><strong>Note libre</strong></td><td>Champ de texte libre attaché à un joueur, utilisable comme critère d'appariement pour regrouper ou séparer des joueurs selon une logique propre à l'organisateur.</td></tr><tr><td><strong>SOS (Strength of Schedule)</strong></td><td>Force du calendrier : somme des points des adversaires déjà rencontrés par un joueur. Sert de critère de départage en cas d'égalité de points.</td></tr><tr><td><strong>Bye</strong></td><td>Tour sans adversaire accordé automatiquement à un joueur quand le nombre de participants actifs est impair. Rapporte les points d'une victoire.</td></tr><tr><td><strong>Score libre / score scénario</strong></td><td>Points additionnels indépendants du résultat classique (victoire/nulle/défaite), par exemple un « Kill Count » personnalisé par tournoi.</td></tr><tr><td><strong>Drop</strong></td><td>Le joueur abandonne définitivement le tournoi. Il ne sera plus jamais réapparié ; son adversaire du moment reçoit un bye.</td></tr><tr><td><strong>Forfait / Absent</strong></td><td>Le joueur est signalé absent pour une ronde sans être exclu définitivement du tournoi.</td></tr><tr><td><strong>Préinscrit / Inscrit</strong></td><td>Statuts d'un joueur qui n'a pas encore rejoint activement le tournoi. Ces joueurs ne sont jamais appariés et apparaissent en bas du classement.</td></tr><tr><td><strong>Actif</strong></td><td>Statut d'un joueur qui participe réellement aux rondes et peut être apparié.</td></tr><tr><td><strong>Bonus / Malus</strong></td><td>Points additionnels ou retirés manuellement par l'organisateur, indépendamment des résultats de match (ex : pénalité de comportement).</td></tr><tr><td><strong>Blocage</strong></td><td>Interdiction manuelle entre deux joueurs spécifiques de s'affronter, quel que soit leur score (ex : deux joueurs du même club).</td></tr><tr><td><strong>Système suisse</strong></td><td>Format de tournoi où chaque ronde apparie les joueurs de niveau proche, sans élimination, afin de départager un classement final sur plusieurs rondes.</td></tr></tbody>
+              <tbody><tr><td><strong>Faction</strong></td><td>Camp ou armée choisi par un joueur au sein d'un système de jeu (ex : Space Marines, Orks).</td></tr><tr><td><strong>Allégeance</strong></td><td>Regroupement de plusieurs factions apparentées (ex : « Order » regroupe Space Marines et Blood Angels). Sert à éviter des affrontements trop proches.</td></tr><tr><td><strong>Match miroir</strong></td><td>Rencontre entre deux joueurs de la même faction. Peut être évité via le critère « Pas de miroir ».</td></tr><tr><td><strong>Compo</strong></td><td>Score de composition de liste (souvent noté sur 1000 ou 2000 selon le format), utilisé comme critère d'appariement optionnel.</td></tr><tr><td><strong>Note libre</strong></td><td>Champ de texte libre attaché à un joueur, utilisable comme critère d'appariement pour regrouper ou séparer des joueurs selon une logique propre à l'organisateur.</td></tr><tr><td><strong>SOS (Strength of Schedule)</strong></td><td>Force du calendrier : somme des points des adversaires déjà rencontrés par un joueur. Sert de critère de départage en cas d'égalité de points.</td></tr><tr><td><strong>Bye</strong></td><td>Tour sans adversaire accordé automatiquement à un joueur quand le nombre de participants actifs est impair. Rapporte les points d'une victoire.</td></tr><tr><td><strong>Score libre / score scénario</strong></td><td>Points additionnels indépendants du résultat classique (victoire/nulle/défaite), par exemple un « Kill Count » personnalisé par tournoi.</td></tr><tr><td><strong>Drop</strong></td><td>Le joueur abandonne définitivement le tournoi. Il ne sera plus jamais réapparié ; son adversaire du moment reçoit un bye.</td></tr><tr><td><strong>Forfait / Absent</strong></td><td>Le joueur est signalé absent pour une ronde sans être exclu définitivement du tournoi.</td></tr><tr><td><strong>Préinscrit / Inscrit</strong></td><td>Statuts d'un joueur qui n'a pas encore rejoint activement le tournoi. Ces joueurs ne sont jamais appariés et apparaissent en bas du classement.</td></tr><tr><td><strong>Actif</strong></td><td>Statut d'un joueur qui participe réellement aux rondes et peut être apparié.</td></tr><tr><td><strong>Bonus / Malus</strong></td><td>Points additionnels ou retirés manuellement par l'organisateur, indépendamment des résultats de match (ex : pénalité de comportement).</td></tr><tr><td><strong>Blocage</strong></td><td>Interdiction manuelle entre deux joueurs spécifiques de s'affronter, quel que soit leur score (ex : deux joueurs du même club).</td></tr><tr><td><strong>Système suisse</strong></td><td>Format de tournoi où chaque ronde apparie les joueurs de niveau proche, sans élimination, afin de départager un classement final sur plusieurs rondes.</td></tr><tr><td><strong>Suisse + Top Cut</strong></td><td>Format hybride en deux phases. Phase 1 : un nombre défini de rondes suisses classiques permettent d'établir un classement général. Phase 2 (« Top Cut ») : les meilleurs joueurs du classement (Top 4, 8, 16 ou 32 selon le choix fait au lancement du tournoi) s'affrontent en élimination directe pour désigner le vainqueur final. Les joueurs non qualifiés passent au statut « Éliminé (Cut) » et ne participent plus. En cas d'égalité parfaite sur la ligne de coupure, l'organisateur doit désigner manuellement le ou les qualifiés restants avant de lancer le bracket.</td></tr><tr><td><strong>Éliminé (Cut)</strong></td><td>Statut attribué automatiquement à un joueur qui n'a pas été retenu dans le Top Cut à l'issue des rondes suisses, dans un tournoi au format hybride. Il ne participe plus aux rondes suivantes mais reste visible dans l'historique et le classement final.</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -471,6 +471,13 @@
             <span class="card-title">Joueurs</span>
             <div style="display:flex;gap:8px;align-items:center">
               <input type="text" class="form-input" style="width:200px" placeholder="🔍 Rechercher..." oninput="filterPlayers(this.value)">
+              <select class="form-input" style="width:auto" id="players-sort-select" onchange="setPlayersSort(this.value)" title="Trier la liste des joueurs">
+                <option value="name-asc">Nom (A→Z)</option>
+                <option value="name-desc">Nom (Z→A)</option>
+                <option value="faction-asc">Faction (A→Z)</option>
+                <option value="status">Statut</option>
+                <option value="rank">Classement (points)</option>
+              </select>
               <button class="btn btn-primary btn-sm" id="btn-add-player" onclick="openAddPlayer()">+ Ajouter</button>
               <button class="btn btn-secondary btn-sm" id="btn-checkin-all" onclick="checkinAllPlayers()" title="Passer tous les joueurs inscrits/préinscrits en statut Actif">✓ Tout Actif</button>
               <button class="btn btn-secondary btn-sm" onclick="openModal('modal-import')">Import CSV</button>
@@ -544,7 +551,22 @@
           <option value="swiss">Suisse (automatique)</option>
           <option value="manual">Manuel (je choisis les tables moi-même)</option>
           <option value="bracket">Élimination directe</option>
+          <option value="hybrid">Suisse + Top Cut (élimination finale)</option>
         </select>
+      </div>
+      <div id="nt-hybrid-options" style="display:none;background:var(--bg2);border:1px solid var(--accent2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+        <label class="form-label">Taille du Top Cut (nombre de qualifiés)</label>
+        <select class="form-input" id="nt-cut-size">
+          <option value="4">Top 4</option>
+          <option value="8" selected>Top 8</option>
+          <option value="16">Top 16</option>
+          <option value="32">Top 32</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+          <input type="checkbox" id="nt-third-place-hybrid" style="width:18px;height:18px;cursor:pointer;flex:0 0 auto">
+          <label for="nt-third-place-hybrid" style="cursor:pointer;font-size:0.85rem;font-weight:600">Petite finale (3ᵉ place)</label>
+        </div>
+        <div style="font-size:0.78rem;color:var(--text3);margin-top:6px">À l'issue des rondes suisses, les meilleurs joueurs du classement s'affrontent en élimination directe.</div>
       </div>
       <div id="nt-bracket-options" style="display:none;background:var(--bg2);border:1px solid var(--accent2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
         <div style="display:flex;align-items:center;gap:8px">
@@ -621,6 +643,16 @@
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('modal-new-tournament')">Annuler</button>
       <button class="btn btn-primary" onclick="createTournament()">Créer</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-topcut-confirm">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-title">🏆 Lancer le Top Cut</div>
+    <div id="tc-confirm-body" style="max-height:55vh;overflow-y:auto;margin-bottom:14px"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-topcut-confirm')">Annuler</button>
+      <button class="btn btn-primary" onclick="confirmTopCut()">✅ Confirmer et lancer</button>
     </div>
   </div>
 </div>
@@ -1166,12 +1198,16 @@ function onPairFormatChange(){
   var val=document.getElementById('nt-pair-format').value;
   var isBracket=(val==='bracket');
   var isManual=(val==='manual');
+  var isHybrid=(val==='hybrid');
   document.getElementById('nt-swiss-criteria').style.display=(isManual||isBracket)?'none':'block';
   var manualOpts=document.getElementById('nt-manual-options');
   if(manualOpts)manualOpts.style.display=isManual?'block':'none';
   var bracketOpts=document.getElementById('nt-bracket-options');
   if(bracketOpts)bracketOpts.style.display=isBracket?'block':'none';
+  var hybridOpts=document.getElementById('nt-hybrid-options');
+  if(hybridOpts)hybridOpts.style.display=isHybrid?'block':'none';
   if(!isBracket){var thirdCb=document.getElementById('nt-third-place');if(thirdCb)thirdCb.checked=false;}
+  if(!isHybrid){var thirdCbH=document.getElementById('nt-third-place-hybrid');if(thirdCbH)thirdCbH.checked=false;}
   if(!isManual){var prepCb=document.getElementById('nt-prep-all-rounds');if(prepCb)prepCb.checked=false;}
   var roundsGroup=document.getElementById('nt-rounds');
   if(roundsGroup){
@@ -1193,7 +1229,7 @@ function createTournament(){
   if(!valid){toast('Merci de remplir les champs obligatoires','warning');return;}
   const freeScore=document.getElementById('nt-freescore').value.trim();
   const dateEnd=document.getElementById('nt-date-end').value;
-  const t={id:uid(),name,rounds:parseInt(roundsVal)||4,date:document.getElementById('nt-date').value,dateEnd:dateEnd||null,listSize:parseInt(document.getElementById('nt-listsize').value)||2000,gameSystemId:gsVal,scoring:{win:parseInt(document.getElementById('nt-win').value)||3,draw:parseInt(document.getElementById('nt-draw').value)||1,loss:parseInt(document.getElementById('nt-loss').value)||0},freeScoreName:freeScore||null,notes:document.getElementById('nt-notes').value,compoPairing:document.getElementById('nt-compo-pairing').checked,pairFormat:document.getElementById('nt-pair-format').value,secondaryCriteria:{compo:document.getElementById('nt-compo-pairing').checked,free:document.getElementById('nt-free-pairing').checked?document.getElementById('nt-free-pairing-mode').value:'none',allegiance:document.getElementById('nt-allegiance-pairing').checked,mirror:document.getElementById('nt-no-mirror').checked}, noteMatchCriteria:document.getElementById('nt-free-pairing').checked?document.getElementById('nt-free-pairing-mode').value:'none',thirdPlaceMatch:document.getElementById('nt-pair-format').value==='bracket'&&document.getElementById('nt-third-place')?document.getElementById('nt-third-place').checked:false,status:'waiting',players:[],roundsData:[],currentRound:0,createdAt:new Date().toISOString(),awards:[]};
+  const t={id:uid(),name,rounds:parseInt(roundsVal)||4,date:document.getElementById('nt-date').value,dateEnd:dateEnd||null,listSize:parseInt(document.getElementById('nt-listsize').value)||2000,gameSystemId:gsVal,scoring:{win:parseInt(document.getElementById('nt-win').value)||3,draw:parseInt(document.getElementById('nt-draw').value)||1,loss:parseInt(document.getElementById('nt-loss').value)||0},freeScoreName:freeScore||null,notes:document.getElementById('nt-notes').value,compoPairing:document.getElementById('nt-compo-pairing').checked,pairFormat:document.getElementById('nt-pair-format').value,secondaryCriteria:{compo:document.getElementById('nt-compo-pairing').checked,free:document.getElementById('nt-free-pairing').checked?document.getElementById('nt-free-pairing-mode').value:'none',allegiance:document.getElementById('nt-allegiance-pairing').checked,mirror:document.getElementById('nt-no-mirror').checked}, noteMatchCriteria:document.getElementById('nt-free-pairing').checked?document.getElementById('nt-free-pairing-mode').value:'none',thirdPlaceMatch:document.getElementById('nt-pair-format').value==='bracket'&&document.getElementById('nt-third-place')?document.getElementById('nt-third-place').checked:(document.getElementById('nt-pair-format').value==='hybrid'&&document.getElementById('nt-third-place-hybrid')?document.getElementById('nt-third-place-hybrid').checked:false),status:'waiting',players:[],roundsData:[],currentRound:0,createdAt:new Date().toISOString(),awards:[],hybridPhase:document.getElementById('nt-pair-format').value==='hybrid'?'swiss':null,cutSize:document.getElementById('nt-pair-format').value==='hybrid'&&document.getElementById('nt-cut-size')?parseInt(document.getElementById('nt-cut-size').value):null,cutSeeds:[],cutStartIndex:null};
   const prepAll = t.pairFormat==='manual' && document.getElementById('nt-prep-all-rounds') && document.getElementById('nt-prep-all-rounds').checked;
   t.prepAllRoundsOption = prepAll;
   S.tournaments.unshift(t);closeModal('modal-new-tournament');document.getElementById('nt-name').value='';document.getElementById('nt-freescore').value='';document.getElementById('nt-date-end').value='';setActiveT(t.id);
@@ -1363,6 +1399,40 @@ function renderSidebar(){
 }
 
 // PLAYERS
+var playersSortMode = playersSortMode || 'name-asc';
+function setPlayersSort(val){
+  playersSortMode = val;
+  renderPlayers(document.querySelector('#panel-joueurs input[type="text"]')?document.querySelector('#panel-joueurs input[type="text"]').value:'');
+}
+function sortPlayersList(players, t, mode){
+  const statusOrder={active:0,inscrit:1,preinscrit:2,absent:3,eliminated_cut:4,dropped:5};
+  const arr=players.slice();
+  if(mode==='name-asc'){
+    arr.sort(function(a,b){return a.name.localeCompare(b.name,'fr',{sensitivity:'base'});});
+  } else if(mode==='name-desc'){
+    arr.sort(function(a,b){return b.name.localeCompare(a.name,'fr',{sensitivity:'base'});});
+  } else if(mode==='faction-asc'){
+    arr.sort(function(a,b){return (a.faction||'').localeCompare(b.faction||'','fr',{sensitivity:'base'}) || a.name.localeCompare(b.name,'fr',{sensitivity:'base'});});
+  } else if(mode==='status'){
+    arr.sort(function(a,b){
+      var oa=statusOrder[normalizePlayerStatus(a.status)]!==undefined?statusOrder[normalizePlayerStatus(a.status)]:statusOrder[a.status]!==undefined?statusOrder[a.status]:9;
+      var ob=statusOrder[normalizePlayerStatus(b.status)]!==undefined?statusOrder[normalizePlayerStatus(b.status)]:statusOrder[b.status]!==undefined?statusOrder[b.status]:9;
+      return oa-ob || a.name.localeCompare(b.name,'fr',{sensitivity:'base'});
+    });
+  } else if(mode==='rank'){
+    try{
+      var standings=getStandings(t);
+      var rankMap={};
+      standings.forEach(function(s,i){rankMap[s.id]=i;});
+      arr.sort(function(a,b){
+        var ra=rankMap[a.id]!==undefined?rankMap[a.id]:9999;
+        var rb=rankMap[b.id]!==undefined?rankMap[b.id]:9999;
+        return ra-rb;
+      });
+    }catch(e){}
+  }
+  return arr;
+}
 function renderPlayers(filter=''){
   const t=getActiveT();if(!t)return;
   const locked=t.status!=='waiting';
@@ -1372,7 +1442,8 @@ function renderPlayers(filter=''){
     var showPrep = t.pairFormat==='manual' && t.prepAllRoundsOption===true && t.roundsData.length===0 && t.players.filter(function(p){return p.status==='active';}).length>=2;
     prepBtn.style.display = showPrep ? '' : 'none';
   }
-  const players=t.players.filter(p=>!filter||p.name.toLowerCase().includes(filter.toLowerCase())||(p.faction||'').toLowerCase().includes(filter.toLowerCase()));
+  const filteredPlayers=t.players.filter(p=>!filter||p.name.toLowerCase().includes(filter.toLowerCase())||(p.faction||'').toLowerCase().includes(filter.toLowerCase()));
+  const players=sortPlayersList(filteredPlayers, t, playersSortMode);
   const tbody=document.getElementById('players-tbody');
   if(!players.length){tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">Aucun joueur</div></div></td></tr>`;return;}
   tbody.innerHTML=players.map((p,i)=>`<tr><td>${i+1}</td><td><strong>${escapeHtml(p.name)}</strong>${(t.awards||[]).filter(a=>a.playerId===p.id).map(a=>`<span title="${a.name}" style="cursor:default;margin-left:4px">⭐</span>`).join('')}${p.penalties&&p.penalties.length?`<span title="Bonus/Malus appliqué" style="cursor:default;margin-left:4px">⚖️</span>`:''}`+(p.note?'<br><span style="font-size:0.72rem;color:var(--text3)">'+escapeHtml(p.note)+'</span>':'')+(()=>{const bc=(t.blocks||[]).filter(b=>b.p1===p.id||b.p2===p.id).length;return bc?' <span class="badge badge-warning" title="Blocages actifs">🚫'+bc+'</span>':'';})()+`</td><td><span style="color:var(--accent2)">${escapeHtml(p.faction)||'—'}</span></td><td>${p.compo!=null?p.compo:'—'}</td><td><select class="form-input" style="padding:4px 8px;font-size:0.78rem;width:auto" onchange="setPlayerStatus('${p.id}',this.value)"><option value="preinscrit" ${normalizePlayerStatus(p.status)==='preinscrit'?'selected':''}>Préinscrit</option><option value="inscrit" ${normalizePlayerStatus(p.status)==='inscrit'?'selected':''}>Inscrit</option><option value="active" ${normalizePlayerStatus(p.status)==='active'?'selected':''}>Actif</option><option value="absent" ${normalizePlayerStatus(p.status)==='absent'?'selected':''}>Forfait</option><option value="dropped" ${normalizePlayerStatus(p.status)==='dropped'?'selected':''}>❌ Drop</option></select></td><td><button class="btn btn-secondary btn-sm" onclick="openEditPlayer('${p.id}')">✏️</button> <button class="btn btn-warning btn-sm" onclick="openPenalty('${p.id}')" title="Bonus / Malus">⚖️</button> <button class="btn btn-secondary btn-sm" onclick="openBlockModal('${p.id}')" title="Bloquer avec...">🚫</button> ${!locked?(p.status!=='dropped'?`<button style="background:rgba(231,76,60,0.15);border:1px solid var(--danger);color:var(--danger);border-radius:6px;padding:4px 8px;font-size:0.78rem;cursor:pointer" onclick="dropPlayer('${p.id}')" title="Drop">❌</button>`:`<button class="btn btn-secondary btn-sm" onclick="undropPlayer('${p.id}')" title="Réactiver">↩️</button>`)+` <button class="btn btn-danger btn-sm" onclick="deletePlayer('${p.id}')">🗑️</button>`:''}</td></tr>`).join('');
@@ -1778,7 +1849,8 @@ function seedOrder(n){
   return res;
 }
 function nextPow2(n){let p=1;while(p<n)p*=2;return p;}
-function isBracketFormat(t){ return t.pairFormat==='bracket'; }
+function isBracketFormat(t){ return t.pairFormat==='bracket' || (t.pairFormat==='hybrid' && t.hybridPhase==='cut'); }
+function isHybridFormat(t){ return t.pairFormat==='hybrid'; }
 
 function bracketRoundColTitle(matchCount){
   if(matchCount===1)return 'Finale';
@@ -1788,6 +1860,9 @@ function bracketRoundColTitle(matchCount){
 }
 
 function getSeededActivePlayers(tournament){
+  if(tournament.pairFormat==='hybrid' && tournament.cutSeeds && tournament.cutSeeds.length){
+    return tournament.cutSeeds.map(function(id){return tournament.players.find(function(p){return p.id===id;});}).filter(Boolean);
+  }
   const active=tournament.players.filter(p=>p.status==='active');
   return active.slice();
 }
@@ -1795,17 +1870,19 @@ function getSeededActivePlayers(tournament){
 function generateBracketRound1(tournament){
   const seeded=getSeededActivePlayers(tournament);
   if(seeded.length<2)return null;
+  const isAvail=function(p){return p && p.status!=='dropped';};
   const size=nextPow2(seeded.length);
   const order=seedOrder(size);
   const slots=order.map(seedNum=>seeded[seedNum-1]||null);
   const matches=[];
   for(let i=0;i<slots.length;i+=2){
-    const p1=slots[i],p2=slots[i+1];
-    if(p1&&p2){
+    let p1=slots[i],p2=slots[i+1];
+    const p1ok=isAvail(p1), p2ok=isAvail(p2);
+    if(p1ok&&p2ok){
       matches.push({p1:p1.id,p2:p2.id,result:null,s1:0,s2:0,f1:0,f2:0,table:matches.length+1});
-    } else if(p1&&!p2){
+    } else if(p1ok&&!p2ok){
       matches.push({p1:p1.id,p2:null,bye:true,result:'bye',byeScenario:0,byeFree:0,table:matches.length+1});
-    } else if(!p1&&p2){
+    } else if(!p1ok&&p2ok){
       matches.push({p1:p2.id,p2:null,bye:true,result:'bye',byeScenario:0,byeFree:0,table:matches.length+1});
     }
   }
@@ -1814,22 +1891,34 @@ function generateBracketRound1(tournament){
 
 function generateBracketNextRound(tournament, bracketKey){
   bracketKey = bracketKey || 'main';
-  const rounds = tournament.roundsData.filter(r=>(r.bracketKey||'main')===bracketKey);
+  const cutStartGBNR = (tournament.pairFormat==='hybrid' && typeof tournament.cutStartIndex==='number') ? tournament.cutStartIndex : 0;
+  const rounds = tournament.roundsData.slice(cutStartGBNR).filter(r=>(r.bracketKey||'main')===bracketKey);
   if(!rounds.length)return null;
   const lastRound = rounds[rounds.length-1];
+  const pm={};tournament.players.forEach(function(p){pm[p.id]=p;});
+  const isAvailGBNR=function(id){ var p=pm[id]; return p && p.status!=='dropped'; };
   const winners = [];
   lastRound.matches.forEach(m=>{
     if(m.bye){ winners.push(m.p1); return; }
     if(m.result==='p1')winners.push(m.p1);
     else if(m.result==='p2')winners.push(m.p2);
   });
-  if(winners.length<2)return winners.length===1?'FINAL_WINNER:'+winners[0]:null;
+  const availableWinners = winners.filter(isAvailGBNR);
+  const droppedWinners = winners.filter(function(id){return !isAvailGBNR(id);});
+  if(droppedWinners.length>0){
+    droppedWinners.forEach(function(id){
+      var p=pm[id];
+      toast((p?p.name:'Un joueur qualifié')+' a été droppé et reçoit un bye au tour suivant.','warning',5000);
+    });
+  }
+  if(availableWinners.length<1)return null;
+  if(availableWinners.length<2)return 'FINAL_WINNER:'+availableWinners[0];
   const matches=[];
-  for(let i=0;i<winners.length;i+=2){
-    if(winners[i+1]!==undefined){
-      matches.push({p1:winners[i],p2:winners[i+1],result:null,s1:0,s2:0,f1:0,f2:0,table:matches.length+1});
+  for(let i=0;i<availableWinners.length;i+=2){
+    if(availableWinners[i+1]!==undefined){
+      matches.push({p1:availableWinners[i],p2:availableWinners[i+1],result:null,s1:0,s2:0,f1:0,f2:0,table:matches.length+1});
     } else {
-      matches.push({p1:winners[i],p2:null,bye:true,result:'bye',byeScenario:0,byeFree:0,table:matches.length+1});
+      matches.push({p1:availableWinners[i],p2:null,bye:true,result:'bye',byeScenario:0,byeFree:0,table:matches.length+1});
     }
   }
   return matches;
@@ -1845,13 +1934,119 @@ function generateBracketNextRound(tournament, bracketKey){
 
 
 // ROUNDS
+function computeCutStandings(t){
+  return getStandings(t).filter(function(s){
+    var p=t.players.find(function(pp){return pp.id===s.id;});
+    return p&&p.status==='active';
+  });
+}
+function tiedKey(s){ return s.pts+'|'+s.scenario+'|'+(s.free||0)+'|'+s.sos; }
+function findCutTies(t,cutSize){
+  var standings=computeCutStandings(t);
+  if(standings.length<=cutSize)return {ties:[],slotsLeft:0,qualifiedCount:standings.length};
+  var borderlineKey=tiedKey(standings[cutSize-1]);
+  var tiedGroup=standings.filter(function(s){return tiedKey(s)===borderlineKey;});
+  if(tiedGroup.length<=1)return {ties:[],slotsLeft:0,qualifiedCount:cutSize};
+  var aboveCount=0;
+  for(var i=0;i<standings.length;i++){
+    if(tiedKey(standings[i])===borderlineKey)break;
+    aboveCount++;
+  }
+  var slotsLeft=cutSize-aboveCount;
+  return {ties:tiedGroup,slotsLeft:slotsLeft,qualifiedCount:aboveCount};
+}
+function needsManualPick(ties,slotsLeft){
+  return ties.length>0 && slotsLeft<ties.length && slotsLeft>0;
+}
+function openTopCutConfirm(){
+  var t=getActiveT();if(!t)return;
+  var cutSize=Math.min(t.cutSize||8, computeCutStandings(t).length);
+  var tieInfo=findCutTies(t,cutSize);
+  var standings=computeCutStandings(t);
+  var manualNeeded=needsManualPick(tieInfo.ties,tieInfo.slotsLeft);
+  var body=document.getElementById('tc-confirm-body');
+  var qualifiedIds=standings.slice(0,tieInfo.qualifiedCount).map(function(s){return s.id;});
+  var html='<div style="margin-bottom:10px;font-size:0.85rem;color:var(--text2)">Top '+cutSize+' — classement suisse final :</div>';
+  html+='<table class="data-table" style="width:100%;font-size:0.85rem"><thead><tr><th>Rang</th><th>Joueur</th><th>Pts</th><th>Scénario</th><th>SOS</th><th>Statut</th></tr></thead><tbody>';
+  standings.forEach(function(s,i){
+    var isTied=tieInfo.ties.some(function(x){return x.id===s.id;});
+    var qualified = i<tieInfo.qualifiedCount;
+    var rowStyle = isTied? 'background:rgba(255,193,7,0.12)' : '';
+    var statusCell;
+    if(manualNeeded && isTied){
+      statusCell='<input type="checkbox" class="tc-pick" data-id="'+s.id+'" style="width:16px;height:16px;cursor:pointer">';
+    } else if(!manualNeeded && isTied){
+      statusCell = (i<cutSize) ? '✅ Qualifié (égalité résolue)' : '❌ Non qualifié';
+    } else {
+      statusCell = qualified ? '✅ Qualifié' : '❌ Non qualifié';
+    }
+    html+='<tr style="'+rowStyle+'"><td>'+(i+1)+'</td><td>'+escapeHtml(s.name)+'</td><td>'+s.pts+'</td><td>'+s.scenario+'</td><td>'+s.sos+'</td><td>'+statusCell+'</td></tr>';
+  });
+  html+='</tbody></table>';
+  if(manualNeeded){
+    html+='<div style="margin-top:12px;padding:10px;background:rgba(255,193,7,0.15);border-radius:8px;font-size:0.85rem">⚠️ '+tieInfo.ties.length+' joueurs sont à égalité parfaite pour '+tieInfo.slotsLeft+' place(s) restante(s). Cochez exactement '+tieInfo.slotsLeft+' joueur(s) parmi les personnes à égalité pour compléter le Top '+cutSize+'.</div>';
+  } else if(tieInfo.ties.length>0){
+    html+='<div style="margin-top:12px;padding:10px;background:rgba(76,175,80,0.15);border-radius:8px;font-size:0.85rem">ℹ️ '+tieInfo.ties.length+' joueurs sont à égalité, mais le nombre de places restantes correspond exactement : tous qualifient automatiquement.</div>';
+  }
+  body.innerHTML=html;
+  body.dataset.cutSize=cutSize;
+  body.dataset.slotsLeft=tieInfo.slotsLeft;
+  body.dataset.manualNeeded=manualNeeded?'1':'0';
+  body.dataset.qualifiedIds=JSON.stringify(qualifiedIds);
+  body.dataset.tieIds=JSON.stringify(tieInfo.ties.map(function(x){return x.id;}));
+  openModal('modal-topcut-confirm');
+}
+function confirmTopCut(){
+  var t=getActiveT();if(!t)return;
+  var body=document.getElementById('tc-confirm-body');
+  var cutSize=parseInt(body.dataset.cutSize);
+  var slotsLeft=parseInt(body.dataset.slotsLeft);
+  var manualNeeded=body.dataset.manualNeeded==='1';
+  var qualifiedIds=JSON.parse(body.dataset.qualifiedIds||'[]');
+  var tieIds=JSON.parse(body.dataset.tieIds||'[]');
+  var finalQualified=qualifiedIds.slice();
+  if(manualNeeded){
+    var checked=Array.from(document.querySelectorAll('.tc-pick:checked')).map(function(el){return el.dataset.id;});
+    if(checked.length!==slotsLeft){
+      toast('Veuillez cocher exactement '+slotsLeft+' joueur(s) pour compléter le Top '+cutSize,'warning');
+      return;
+    }
+    finalQualified=finalQualified.concat(checked);
+  } else if(tieIds.length>0){
+    finalQualified=finalQualified.concat(tieIds).slice(0,cutSize);
+  }
+  if(finalQualified.length!==cutSize){
+    toast('Erreur interne : nombre de qualifiés incorrect ('+finalQualified.length+' au lieu de '+cutSize+'). Lancement annulé.','error');
+    return;
+  }
+  var standings=computeCutStandings(t);
+  var seeded=standings.filter(function(s){return finalQualified.indexOf(s.id)!==-1;});
+  seeded.sort(function(a,b){return finalQualified.indexOf(a.id)-finalQualified.indexOf(b.id);});
+  var eliminatedCount=0;
+  t.players.forEach(function(p){
+    if(finalQualified.indexOf(p.id)===-1 && p.status==='active'){
+      p.status='eliminated_cut';
+      eliminatedCount++;
+    }
+  });
+  t.cutSeeds=seeded.map(function(s){return s.id;});
+  t.cutStartIndex=t.roundsData.length;
+  t.hybridPhase='cut';
+  t.status='active';
+  closeModal('modal-topcut-confirm');
+  renderTopbar();renderSidebar();renderRounds();renderClassement();save();
+  toast('🏆 Top '+cutSize+' qualifié ! '+eliminatedCount+' joueur(s) éliminé(s), le bracket peut être lancé.','success');
+}
 function renderRounds(){
   const t=getActiveT();if(!t)return;
   const nav=document.getElementById('rounds-nav'),content=document.getElementById('rounds-content');
   let navHtml='';
   for(let i=0;i<t.roundsData.length;i++){const r=t.roundsData[i];const pending=r.validated?0:r.matches.filter(m=>!m.bye&&m.result===null).length;navHtml+=`<button class="btn ${r.validated?'btn-secondary':'btn-primary'} btn-sm" onclick="viewRound(${i})">${r.validated?'🔒':'⚔️'} Ronde ${i+1}${!r.validated&&pending>0?` (${pending})`:''}${r.validated?' ✓':''}</button>`;}
-  const canStart=t.status!=='finished'&&t.status!=='completed'&&(t.roundsData.length===0||t.roundsData[t.roundsData.length-1]?.validated)&&(isBracketFormat(t)||t.roundsData.length<t.rounds);
-  if(canStart&&t.players.filter(p=>p.status==='active').length>=2)navHtml+=`<button class="btn btn-primary btn-sm" onclick="startNewRound()">▶ Lancer ronde ${t.roundsData.length+1}</button>`;
+  const swissRoundsValidatedCount=t.roundsData.filter(function(r){return r.validated;}).length;
+  const isHybridSwissDone = t.pairFormat==='hybrid' && t.hybridPhase==='swiss' && swissRoundsValidatedCount>=t.rounds && (t.roundsData.length===0||t.roundsData[t.roundsData.length-1]?.validated);
+  const canStart=t.status!=='finished'&&t.status!=='completed'&&!isHybridSwissDone&&(t.roundsData.length===0||t.roundsData[t.roundsData.length-1]?.validated)&&(isBracketFormat(t)||t.roundsData.length<t.rounds);
+  if(isHybridSwissDone)navHtml+=`<button class="btn btn-primary btn-sm" onclick="openTopCutConfirm()">🏆 Lancer le Top Cut</button>`;
+  else if(canStart&&t.players.filter(p=>p.status==='active').length>=2)navHtml+=`<button class="btn btn-primary btn-sm" onclick="startNewRound()">▶ Lancer ronde ${t.roundsData.length+1}</button>`;
   if(isBracketFormat(t)&&t.roundsData.length>0)navHtml+=`<button class="btn btn-secondary btn-sm" onclick="showBracketView()">🌳 Voir le tableau</button>`;
   navHtml+=`<button class="btn btn-secondary btn-sm" onclick="printAllRoundsRecap()" style="margin-left:auto">📄 Récap</button><button class="btn btn-secondary btn-sm" onclick="openModal('modal-timer')" style="margin-left:8px">⏱ ${timer.active?'Modifier':'Lancer'} timer</button>`;
   nav.innerHTML=navHtml;renderTimerPanel();
@@ -1950,7 +2145,7 @@ function startNewRound(manual){
   var t=getActiveT(),idx=t.roundsData.length;
   if(t.players.filter(function(p){return p.status==='active';}).length<2){toast('Pas assez de joueurs','warning');return;}
   pendingManualRound=manual===true||t.pairFormat==='manual';
-  var notActive=t.players.filter(function(p){return p.status!=='active';});
+  var notActive=t.players.filter(function(p){return p.status!=='active'&&p.status!=='eliminated_cut';});
   if(notActive.length>0){
     var statusLabels={preinscrit:'Préinscrit',inscrit:'Inscrit',absent:'Forfait',dropped:'Drop'};
     var listStr=notActive.map(function(p){return p.name+' ('+(statusLabels[p.status]||p.status)+')';}).join(', ');
@@ -1963,7 +2158,8 @@ function _startNewRoundProceed(idx){
   var t=getActiveT();
   pendingRoundIdx=idx;
   if(t&&isBracketFormat(t)){
-    var matches = idx===0? generateBracketRound1(t) : generateBracketNextRound(t);
+    var isFirstBracketRound = (t.pairFormat==='hybrid' && typeof t.cutStartIndex==='number') ? (idx===t.cutStartIndex) : (idx===0);
+    var matches = isFirstBracketRound? generateBracketRound1(t) : generateBracketNextRound(t);
     if(typeof matches==='string'&&matches.indexOf('FINAL_WINNER:')===0){
       var winnerId=matches.split(':')[1];
       var wp=t.players.find(function(p){return p.id===winnerId;});
@@ -2006,8 +2202,10 @@ function _startNewRoundProceed(idx){
 }
 
 function computeBracketRoundLabel(t, idx){
-  var mainRounds=t.roundsData.filter(function(r){return (r.bracketKey||'main')==='main';});
-  var remainingAfter = idx===0
+  var cutStartLbl = (t.pairFormat==='hybrid' && typeof t.cutStartIndex==='number') ? t.cutStartIndex : 0;
+  var mainRounds=t.roundsData.slice(cutStartLbl).filter(function(r){return (r.bracketKey||'main')==='main';});
+  var isFirstBracketRoundLbl = (t.pairFormat==='hybrid' && typeof t.cutStartIndex==='number') ? (idx===t.cutStartIndex) : (idx===0);
+  var remainingAfter = isFirstBracketRoundLbl
     ? nextPow2(t.players.filter(function(p){return p.status==='active';}).length)/2
     : (function(){
         var last=mainRounds[mainRounds.length-1];
@@ -2100,7 +2298,9 @@ function renderBracketTree(t){
     return round.scenarioName || bracketRoundColTitle(round.matches.filter(function(m){return !m.bye;}).length || round.matches.length);
   };
 
-  var mainRounds=t.roundsData.filter(function(r){return (r.bracketKey||'main')==='main';});
+  var cutStart = (t.pairFormat==='hybrid' && typeof t.cutStartIndex==='number') ? t.cutStartIndex : 0;
+  var bracketRounds = t.roundsData.slice(cutStart);
+  var mainRounds=bracketRounds.filter(function(r){return (r.bracketKey||'main')==='main';});
   if(!mainRounds.length)return '<p style="color:var(--text3);text-align:center">Aucune ronde lancée pour le moment.</p>';
   var html=svgRenderSingleTree(mainRounds, pm, titleFn);
   var lastRound=mainRounds[mainRounds.length-1];
@@ -2153,6 +2353,8 @@ function confirmValidate(){const t=getActiveT(),idx=validateIdx;const alerts=get
       toast('🏆 '+(wp?wp.name:'Le vainqueur')+' remporte le tournoi !','success');
       return;
     }
+  } else if(t.pairFormat==='hybrid'){
+    // Rondes suisses terminées : on attend le lancement manuel du Top Cut, ne jamais clôturer le tournoi ici.
   } else if(t.roundsData.filter(function(r){return r.validated;}).length>=t.rounds){ t.status='finished'; }
   closeModal('modal-validate');renderTopbar();renderSidebar();renderRounds();renderClassement();save();toast(`Ronde ${idx+1} validée !`,'success');}
 
@@ -2573,7 +2775,7 @@ function renderParams(){
     </div>
     <div class="section-block" style="margin-top:4px;margin-bottom:14px">
       <div style="font-weight:700;font-size:0.9rem;margin-bottom:10px">⚔️ Appariement</div>
-      <div style="font-size:0.85rem;color:var(--text2);margin-bottom:10px">Base d'appairage : <strong>${({swiss:'Suisse',manual:'Manuel',bracket:'Élimination directe'})[t.pairFormat]||'Suisse'}</strong></div>${t.pairFormat==='bracket' ? `
+      <div style="font-size:0.85rem;color:var(--text2);margin-bottom:10px">Base d'appairage : <strong>${({swiss:'Suisse',manual:'Manuel',bracket:'Élimination directe',hybrid:'Suisse + Top Cut'})[t.pairFormat]||'Suisse'}</strong>${t.pairFormat==='hybrid'&&t.cutSize?' <span style="color:var(--text3)">(Top '+t.cutSize+')</span>':''}</div>${(t.pairFormat==='bracket'||t.pairFormat==='hybrid') ? `
       <div class="form-group" style="background:var(--bg2);border:1px solid var(--accent2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
         <div style="display:flex;align-items:center;gap:8px">
           <input type="checkbox" id="param-third-place" ${t.thirdPlaceMatch?'checked':''} ${t.roundsData&&t.roundsData.length>0?'disabled':''} style="width:18px;height:18px;cursor:pointer;flex:0 0 auto" onchange="updParam('thirdPlaceMatch',this.checked)">
@@ -2583,7 +2785,7 @@ function renderParams(){
         </div>
         <div style="font-size:0.75rem;color:var(--text3);margin-left:28px;margin-top:2px">${t.roundsData&&t.roundsData.length>0?'Verrouillé : des rondes existent déjà.':'Ajoute un match entre les deux perdants de demi-finale.'}</div>
       </div>
-    ` : ''}${t.pairFormat==='swiss' ? `
+    ` : ''}${(t.pairFormat==='swiss'||t.pairFormat==='hybrid') ? `
       <div class="form-group">
         <div style="display:flex;align-items:center;gap:8px">
           <input type="checkbox" id="param-compo-pairing" ${t.compoPairing?'checked':''} style="width:18px;height:18px;cursor:pointer;flex:0 0 auto" onchange="updParam('compoPairing',this.checked)">
