@@ -1,6 +1,7 @@
 <!--
   Tournoi Manager
-  © Adrien Gilbert — tous droits réservés.
+  © Adrien Gilbert
+  Distribué sous licence GNU GPL v3.0 — voir https://www.gnu.org/licenses/gpl-3.0.html
   Signature de build : TM4-ORIG-2026
 -->
 <!DOCTYPE html>
@@ -8,7 +9,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="author" content="Adrien Gilbert">
-<meta name="copyright" content="Tous droits réservés">
+<meta name="copyright" content="GNU GPL v3.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wargame Tournoi Manager</title>
 <style>
@@ -261,6 +262,7 @@
       <div class="t-badge-status" id="tb-status">—</div>
       <div class="t-badge-summary" id="tb-summary"></div>
     </div>
+    <button class="btn btn-secondary btn-sm" id="tb-reset-waiting" style="display:none" onclick="resetTournamentToWaiting()" title="Repasser le tournoi en attente pour réautoriser l'édition des joueurs">↺ Repasser en attente</button>
   </div>
   <div id="timer-badge">
     <span>⏱</span>
@@ -333,14 +335,26 @@
 
           <div class="info-panel active" id="info-panel-apropos">
             <h2 style="margin-top:0">🏆 Tournoi Manager</h2>
-            <p style="color:var(--text2)">Version actuelle : <strong>V1.9.13</strong></p>
+            <p style="color:var(--text2)">Version actuelle : <strong>V1.9.17</strong></p>
             <div class="divider"></div>
-            <h3>Notes légales</h3>
+            <h3>Licence</h3>
             <p style="color:var(--text2);font-size:0.9rem;line-height:1.6">
-              Ce logiciel, son code source, son design et sa documentation restent la propriété exclusive de son auteur.
-              Toute reproduction, distribution, modification ou exploitation commerciale sans autorisation écrite préalable est interdite.
-              Tous droits réservés.
+              Ce logiciel est distribué sous licence <strong>GNU General Public License v3.0 (GPLv3)</strong>.
+              Vous êtes libre de l'utiliser, l'étudier, le modifier et le redistribuer, à condition que toute
+              version modifiée ou dérivée reste également sous licence GPLv3 et que son code source demeure accessible.
+              Ce logiciel est fourni « tel quel », sans garantie d'aucune sorte.
+              Texte complet de la licence : <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener" style="color:var(--accent2)">gnu.org/licenses/gpl-3.0</a>.
             </p>
+            <div class="divider"></div>
+            <div style="background:var(--bg2);border:1px solid var(--accent2);border-radius:10px;padding:14px 16px;margin-top:6px">
+              <p style="color:var(--text2);font-size:0.9rem;line-height:1.6;margin:0 0 10px">
+                Ce logiciel est gratuit, sans publicité et sans compte. Si il vous est utile pour vos tournois, un café offert au développeur est toujours apprécié :
+              </p>
+              <a href="https://ko-fi.com/kugne" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#FF5E5B;color:#fff;font-weight:700;font-size:0.9rem;padding:8px 16px;border-radius:8px;text-decoration:none">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="#fff" aria-hidden="true"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324.665 11.322c.556 2.983 3.415 3.303 3.415 3.303s6.638.335 8.665-.02c.822-.144 1.535-.4 2.135-.729.336.169.71.256 1.108.256.85 0 1.559-.375 2.075-1.081.24.09.5.14.774.14 1.14 0 2.077-.94 2.077-2.084 0-.28-.055-.549-.155-.795 1.222-.34 2.28-1.135 2.98-2.283.6-.988.902-2.153.902-3.34 0-.24-.017-.478-.048-.712zm-4.6 3.677c-.257.42-.63.673-1.05.673-.06 0-.117-.005-.174-.014-.05.14-.117.273-.2.396-.318.474-.788.75-1.29.75-.284 0-.556-.086-.79-.238-.372.28-.83.44-1.318.44-.298 0-.582-.06-.845-.17-.442.507-1.1.86-1.85.86-1.343 0-2.44-1.09-2.44-2.44v-4.86h9.634c.017.145.026.293.026.443 0 1.503-.632 2.85-1.703 3.16z"/></svg>
+                Buy me a coffee sur Ko-fi
+              </a>
+            </div>
           </div>
 
           <div class="info-panel" id="info-panel-features" style="display:none">
@@ -358,6 +372,8 @@
               <li>Pénalités et prix spéciaux</li>
               <li>Statistiques de tournoi</li>
               <li>Timer de ronde intégré</li>
+              <li>Feuilles de table imprimables par ronde (format A5, une page par table, avec zone de résultat manuscrite)</li>
+              <li>Petite finale (3ᵉ place) optionnelle en mode élimination directe, opposant automatiquement les deux perdants de demi-finale</li>
               <li>Export CSV, PDF et JSON, ainsi qu'import JSON pour sauvegarde/restauration</li>
               <li>Gestion de plusieurs systèmes de jeu et scénarios</li>
             </ul>
@@ -414,6 +430,10 @@
             <p style="color:var(--text2);font-size:0.9rem">Une fois tous les résultats d'un tour saisis et la ronde validée, seuls les vainqueurs sont réappariés automatiquement deux par deux pour former le tour suivant. Ce processus se répète jusqu'à ce qu'il ne reste qu'un seul joueur invaincu : le champion du tournoi.</p>
             <h3>Nommage automatique des tours</h3>
             <p style="color:var(--text2);font-size:0.9rem">L'application nomme chaque tour selon le nombre de matchs restants : Finale (1 match), Demi-finales (2 matchs), Quarts de finale (4 matchs), ou « Tour de X » pour les tours plus larges.</p>
+            <h3>Petite finale (3ᵉ place)</h3>
+            <p style="color:var(--text2);font-size:0.9rem">En activant l'option « Petite finale (3ᵉ place) » lors de la création du tournoi (ou dans ses paramètres avant de lancer la première ronde), un match supplémentaire est automatiquement créé entre les deux perdants des demi-finales, en parallèle de la finale. Cette option est verrouillée dès qu'une ronde a été lancée.</p>
+            <h3>Feuilles de table imprimables</h3>
+            <p style="color:var(--text2);font-size:0.9rem">Depuis l'onglet Rondes, le bouton « 🖨️ Feuilles de table » génère une page imprimable par table (format A5), avec les noms des joueurs, leurs factions et une zone à remplir à la main pour le résultat. Disponible pour les rondes en cours comme pour les rondes déjà validées.</p>
             <h3>Visualiser le tableau</h3>
             <p style="color:var(--text2);font-size:0.9rem">Le bouton « 🌳 Voir le tableau » affiche l'arbre complet du tournoi sous forme de schéma, avec les vainqueurs de chaque match mis en évidence.</p>
             <h3>Fin de tournoi</h3>
@@ -452,6 +472,7 @@
             <div style="display:flex;gap:8px;align-items:center">
               <input type="text" class="form-input" style="width:200px" placeholder="🔍 Rechercher..." oninput="filterPlayers(this.value)">
               <button class="btn btn-primary btn-sm" id="btn-add-player" onclick="openAddPlayer()">+ Ajouter</button>
+              <button class="btn btn-secondary btn-sm" id="btn-checkin-all" onclick="checkinAllPlayers()" title="Passer tous les joueurs inscrits/préinscrits en statut Actif">✓ Tout Actif</button>
               <button class="btn btn-secondary btn-sm" onclick="openModal('modal-import')">Import CSV</button>
               <button class="btn btn-warning btn-sm" id="btn-prep-all-rounds" style="display:none" onclick="prepareAllManualRounds(getActiveT().id)">🗂️ Préparer toutes les rondes</button>
             </div>
@@ -524,6 +545,15 @@
           <option value="manual">Manuel (je choisis les tables moi-même)</option>
           <option value="bracket">Élimination directe</option>
         </select>
+      </div>
+      <div id="nt-bracket-options" style="display:none;background:var(--bg2);border:1px solid var(--accent2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="nt-third-place" style="width:18px;height:18px;cursor:pointer;flex:0 0 auto">
+          <label for="nt-third-place" style="cursor:pointer;font-size:0.85rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;line-height:1">
+            <span title="Ajoute un match entre les deux perdants de demi-finale pour désigner la 3ᵉ place">🥉 Petite finale (3ᵉ place)</span>
+          </label>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text3);margin-left:28px;margin-top:2px">Ajoute un match entre les deux perdants de demi-finale.</div>
       </div>
       <div id="nt-manual-options" style="display:none">
         <div class="form-group" style="display:flex;align-items:center;gap:10px">
@@ -859,7 +889,9 @@
 let S={tournaments:[],gameSystems:[{id:'default',name:'Standard',factions:[]}],scenarios:[],activeTId:null,view:'tournaments',_sig:'TM4-ORIG-2026'};
 let pendingRoundIdx=null,editPairingRoundIdx=null,pendingManualRound=false;
 let confirmCb=null,validateIdx=null,activeTab='joueurs',expandedPlayer=null;
-let timer={active:false,paused:false,total:0,remaining:0,interval:null,alerts:{30:false,20:false,10:false,0:false}};
+let timer={active:false,paused:false,total:0,remaining:0,interval:null,endsAt:null,alerts:{30:false,20:false,10:false,0:false}};
+let sharedAudioCtx=null;
+function getAudioCtx(){if(!sharedAudioCtx){try{sharedAudioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}return sharedAudioCtx;}
 
 let undoStack=[],lastSnapshot=null;
 const UNDO_LIMIT=20;
@@ -945,8 +977,24 @@ function toast(msg,type='info',dur=3000){
   document.getElementById('toast-c').appendChild(el);setTimeout(()=>el.remove(),dur);
 }
 
-function openModal(id){document.getElementById(id).classList.add('open');}
+function openModal(id){
+  const el=document.getElementById(id);
+  el.classList.add('open');
+  setTimeout(()=>{
+    const field=el.querySelector('input,select,textarea');
+    if(field)field.focus();
+  },50);
+}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    const openModals=document.querySelectorAll('.modal-overlay.open');
+    if(openModals.length){
+      const last=openModals[openModals.length-1];
+      last.classList.remove('open');
+    }
+  }
+});
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 function confirmAction(title,msg,cb,danger=true){
   document.getElementById('conf-title').textContent=title;document.getElementById('conf-msg').textContent=msg;
@@ -966,7 +1014,7 @@ function timerUpdateUI(){
   if(activeTab==='rondes')renderTimerPanel();
 }
 function timerPlaySound(freq,dur,times){
-  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();
+  try{const ctx=getAudioCtx();if(!ctx)return;
     for(let i=0;i<times;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=freq;g.gain.setValueAtTime(0.3,ctx.currentTime+i*0.4);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.4+dur);o.start(ctx.currentTime+i*0.4);o.stop(ctx.currentTime+i*0.4+dur);}
   }catch(e){}
 }
@@ -977,14 +1025,23 @@ function timerCheckAlerts(){
   if(min===10&&!timer.alerts[10]){timer.alerts[10]=true;toast('⚠️ 10 minutes restantes !','error',5000);timerPlaySound(880,0.3,3);}
   if(timer.remaining===0&&!timer.alerts[0]){timer.alerts[0]=true;toast('🔔 Temps écoulé !','error',8000);timerPlaySound(220,0.8,4);}
 }
-function timerTick(){if(timer.paused||!timer.active)return;if(timer.remaining>0){timer.remaining--;timerCheckAlerts();}timerUpdateUI();}
+function timerTick(){if(timer.paused||!timer.active)return;timer.remaining=Math.max(0,Math.round((timer.endsAt-Date.now())/1000));timerCheckAlerts();timerUpdateUI();}
 function timerStart(){
   const mins=parseInt(document.getElementById('timer-duration').value)||90;closeModal('modal-timer');
   if(timer.interval)clearInterval(timer.interval);
-  timer={active:true,paused:false,total:mins*60,remaining:mins*60,interval:null,alerts:{30:false,20:false,10:false,0:false}};
+  timer={active:true,paused:false,total:mins*60,remaining:mins*60,interval:null,endsAt:Date.now()+mins*60000,alerts:{30:false,20:false,10:false,0:false}};
   timer.interval=setInterval(timerTick,1000);timerUpdateUI();toast(`Timer lancé : ${mins} min`,'success');
 }
-function timerTogglePause(){if(!timer.active)return;timer.paused=!timer.paused;timerUpdateUI();toast(timer.paused?'Timer en pause':'Timer repris','info');}
+function timerTogglePause(){
+  if(!timer.active)return;
+  if(!timer.paused){
+    timer.paused=true;
+  } else {
+    timer.paused=false;
+    timer.endsAt=Date.now()+timer.remaining*1000;
+  }
+  timerUpdateUI();toast(timer.paused?'Timer en pause':'Timer repris','info');
+}
 function timerStop(){if(timer.interval)clearInterval(timer.interval);timer={active:false,paused:false,total:0,remaining:0,interval:null,alerts:{30:false,20:false,10:false,0:false}};timerUpdateUI();toast('Timer arrêté','info');}
 function renderTimerPanel(){
   const wrap=document.getElementById('timer-panel-wrap');if(!wrap)return;
@@ -1081,7 +1138,7 @@ function saveGS(){
   }).filter(Boolean);
   const editId=document.getElementById('gs-edit-id').value;
   if(editId){const gs=S.gameSystems.find(g=>g.id===editId);if(gs){gs.name=name;gs.factions=factions;gs.allegiances=allegiances;toast('Mis à jour','success');}}
-  else{S.gameSystems.push({id:Date.now().toString(),name,factions,allegiances});toast('Créé !','success');}
+  else{S.gameSystems.push({id:uid(),name,factions,allegiances});toast('Créé !','success');}
   closeModal('modal-gs');updateGSSelects();renderGSList();save();
 }
 function deleteGS(id){
@@ -1112,6 +1169,9 @@ function onPairFormatChange(){
   document.getElementById('nt-swiss-criteria').style.display=(isManual||isBracket)?'none':'block';
   var manualOpts=document.getElementById('nt-manual-options');
   if(manualOpts)manualOpts.style.display=isManual?'block':'none';
+  var bracketOpts=document.getElementById('nt-bracket-options');
+  if(bracketOpts)bracketOpts.style.display=isBracket?'block':'none';
+  if(!isBracket){var thirdCb=document.getElementById('nt-third-place');if(thirdCb)thirdCb.checked=false;}
   if(!isManual){var prepCb=document.getElementById('nt-prep-all-rounds');if(prepCb)prepCb.checked=false;}
   var roundsGroup=document.getElementById('nt-rounds');
   if(roundsGroup){
@@ -1133,7 +1193,7 @@ function createTournament(){
   if(!valid){toast('Merci de remplir les champs obligatoires','warning');return;}
   const freeScore=document.getElementById('nt-freescore').value.trim();
   const dateEnd=document.getElementById('nt-date-end').value;
-  const t={id:Date.now().toString(),name,rounds:parseInt(roundsVal)||4,date:document.getElementById('nt-date').value,dateEnd:dateEnd||null,listSize:parseInt(document.getElementById('nt-listsize').value)||2000,gameSystemId:gsVal,scoring:{win:parseInt(document.getElementById('nt-win').value)||3,draw:parseInt(document.getElementById('nt-draw').value)||1,loss:parseInt(document.getElementById('nt-loss').value)||0},freeScoreName:freeScore||null,notes:document.getElementById('nt-notes').value,compoPairing:document.getElementById('nt-compo-pairing').checked,pairFormat:document.getElementById('nt-pair-format').value,secondaryCriteria:{compo:document.getElementById('nt-compo-pairing').checked,free:document.getElementById('nt-free-pairing').checked?document.getElementById('nt-free-pairing-mode').value:'none',allegiance:document.getElementById('nt-allegiance-pairing').checked,mirror:document.getElementById('nt-no-mirror').checked}, noteMatchCriteria:document.getElementById('nt-free-pairing').checked?document.getElementById('nt-free-pairing-mode').value:'none',status:'waiting',players:[],roundsData:[],currentRound:0,createdAt:new Date().toISOString(),awards:[]};
+  const t={id:uid(),name,rounds:parseInt(roundsVal)||4,date:document.getElementById('nt-date').value,dateEnd:dateEnd||null,listSize:parseInt(document.getElementById('nt-listsize').value)||2000,gameSystemId:gsVal,scoring:{win:parseInt(document.getElementById('nt-win').value)||3,draw:parseInt(document.getElementById('nt-draw').value)||1,loss:parseInt(document.getElementById('nt-loss').value)||0},freeScoreName:freeScore||null,notes:document.getElementById('nt-notes').value,compoPairing:document.getElementById('nt-compo-pairing').checked,pairFormat:document.getElementById('nt-pair-format').value,secondaryCriteria:{compo:document.getElementById('nt-compo-pairing').checked,free:document.getElementById('nt-free-pairing').checked?document.getElementById('nt-free-pairing-mode').value:'none',allegiance:document.getElementById('nt-allegiance-pairing').checked,mirror:document.getElementById('nt-no-mirror').checked}, noteMatchCriteria:document.getElementById('nt-free-pairing').checked?document.getElementById('nt-free-pairing-mode').value:'none',thirdPlaceMatch:document.getElementById('nt-pair-format').value==='bracket'&&document.getElementById('nt-third-place')?document.getElementById('nt-third-place').checked:false,status:'waiting',players:[],roundsData:[],currentRound:0,createdAt:new Date().toISOString(),awards:[]};
   const prepAll = t.pairFormat==='manual' && document.getElementById('nt-prep-all-rounds') && document.getElementById('nt-prep-all-rounds').checked;
   t.prepAllRoundsOption = prepAll;
   S.tournaments.unshift(t);closeModal('modal-new-tournament');document.getElementById('nt-name').value='';document.getElementById('nt-freescore').value='';document.getElementById('nt-date-end').value='';setActiveT(t.id);
@@ -1233,7 +1293,10 @@ function saveManualPrepRound(showToast){
     }
     var p1El=document.getElementById('mp-p1-'+mi);
     var p2El=document.getElementById('mp-p2-'+mi);
-    return Object.assign({},m,{p1:p1El?p1El.value:m.p1, p2:p2El?p2El.value:m.p2});
+    var newP1=p1El?p1El.value:m.p1, newP2=p2El?p2El.value:m.p2;
+    var changed = (newP1!==m.p1) || (newP2!==m.p2);
+    var reset = changed ? {result:null,s1:0,s2:0,f1:0,f2:0} : {};
+    return Object.assign({},m,{p1:newP1, p2:newP2},reset);
   });
   var incomplete=newMatches.some(function(m){return !m.p1 || (!m.bye && !m.p2);});
   if(incomplete){toast('Ronde '+(idx+1)+' : toutes les tables doivent avoir leurs joueurs sélectionnés','warning');return false;}
@@ -1264,7 +1327,7 @@ function finishManualPrep(){
   renderRounds();
   toast('Préparation terminée, vous pouvez lancer le tournoi 🚀','success');
 }
-function duplicateT(id){const src=S.tournaments.find(x=>x.id===id);if(!src)return;const copy=JSON.parse(JSON.stringify(src));copy.id=Date.now().toString();copy.name+=' (copie)';copy.status='waiting';copy.roundsData=[];copy.currentRound=0;copy.createdAt=new Date().toISOString();S.tournaments.unshift(copy);setActiveT(copy.id);toast('Dupliqué','success');}
+function duplicateT(id){const src=S.tournaments.find(x=>x.id===id);if(!src)return;const copy=JSON.parse(JSON.stringify(src));copy.id=uid();copy.name+=' (copie)';copy.status='waiting';copy.roundsData=[];copy.currentRound=0;copy.createdAt=new Date().toISOString();S.tournaments.unshift(copy);setActiveT(copy.id);toast('Dupliqué','success');}
 function archiveT(id){confirmAction('Archiver','Marquer comme terminé ?',()=>{const t=S.tournaments.find(x=>x.id===id);if(t){t.status='finished';renderSidebar();renderTopbar();save();toast('Archivé','info');}},false);}
 function deleteT(id){const t=S.tournaments.find(x=>x.id===id);if(!t)return;confirmAction('Supprimer',`Supprimer "${t.name}" ?`,()=>{S.tournaments=S.tournaments.filter(x=>x.id!==id);if(S.activeTId===id){S.activeTId=null;showView('tournaments');}renderSidebar();save();toast('Supprimé','error');});}
 
@@ -1284,6 +1347,10 @@ function renderTopbar(){
   const resetBtn=document.getElementById('tb-reset-waiting');
   if(resetBtn)resetBtn.style.display=t.status==='active'?'inline-flex':'none';
 }
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,10);}
+function shuffleArray(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function csvEscape(val){const s=String(val==null?'':val);return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function sanitizeFilename(name){return String(name||'export').replace(/[\\\/:*?"<>|]/g,'_');}
 function escapeHtml(str){
   if(str==null)return '';
   return String(str).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});
@@ -1318,7 +1385,7 @@ function addPlayer(){
   if(!name){toast('Pseudo requis','warning');return;}if(!faction){toast('Faction requise','warning');return;}
   if(t.players.find(p=>p.name.toLowerCase()===name.toLowerCase())){toast('Joueur déjà existant','warning');return;}
   const note=document.getElementById('ap-note')?document.getElementById('ap-note').value.trim():'';
-  t.players.push({id:Date.now().toString(),name,faction,compo:compo!==''?parseInt(compo):null,status:'inscrit',note:note,extras:{},penalties:[]});
+  t.players.push({id:uid(),name,faction,compo:compo!==''?parseInt(compo):null,status:'inscrit',note:note,extras:{},penalties:[]});
   closeModal('modal-add-player');document.getElementById('ap-name').value='';document.getElementById('ap-compo').value='';if(document.getElementById('ap-note'))document.getElementById('ap-note').value='';
   renderPlayers();save();toast(`${name} ajouté !`,'success');
 }
@@ -1373,7 +1440,7 @@ function addBlock(){
   const blocks=getBlocks(t);
   const exists=blocks.some(b=>(b.p1===p1&&b.p2===p2)||(b.p1===p2&&b.p2===p1));
   if(exists){toast('Ce blocage existe déjà','warning');return;}
-  blocks.push({id:Date.now().toString(),p1,p2});
+  blocks.push({id:uid(),p1,p2});
   renderBlockList(p1);
   renderPlayers();
   save();
@@ -1425,9 +1492,24 @@ function undropPlayer(id){
   const p=t.players.find(x=>x.id===id);if(!p)return;
   p.status='active';renderPlayers();renderClassement();save();toast(p.name+' réactivé ✅','success');
 }
+function checkinAllPlayers(){
+  const t=getActiveT();if(!t)return;
+  const toActivate=t.players.filter(p=>{const s=normalizePlayerStatus(p.status);return s==='inscrit'||s==='preinscrit';});
+  if(!toActivate.length){toast('Aucun joueur à activer','info');return;}
+  confirmAction('Check-in en masse',`Passer les ${toActivate.length} joueurs inscrits/préinscrits en statut Actif ?`,()=>{
+    toActivate.forEach(p=>{p.status='active';});
+    renderPlayers();save();toast(`${toActivate.length} joueur(s) passé(s) en Actif`,'success');
+  },false);
+}
 function setPlayerStatus(id,val){
   const t=getActiveT(),p=t.players.find(x=>x.id===id);if(!p)return;
-  p.status=normalizePlayerStatus(val);renderPlayers();save();toast('Statut mis à jour','success');
+  const normalized=normalizePlayerStatus(val);
+  if(normalized==='dropped'&&p.status!=='dropped'){
+    dropPlayer(id);
+    renderPlayers();
+    return;
+  }
+  p.status=normalized;renderPlayers();save();toast('Statut mis à jour','success');
 }
 function saveEditPlayer(){
   const t=getActiveT(),id=document.getElementById('ep-id').value,p=t.players.find(x=>x.id===id);if(!p)return;
@@ -1460,7 +1542,7 @@ function importGSCSV(){
 function importCSV(){
   const t=getActiveT(),text=document.getElementById('import-csv').value.trim();if(!text){toast('Aucune donnée','warning');return;}
   let added=0,skipped=0;
-  text.split('\n').filter(l=>l.trim()).forEach(line=>{const parts=line.split(';');const name=(parts[0]||'').trim(),faction=(parts[1]||'').trim(),compo=(parts[2]||'').trim();if(!name||t.players.find(p=>p.name.toLowerCase()===name.toLowerCase())){skipped++;return;}t.players.push({id:Date.now().toString()+Math.random(),name,faction,compo:compo!==''?parseInt(compo):null,status:'inscrit',note:'',extras:{}});added++;});
+  text.split('\n').filter(l=>l.trim()).forEach(line=>{const parts=line.split(';');const name=(parts[0]||'').trim(),faction=(parts[1]||'').trim(),compo=(parts[2]||'').trim();if(!name||t.players.find(p=>p.name.toLowerCase()===name.toLowerCase())){skipped++;return;}t.players.push({id:uid(),name,faction,compo:compo!==''?parseInt(compo):null,status:'inscrit',note:'',extras:{}});added++;});
   closeModal('modal-import');document.getElementById('import-csv').value='';renderPlayers();save();toast(`${added} importé(s), ${skipped} ignoré(s)`,added>0?'success':'warning');
 }
 
@@ -1528,13 +1610,22 @@ function generatePairings(tournament,roundIndex){
   // Sort players for seeding
   let sorted;
   if(roundIndex===0){
-    sorted=[...active].sort((a,b)=>{
-      if(tournament.compoPairing){
+    if(tournament.compoPairing){
+      sorted=[...active].sort((a,b)=>{
         const ca=a.compo!=null?parseInt(a.compo):-1,cb=b.compo!=null?parseInt(b.compo):-1;
-        if(cb!==ca)return cb-ca;
-      }
-      return Math.random()-0.5;
-    });
+        return cb-ca;
+      });
+      let groups=[];let curGroup=[];let curVal=undefined;
+      sorted.forEach(p=>{
+        const v=p.compo!=null?parseInt(p.compo):-1;
+        if(v!==curVal){if(curGroup.length)groups.push(curGroup);curGroup=[];curVal=v;}
+        curGroup.push(p);
+      });
+      if(curGroup.length)groups.push(curGroup);
+      sorted=groups.flatMap(g=>shuffleArray(g));
+    } else {
+      sorted=shuffleArray([...active]);
+    }
   } else {
     const paired=getSortedForPairing(tournament);
     sorted=paired.filter(s=>active.find(a=>a.id===s.id)).map(s=>active.find(a=>a.id===s.id));
@@ -1777,13 +1868,13 @@ function renderRoundTable(tournament,idx){
 }
 function renderRoundContent(idx,container){
   const t=getActiveT(),r=t.roundsData[idx],hasFree=!!t.freeScoreName,pm={};t.players.forEach(p=>{pm[p.id]=p;});
-  if(r.validated){container.innerHTML=`<div class="card"><div class="card-header"><span class="card-title">🔒 Ronde ${idx+1} — Validée</span></div>${renderRoundTable(t,idx)}</div>`;return;}
+  if(r.validated){container.innerHTML=`<div class="card"><div class="card-header"><span class="card-title">🔒 Ronde ${idx+1} — Validée</span><button class="btn btn-secondary btn-sm" onclick="printTableSheets(${idx})">🖨️ Feuilles de table</button></div>${renderRoundTable(t,idx)}</div>`;return;}
   const pending=r.matches.filter(m=>!m.bye&&m.result===null).length,allScored=pending===0;
   const pairingAlerts=getPairingAlerts(t,idx);
   const matchesHtml=r.matches.map((m,mi)=>{
     const p1=pm[m.p1],p2=pm[m.p2];
     if(m.bye)return `<div class="match-card"><div class="match-header"><span class="match-table-badge">Table #${m.table}</span><span class="badge badge-info">BYE</span>${renderAlertBadge(pairingAlerts[mi]||[])}</div><div style="display:flex;align-items:center;gap:12px"><strong>${escapeHtml(p1?.name)}</strong><span style="font-size:0.8rem;color:var(--text3)">Score scénario attribué : ${m.byeScenario||0}</span></div></div>`;
-    return `<div class="match-card"><div class="match-header">${m.result?'<span class="badge badge-success">✓ Scoré</span>':'<span class="badge badge-warning">En attente</span>'}${renderAlertBadge(pairingAlerts[mi]||[])}</div><div class="match-grid"><div class="match-player"><div class="match-player-name">${escapeHtml(p1?.name)||'?'}</div><div class="match-player-faction">${escapeHtml(p1?.faction)||''}</div><div class="match-player-compo">Compo: ${p1?.compo!=null?p1.compo:'—'}</div><div class="match-score-input"><label>Scénario</label><input type="number" min="0" value="${m.s1||0}" oninput="setScore(${idx},${mi},'s1',this.value)"></div>${hasFree?`<div class="match-score-input"><label>${t.freeScoreName}</label><input type="number" min="0" value="${m.f1||0}" oninput="setScore(${idx},${mi},'f1',this.value)"></div>`:''}</div><div class="match-center"><div class="match-table-big">#${m.table}</div><div class="match-vs">VS</div><div class="score-btns"><button class="score-btn win ${m.result==='p1'?'selected':''}" onclick="setResult(${idx},${mi},'p1')">V1</button><button class="score-btn draw ${m.result==='draw'?'selected':''}" onclick="setResult(${idx},${mi},'draw')">N</button><button class="score-btn win ${m.result==='p2'?'selected':''}" onclick="setResult(${idx},${mi},'p2')">V2</button></div></div><div class="match-player right"><div class="match-player-name">${escapeHtml(p2?.name)||'?'}</div><div class="match-player-faction">${escapeHtml(p2?.faction)||''}</div><div class="match-player-compo">Compo: ${p2?.compo!=null?p2.compo:'—'}</div><div class="match-score-input"><label>Scénario</label><input type="number" min="0" value="${m.s2||0}" oninput="setScore(${idx},${mi},'s2',this.value)"></div>${hasFree?`<div class="match-score-input"><label>${t.freeScoreName}</label><input type="number" min="0" value="${m.f2||0}" oninput="setScore(${idx},${mi},'f2',this.value)"></div>`:''}</div></div></div>`;
+    return `<div class="match-card"><div class="match-header">${m.result?'<span class="badge badge-success">✓ Scoré</span>':'<span class="badge badge-warning">En attente</span>'}${renderAlertBadge(pairingAlerts[mi]||[])}</div><div class="match-grid"><div class="match-player"><div class="match-player-name">${escapeHtml(p1?.name)||'?'}</div><div class="match-player-faction">${escapeHtml(p1?.faction)||''}</div><div class="match-player-compo">Compo: ${p1?.compo!=null?p1.compo:'—'}</div><div class="match-score-input"><label>Scénario</label><input type="number" min="0" value="${m.s1||0}" oninput="setScore(${idx},${mi},'s1',this.value)"></div>${hasFree?`<div class="match-score-input"><label>${t.freeScoreName}</label><input type="number" min="0" value="${m.f1||0}" oninput="setScore(${idx},${mi},'f1',this.value)"></div>`:''}</div><div class="match-center"><div class="match-table-big">#${m.table}</div><div class="match-vs">VS</div><div class="score-btns"><button class="score-btn win ${m.result==='p1'?'selected':''}" onclick="setResult(${idx},${mi},'p1')">V1</button>${isBracketFormat(t)?'':`<button class="score-btn draw ${m.result==='draw'?'selected':''}" onclick="setResult(${idx},${mi},'draw')">N</button>`}<button class="score-btn win ${m.result==='p2'?'selected':''}" onclick="setResult(${idx},${mi},'p2')">V2</button>${m.result?`<button class="score-btn" style="opacity:0.7" title="Effacer le résultat" onclick="clearResult(${idx},${mi})">✕</button>`:''}</div></div><div class="match-player right"><div class="match-player-name">${escapeHtml(p2?.name)||'?'}</div><div class="match-player-faction">${escapeHtml(p2?.faction)||''}</div><div class="match-player-compo">Compo: ${p2?.compo!=null?p2.compo:'—'}</div><div class="match-score-input"><label>Scénario</label><input type="number" min="0" value="${m.s2||0}" oninput="setScore(${idx},${mi},'s2',this.value)"></div>${hasFree?`<div class="match-score-input"><label>${t.freeScoreName}</label><input type="number" min="0" value="${m.f2||0}" oninput="setScore(${idx},${mi},'f2',this.value)"></div>`:''}</div></div></div>`;
   }).join('');
   const pct=r.matches.length>0?Math.round(((r.matches.length-pending)/r.matches.length)*100):100;
   var r2=t.roundsData[idx];
@@ -1791,9 +1882,69 @@ function renderRoundContent(idx,container){
   var validateOnclick=allScored?'openValidate('+idx+')':'toast(\'Scores manquants\',\'warning\')';
   var validateStyle=allScored?'':'style="opacity:0.5"';
   var pendingMsg=allScored?'✅ Tous les scores saisis':'⚠️ '+pending+' manquant'+(pending>1?'s':'');
-  container.innerHTML='<div class="card"><div class="card-header"><span class="card-title">⚔️ Ronde '+(idx+1)+(r2.scenarioName?' · <span style="color:var(--accent2);font-size:0.85rem;font-weight:400">'+escapeHtml(r2.scenarioName)+'</span>':'')+'</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" onclick="openEditPairings('+idx+')">✏️ Éditer</button><button class="btn btn-secondary btn-sm" onclick="rerollPairings('+idx+')">🔀 Relancer</button><button class="btn btn-primary btn-sm" '+validateStyle+' onclick="'+validateOnclick+'">✅ Valider</button></div></div>'+scenBanner+'<div style="margin-bottom:14px"><div style="font-size:0.8rem;color:var(--text2);margin-bottom:4px">'+pendingMsg+'</div><div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div></div>'+renderAlertPanel(pairingAlerts)+matchesHtml+'</div>';
+  container.innerHTML='<div class="card"><div class="card-header"><span class="card-title">⚔️ Ronde '+(idx+1)+(r2.scenarioName?' · <span style="color:var(--accent2);font-size:0.85rem;font-weight:400">'+escapeHtml(r2.scenarioName)+'</span>':'')+'</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" onclick="printTableSheets('+idx+')">🖨️ Feuilles de table</button><button class="btn btn-secondary btn-sm" onclick="openEditPairings('+idx+')">✏️ Éditer</button><button class="btn btn-secondary btn-sm" onclick="rerollPairings('+idx+')">🔀 Relancer</button><button class="btn btn-primary btn-sm" '+validateStyle+' onclick="'+validateOnclick+'">✅ Valider</button></div></div>'+scenBanner+'<div style="margin-bottom:14px"><div style="font-size:0.8rem;color:var(--text2);margin-bottom:4px">'+pendingMsg+'</div><div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div></div>'+renderAlertPanel(pairingAlerts)+matchesHtml+'</div>';
 }
 function setResult(ri,mi,result){const t=getActiveT();t.roundsData[ri].matches[mi].result=result;save();renderRoundContent(ri,document.getElementById('rounds-content'));}
+function clearResult(ri,mi){const t=getActiveT();const m=t.roundsData[ri].matches[mi];m.result=null;m.s1=0;m.s2=0;m.f1=0;m.f2=0;save();renderRoundContent(ri,document.getElementById('rounds-content'));}
+function printTableSheets(ri){
+  const t=getActiveT();if(!t)return;
+  const r=t.roundsData[ri];if(!r)return;
+  const pm={};t.players.forEach(p=>{pm[p.id]=p;});
+  const sheets=r.matches.map(m=>{
+    const p1=pm[m.p1],p2=pm[m.p2];
+    if(m.bye){
+      return `<div class="sheet"><div class="sheet-tournoi">${escapeHtml(t.name)}</div><div class="sheet-ronde">Ronde ${ri+1}${r.scenarioName?' · '+escapeHtml(r.scenarioName):''}</div><div class="sheet-table">Table #${m.table}</div><div class="sheet-bye">${escapeHtml(p1?.name)||'?'}<br><span style="font-size:0.9rem;color:#888">BYE — qualifié sans adversaire</span></div><div class="sheet-footer">${escapeHtml(t.name)} — ${new Date().toLocaleDateString()}</div></div>`;
+    }
+    return `<div class="sheet">
+      <div class="sheet-tournoi">${escapeHtml(t.name)}</div>
+      <div class="sheet-ronde">Ronde ${ri+1}${r.scenarioName?' · '+escapeHtml(r.scenarioName):''}</div>
+      <div class="sheet-table">Table #${m.table}</div>
+      <div class="sheet-players">
+        <div class="sheet-player">
+          <div class="sheet-player-name">${escapeHtml(p1?.name)||'?'}</div>
+          <div class="sheet-player-faction">${escapeHtml(p1?.faction)||''}</div>
+        </div>
+        <div class="sheet-vs">VS</div>
+        <div class="sheet-player">
+          <div class="sheet-player-name">${escapeHtml(p2?.name)||'?'}</div>
+          <div class="sheet-player-faction">${escapeHtml(p2?.faction)||''}</div>
+        </div>
+      </div>
+      <div class="sheet-result">
+        <div class="sheet-result-label">Résultat</div>
+        <div class="sheet-result-box"></div>
+      </div>
+      <div class="sheet-footer">${escapeHtml(t.name)} — ${new Date().toLocaleDateString()}</div>
+    </div>`;
+  }).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Feuilles de table – Ronde ${ri+1} – ${escapeHtml(t.name)}</title>
+    <style>
+      @page { size: A5 landscape; margin: 12mm; }
+      body { font-family: 'Segoe UI', sans-serif; margin:0; color:#1a2340; }
+      .sheet { page-break-after: always; padding: 20px; display:flex; flex-direction:column; justify-content:space-between; height: 100vh; box-sizing:border-box; }
+      .sheet:last-child { page-break-after: auto; }
+      .sheet-tournoi { font-size: 1rem; color:#666; text-align:center; }
+      .sheet-ronde { font-size: 1.2rem; color:#2563eb; text-align:center; font-weight:600; margin-bottom:4px; }
+      .sheet-table { font-size: 2.4rem; font-weight:800; text-align:center; margin: 10px 0 20px; color:#1a2340; }
+      .sheet-players { display:flex; align-items:center; justify-content:center; gap:24px; margin: 10px 0; }
+      .sheet-player { text-align:center; flex:1; }
+      .sheet-player-name { font-size: 1.6rem; font-weight:700; }
+      .sheet-player-faction { font-size: 1rem; color:#4f8ef7; margin-top:4px; }
+      .sheet-vs { font-size: 1.2rem; font-weight:700; color:#888; }
+      .sheet-bye { text-align:center; font-size: 1.6rem; font-weight:700; margin: 30px 0; }
+      .sheet-result { margin-top: 20px; text-align:center; }
+      .sheet-result-label { font-size: 0.9rem; color:#666; margin-bottom:6px; }
+      .sheet-result-box { border: 2px solid #ccc; border-radius: 8px; height: 60px; }
+      .sheet-footer { font-size: 0.75rem; color:#999; text-align:center; }
+      @media print { .sheet { height: auto; min-height: 90vh; } }
+    </style>
+  </head><body>${sheets}</body></html>`;
+  const w=window.open('','_blank');
+  if(!w){toast('Popup bloquée par le navigateur : autorisez les popups pour ce site','warning',6000);return;}
+  w.document.write(html);w.document.close();
+  w.onload=()=>{w.print();};
+}
 function setScore(ri,mi,field,value){const t=getActiveT();t.roundsData[ri].matches[mi][field]=parseInt(value)||0;save();}
 function startNewRound(manual){
   var t=getActiveT(),idx=t.roundsData.length;
@@ -1823,6 +1974,22 @@ function _startNewRoundProceed(idx){
     }
     if(!matches){toast('Pas assez de joueurs','warning');return;}
     var roundLabel = computeBracketRoundLabel(t, idx);
+    if(t.thirdPlaceMatch && matches.length===1 && idx>0){
+      var mainRoundsSoFar=t.roundsData.filter(function(r){return (r.bracketKey||'main')==='main';});
+      var semis=mainRoundsSoFar[mainRoundsSoFar.length-1];
+      var hasThirdAlready=t.roundsData.some(function(r){return r.bracketKey==='3rd-place';});
+      if(semis && semis.matches.length===2 && !hasThirdAlready){
+        var losers=[];
+        semis.matches.forEach(function(m){
+          if(m.bye)return;
+          if(m.result==='p1')losers.push(m.p2);
+          else if(m.result==='p2')losers.push(m.p1);
+        });
+        if(losers.length===2){
+          t.roundsData.push({matches:[{p1:losers[0],p2:losers[1],result:null,s1:0,s2:0,f1:0,f2:0,table:1}],validated:false,scenarioName:'Petite finale (3ᵉ place)',scenarioDesc:'',bracketKey:'3rd-place'});
+        }
+      }
+    }
     t.roundsData.push({matches:matches,validated:false,scenarioName:roundLabel,scenarioDesc:'',bracketKey:'main'});
     t.status='active';t.currentRound=idx+1;
     renderTopbar();renderRounds();save();
@@ -1986,7 +2153,7 @@ function confirmValidate(){const t=getActiveT(),idx=validateIdx;const alerts=get
       toast('🏆 '+(wp?wp.name:'Le vainqueur')+' remporte le tournoi !','success');
       return;
     }
-  } else if(t.roundsData.length>=t.rounds){ t.status='finished'; }
+  } else if(t.roundsData.filter(function(r){return r.validated;}).length>=t.rounds){ t.status='finished'; }
   closeModal('modal-validate');renderTopbar();renderSidebar();renderRounds();renderClassement();save();toast(`Ronde ${idx+1} validée !`,'success');}
 
 // CLASSEMENT
@@ -1995,8 +2162,9 @@ function renderClassement(){
   const standings=getStandings(t),hasFree=!!t.freeScoreName;
   const wrap=document.getElementById('classement-wrap');
   if(!standings.length){wrap.innerHTML='<div class="empty-state"><div class="empty-desc">Aucune donnée</div></div>';return;}
+  const bracketHtml = isBracketFormat(t) ? `<div class="bracket-wrap" style="margin-bottom:24px">${renderBracketTree(t)}</div>` : '';
   const extraTh=`<th>Scénario</th>${hasFree?`<th>${t.freeScoreName}</th>`:''}`;
-  wrap.innerHTML=`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="data-table" style="min-width:420px"><thead><tr><th>Rang</th><th>Joueur</th><th>Faction</th><th>Pts</th>${extraTh}<th>SOS</th><th>Compo</th><th>Statut</th></tr></thead><tbody>${standings.map((p,i)=>{const dropped=normalizePlayerStatus(p.status)==='dropped';const rc=dropped?'':i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';const medal=dropped?'—':i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;const extraTd=`<td><strong>${p.scenario}</strong></td>${hasFree?`<td>${p.free}</td>`:''}`;const rowStyle=dropped?'opacity:0.5;':'';return `<tr class="${rc}" style="${rowStyle}"><td>${medal}${!dropped&&i===0?' 👑':''}</td><td><strong>${dropped?`<s>${escapeHtml(p.name)}</s>`:escapeHtml(p.name)}</strong>${(t.awards||[]).filter(a=>a.playerId===p.id).map(a=>`<span title="${a.name}" style="cursor:default;margin-left:4px">⭐</span>`).join('')}${(()=>{const pl=t.players.find(x=>x.id===p.id);return pl&&pl.penalties&&pl.penalties.length?`<span title="Bonus/Malus appliqué" style="cursor:default;margin-left:4px">⚖️</span>`:'';})()}</td><td style="color:var(--accent2)">${p.faction}</td><td><strong>${p.pts}</strong></td>${extraTd}<td>${p.sos}</td><td>${p.compo!=null?p.compo:'—'}</td><td>${(()=>{const st=normalizePlayerStatus(p.status);if(st==='dropped')return '<span class=\"badge badge-drop\">❌ Drop</span>';if(st==='absent')return '<span class=\"badge badge-danger\">Forfait</span>';if(st==='preinscrit')return '<span class=\"badge badge-neutral\">Préinscrit</span>';if(st==='inscrit')return '<span class=\"badge badge-neutral\">Inscrit</span>';return '<span class=\"badge badge-success\">Actif</span>';})()}</td></tr>`;}).join('')}</tbody></table></div>`;
+  wrap.innerHTML=`${bracketHtml}<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="data-table" style="min-width:420px"><thead><tr><th>Rang</th><th>Joueur</th><th>Faction</th><th>Pts</th>${extraTh}<th>SOS</th><th>Compo</th><th>Statut</th></tr></thead><tbody>${standings.map((p,i)=>{const dropped=normalizePlayerStatus(p.status)==='dropped';const rc=dropped?'':i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';const medal=dropped?'—':i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;const extraTd=`<td><strong>${p.scenario}</strong></td>${hasFree?`<td>${p.free}</td>`:''}`;const rowStyle=dropped?'opacity:0.5;':'';return `<tr class="${rc}" style="${rowStyle}"><td>${medal}${!dropped&&i===0?' 👑':''}</td><td><strong>${dropped?`<s>${escapeHtml(p.name)}</s>`:escapeHtml(p.name)}</strong>${(t.awards||[]).filter(a=>a.playerId===p.id).map(a=>`<span title="${a.name}" style="cursor:default;margin-left:4px">⭐</span>`).join('')}${(()=>{const pl=t.players.find(x=>x.id===p.id);return pl&&pl.penalties&&pl.penalties.length?`<span title="Bonus/Malus appliqué" style="cursor:default;margin-left:4px">⚖️</span>`:'';})()}</td><td style="color:var(--accent2)">${p.faction}</td><td><strong>${p.pts}</strong></td>${extraTd}<td>${p.sos}</td><td>${p.compo!=null?p.compo:'—'}</td><td>${(()=>{const st=normalizePlayerStatus(p.status);if(st==='dropped')return '<span class=\"badge badge-drop\">❌ Drop</span>';if(st==='absent')return '<span class=\"badge badge-danger\">Forfait</span>';if(st==='preinscrit')return '<span class=\"badge badge-neutral\">Préinscrit</span>';if(st==='inscrit')return '<span class=\"badge badge-neutral\">Inscrit</span>';return '<span class=\"badge badge-success\">Actif</span>';})()}</td></tr>`;}).join('')}</tbody></table></div>`;
 }
 
 // STATS
@@ -2254,7 +2422,7 @@ function exportPlayerCSV(playerId){
     const rl=r.result==='win'?'Victoire':r.result==='draw'?'Nul':r.result==='bye'?'BYE':r.result==='loss'?'Défaite':'En attente';
     out.push(`R${r.ronde};${r.adversaire};${r.adversaireFaction||'—'};${rl};${r.scenario}${hasFree?';'+r.free:''}`);
   });
-  dlFile(`fiche-${p.name}-${t.name}.csv`, out.join('\n'), 'text/csv');
+  dlFile(`${sanitizeFilename('fiche-'+p.name+'-'+t.name)}.csv`, out.join('\n'), 'text/csv');
   toast('Export CSV joueur OK ✅','success');
 }
 
@@ -2405,7 +2573,17 @@ function renderParams(){
     </div>
     <div class="section-block" style="margin-top:4px;margin-bottom:14px">
       <div style="font-weight:700;font-size:0.9rem;margin-bottom:10px">⚔️ Appariement</div>
-      <div style="font-size:0.85rem;color:var(--text2);margin-bottom:10px">Base d'appairage : <strong>${({swiss:'Suisse',manual:'Manuel',bracket:'Élimination directe'})[t.pairFormat]||'Suisse'}</strong></div>${t.pairFormat==='swiss' ? `
+      <div style="font-size:0.85rem;color:var(--text2);margin-bottom:10px">Base d'appairage : <strong>${({swiss:'Suisse',manual:'Manuel',bracket:'Élimination directe'})[t.pairFormat]||'Suisse'}</strong></div>${t.pairFormat==='bracket' ? `
+      <div class="form-group" style="background:var(--bg2);border:1px solid var(--accent2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="param-third-place" ${t.thirdPlaceMatch?'checked':''} ${t.roundsData&&t.roundsData.length>0?'disabled':''} style="width:18px;height:18px;cursor:pointer;flex:0 0 auto" onchange="updParam('thirdPlaceMatch',this.checked)">
+          <label for="param-third-place" style="cursor:pointer;font-size:0.85rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;line-height:1">
+            <span title="Ajoute un match entre les deux perdants de demi-finale pour désigner la 3ᵉ place">🥉 Petite finale (3ᵉ place)</span>
+          </label>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text3);margin-left:28px;margin-top:2px">${t.roundsData&&t.roundsData.length>0?'Verrouillé : des rondes existent déjà.':'Ajoute un match entre les deux perdants de demi-finale.'}</div>
+      </div>
+    ` : ''}${t.pairFormat==='swiss' ? `
       <div class="form-group">
         <div style="display:flex;align-items:center;gap:8px">
           <input type="checkbox" id="param-compo-pairing" ${t.compoPairing?'checked':''} style="width:18px;height:18px;cursor:pointer;flex:0 0 auto" onchange="updParam('compoPairing',this.checked)">
@@ -2457,7 +2635,20 @@ function renderParams(){
     </div>`;
 }
 
-function updParam(k,v){const t=getActiveT();if(!t)return;t[k]=v;renderTopbar();save();}
+function updParam(k,v){
+  const t=getActiveT();if(!t)return;
+  if(k==='rounds'){
+    if(t.roundsData&&t.roundsData.length>0){
+      toast('Impossible de modifier le nombre de rondes : des rondes existent déjà','warning');
+      renderParams&&renderParams();
+      return;
+    }
+    const n=Math.max(1,Math.min(10,parseInt(v)||t.rounds));
+    t[k]=n;renderTopbar();save();
+    return;
+  }
+  t[k]=v;renderTopbar();save();
+}
 function updSecondaryCriteria(k,v){const t=getActiveT();if(!t)return;if(!t.secondaryCriteria)t.secondaryCriteria={};t.secondaryCriteria[k]=v;renderTopbar();save();}
 function updScoring(k,v){const t=getActiveT();if(!t)return;if(!t.scoring)t.scoring={win:3,draw:1,loss:0};t.scoring[k]=v;save();}
 
@@ -2494,9 +2685,12 @@ function importJSON() {
       try { document.body.removeChild(input); } catch(e){}
       try {
         const data = JSON.parse(ev.target.result);
-        if (!data.tournaments || !data.gameSystems) { toast('Format invalide', 'error'); return; }
+        const validShape = data && Array.isArray(data.tournaments) && Array.isArray(data.gameSystems)
+          && data.tournaments.every(t => t && typeof t.id !== 'undefined' && Array.isArray(t.players) && Array.isArray(t.roundsData));
+        if (!validShape) { toast('Format invalide : structure de sauvegarde incorrecte', 'error'); return; }
         confirmAction('Importer', `Importer "${file.name}" ? Les données actuelles seront remplacées.`, () => {
-          S = data; save(); init(); toast('Import réussi !', 'success');
+          try { S = data; save(); init(); toast('Import réussi !', 'success'); }
+          catch(saveErr) { toast('Erreur lors de la sauvegarde : ' + saveErr.message, 'error'); }
         });
       } catch(err) { toast('JSON invalide : ' + err.message, 'error'); }
     };
@@ -2519,11 +2713,11 @@ function exportJSON() {
 function exportCSV() {
   const t = getActiveT(); if (!t) return;
   const s = getStandings(t), hasFree = !!t.freeScoreName;
-  const header = `Rang;Joueur;Faction;Pts;Scénario${hasFree ? ';' + t.freeScoreName : ''};SOS;Compo`;
+  const header = `Rang;Joueur;Faction;Pts;Scénario${hasFree ? ';' + csvEscape(t.freeScoreName) : ''};SOS;Compo`;
   const rows = s.map((p, i) =>
-    `${i+1};${p.name};${p.faction};${p.pts};${p.scenario}${hasFree ? ';' + p.free : ''};${p.sos};${p.compo != null ? p.compo : ''}`
+    `${i+1};${csvEscape(p.name)};${csvEscape(p.faction)};${p.pts};${p.scenario}${hasFree ? ';' + p.free : ''};${p.sos};${p.compo != null ? p.compo : ''}`
   );
-  dlFile(`classement-${t.name}.csv`, [header, ...rows].join('\n'), 'text/csv');
+  dlFile(`${sanitizeFilename('classement-'+t.name)}.csv`, [header, ...rows].join('\n'), 'text/csv');
   toast('Export CSV OK ✅', 'success');
 }
 
@@ -2633,7 +2827,7 @@ function exportStatsCSV() {
       if(d) out.push(buildPlayerSectionCSV(t, d));
     });
   }
-  dlFile(`stats-${t.name}.csv`, out.join('\n'), 'text/csv');
+  dlFile(`${sanitizeFilename('stats-'+t.name)}.csv`, out.join('\n'), 'text/csv');
   toast('Export CSV Stats OK ✅', 'success');
 }
 
@@ -2819,7 +3013,7 @@ function addScenario(){
     if(sc){sc.name=name;sc.desc=document.getElementById('sc-desc').value.trim();}
     toast('Scénario modifié ✅','success');
   } else {
-    S.scenarios.push({id:Date.now().toString(),name:name,desc:document.getElementById('sc-desc').value.trim()});
+    S.scenarios.push({id:uid(),name:name,desc:document.getElementById('sc-desc').value.trim()});
     toast('Scénario ajouté ✅','success');
   }
   if(document.getElementById('sc-edit-id'))document.getElementById('sc-edit-id').value='';
@@ -2931,7 +3125,10 @@ function savePairingEdits(){
     }
     var p1El=document.getElementById('pe-p1-'+mi);
     var p2El=document.getElementById('pe-p2-'+mi);
-    return Object.assign({},m,{p1:p1El?p1El.value:m.p1, p2:p2El?p2El.value:m.p2});
+    var newP1=p1El?p1El.value:m.p1, newP2=p2El?p2El.value:m.p2;
+    var changed = (newP1!==m.p1) || (newP2!==m.p2);
+    var reset = changed ? {result:null,s1:0,s2:0,f1:0,f2:0} : {};
+    return Object.assign({},m,{p1:newP1, p2:newP2},reset);
   });
   var incomplete=newMatches.some(function(m){return !m.p1 || (!m.bye && !m.p2);});
   if(incomplete){toast('Toutes les tables doivent avoir leurs joueurs sélectionnés','warning');return;}
@@ -3056,7 +3253,10 @@ function getPairingAlerts(t,roundIdx){
     if(!m.p1||!m.p2)return;
     const p1=pm[m.p1],p2=pm[m.p2];
     if(hist[m.p1]?.has(m.p2))warnings.push({level:'red',msg:`${p1?.name} et ${p2?.name} se sont déjà affrontés`});
-    if(p1?.allegiance&&p2?.allegiance&&p1.allegiance===p2.allegiance)warnings.push({level:'yellow',msg:`Même allégeance : ${p1.allegiance}`});
+    const gsAlert=getGS(t.gameSystemId);
+    const alg1=p1?.faction?getAllegiance(gsAlert,p1.faction):null;
+    const alg2=p2?.faction?getAllegiance(gsAlert,p2.faction):null;
+    if(alg1&&alg2&&alg1===alg2)warnings.push({level:'yellow',msg:`Même allégeance : ${alg1}`});
     else if(p1?.faction&&p2?.faction&&p1.faction===p2.faction)warnings.push({level:'yellow',msg:`Même faction : ${p1.faction}`});
     if(warnings.length)alerts[mi]=warnings;
   });
@@ -3129,7 +3329,7 @@ function printAllRoundsRecap(){
   <div class="footer">Généré par Tournoi Manager · ${new Date().toLocaleDateString('fr-FR')}</div>
   </body></html>`;
 
-  const w=window.open('','_blank');w.document.write(html);w.document.close();
+  const w=window.open('','_blank');if(!w){toast('Popup bloquée par le navigateur : autorisez les popups pour ce site','warning',6000);return;}w.document.write(html);w.document.close();
 }
 
 
