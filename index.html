@@ -335,7 +335,7 @@
 
           <div class="info-panel active" id="info-panel-apropos">
             <h2 style="margin-top:0">🏆 Tournoi Manager</h2>
-            <p style="color:var(--text2)">Version actuelle : <strong>V1.9.23</strong></p>
+            <p style="color:var(--text2)">Version actuelle : <strong>V1.9.32</strong></p>
             <div class="divider"></div>
             <h3>Licence</h3>
             <p style="color:var(--text2);font-size:0.9rem;line-height:1.6">
@@ -460,7 +460,7 @@
             <p style="color:var(--text2);font-size:0.9rem">Définitions des termes utilisés dans l'application.</p>
             <table class="data-table">
               <thead><tr><th>Terme</th><th>Définition</th></tr></thead>
-              <tbody><tr><td><strong>Faction</strong></td><td>Camp ou armée choisi par un joueur au sein d'un système de jeu (ex : Space Marines, Orks).</td></tr><tr><td><strong>Allégeance</strong></td><td>Regroupement de plusieurs factions apparentées (ex : « Order » regroupe Space Marines et Blood Angels). Sert à éviter des affrontements trop proches.</td></tr><tr><td><strong>Match miroir</strong></td><td>Rencontre entre deux joueurs de la même faction. Peut être évité via le critère « Pas de miroir ».</td></tr><tr><td><strong>Compo</strong></td><td>Score de composition de liste (souvent noté sur 1000 ou 2000 selon le format), utilisé comme critère d'appariement optionnel.</td></tr><tr><td><strong>Note libre</strong></td><td>Champ de texte libre attaché à un joueur, utilisable comme critère d'appariement pour regrouper ou séparer des joueurs selon une logique propre à l'organisateur.</td></tr><tr><td><strong>SOS (Strength of Schedule)</strong></td><td>Force du calendrier : somme des points des adversaires déjà rencontrés par un joueur. Sert de critère de départage en cas d'égalité de points.</td></tr><tr><td><strong>Bye</strong></td><td>Tour sans adversaire accordé automatiquement à un joueur quand le nombre de participants actifs est impair. Rapporte les points d'une victoire.</td></tr><tr><td><strong>Score libre / score scénario</strong></td><td>Points additionnels indépendants du résultat classique (victoire/nulle/défaite), par exemple un « Kill Count » personnalisé par tournoi.</td></tr><tr><td><strong>Drop</strong></td><td>Le joueur abandonne définitivement le tournoi. Il ne sera plus jamais réapparié ; son adversaire du moment reçoit un bye.</td></tr><tr><td><strong>Forfait / Absent</strong></td><td>Le joueur est signalé absent pour une ronde sans être exclu définitivement du tournoi.</td></tr><tr><td><strong>Préinscrit / Inscrit</strong></td><td>Statuts d'un joueur qui n'a pas encore rejoint activement le tournoi. Ces joueurs ne sont jamais appariés et apparaissent en bas du classement.</td></tr><tr><td><strong>Actif</strong></td><td>Statut d'un joueur qui participe réellement aux rondes et peut être apparié.</td></tr><tr><td><strong>Bonus / Malus</strong></td><td>Points additionnels ou retirés manuellement par l'organisateur, indépendamment des résultats de match (ex : pénalité de comportement).</td></tr><tr><td><strong>Blocage</strong></td><td>Interdiction manuelle entre deux joueurs spécifiques de s'affronter, quel que soit leur score (ex : deux joueurs du même club).</td></tr><tr><td><strong>Système suisse</strong></td><td>Format de tournoi où chaque ronde apparie les joueurs de niveau proche, sans élimination, afin de départager un classement final sur plusieurs rondes.</td></tr><tr><td><strong>Suisse + Top Cut</strong></td><td>Format hybride en deux phases. Phase 1 : un nombre défini de rondes suisses classiques permettent d'établir un classement général. Phase 2 (« Top Cut ») : les meilleurs joueurs du classement (Top 4, 8, 16 ou 32 selon le choix fait au lancement du tournoi) s'affrontent en élimination directe pour désigner le vainqueur final. Les joueurs non qualifiés passent au statut « Éliminé (Cut) » et ne participent plus. En cas d'égalité parfaite sur la ligne de coupure, l'organisateur doit désigner manuellement le ou les qualifiés restants avant de lancer le bracket.</td></tr><tr><td><strong>Éliminé (Cut)</strong></td><td>Statut attribué automatiquement à un joueur qui n'a pas été retenu dans le Top Cut à l'issue des rondes suisses, dans un tournoi au format hybride. Il ne participe plus aux rondes suivantes mais reste visible dans l'historique et le classement final.</td></tr></tbody>
+              <tbody><tr><td><strong>Absent / Forfait</strong></td><td>Statut signalant qu'un joueur ne peut pas jouer une ronde donnée sans être exclu définitivement du tournoi. En système suisse, il reçoit un bye ou saute la ronde. En élimination directe et en phase Top Cut, il perd automatiquement son match en cours et passe au statut « Éliminé » : son adversaire est déclaré vainqueur et progresse normalement dans le tableau.</td></tr><tr><td><strong>Actif</strong></td><td>Statut d'un joueur qui participe réellement aux rondes et peut être apparié.</td></tr><tr><td><strong>Allégeance</strong></td><td>Regroupement de plusieurs factions apparentées (ex : « Order » regroupe Space Marines et Blood Angels). Sert à éviter des affrontements trop proches.</td></tr><tr><td><strong>Blocage</strong></td><td>Interdiction manuelle entre deux joueurs spécifiques de s'affronter, quel que soit leur score (ex : deux joueurs du même club).</td></tr><tr><td><strong>Bonus / Malus</strong></td><td>Points additionnels ou retirés manuellement par l'organisateur, indépendamment des résultats de match (ex : pénalité de comportement).</td></tr><tr><td><strong>Bye</strong></td><td>Tour sans adversaire accordé automatiquement à un joueur quand le nombre de participants actifs est impair. Rapporte les points d'une victoire.</td></tr><tr><td><strong>Compo</strong></td><td>Score de composition de liste (souvent noté sur 1000 ou 2000 selon le format), utilisé comme critère d'appariement optionnel.</td></tr><tr><td><strong>Drop</strong></td><td>Le joueur abandonne définitivement le tournoi. Il ne sera plus jamais réapparié ; son adversaire du moment reçoit un bye.</td></tr><tr><td><strong>Élimination directe (Bracket)</strong></td><td>Format de tournoi où chaque défaite élimine immédiatement le joueur du tableau. Le nombre de rondes dépend du nombre de participants (tableau à 4, 8, 16, 32 joueurs...). Le barème victoire/nul/défaite ne s'applique pas : seule la progression dans le tableau compte pour le classement.</td></tr><tr><td><strong>Éliminé (Cut)</strong></td><td>Statut attribué automatiquement à un joueur écarté d'une phase à élimination directe : soit il n'a pas été retenu dans le Top Cut à l'issue des rondes suisses (format hybride), soit il a perdu un match du tableau (bracket ou Top Cut), soit il a été déclaré forfait pendant une phase d'élimination directe. Il ne participe plus aux rondes suivantes mais reste visible dans l'historique et le classement final.</td></tr><tr><td><strong>Faction</strong></td><td>Camp ou armée choisi par un joueur au sein d'un système de jeu (ex : Space Marines, Orks).</td></tr><tr><td><strong>Historique de pairing</strong></td><td>Registre des adversaires déjà rencontrés par chaque joueur au fil des rondes, utilisé par le système suisse pour éviter les répétitions. Lors d'une relance (reroll) d'une ronde, la ronde régénérée est exclue de cet historique pour ne pas se bloquer elle-même.</td></tr><tr><td><strong>Match miroir</strong></td><td>Rencontre entre deux joueurs de la même faction. Peut être évité via le critère « Pas de miroir ».</td></tr><tr><td><strong>Mode manuel</strong></td><td>Format d'appariement où l'organisateur compose librement les tables de chaque ronde, avec possibilité de préparer toutes les rondes à l'avance.</td></tr><tr><td><strong>Note libre</strong></td><td>Champ de texte libre attaché à un joueur, utilisable comme critère d'appariement pour regrouper ou séparer des joueurs selon une logique propre à l'organisateur.</td></tr><tr><td><strong>Petite finale (match de 3e place)</strong></td><td>Match optionnel disputé entre les deux joueurs éliminés en demi-finale d'un tableau à élimination directe, afin de désigner le 3e du classement final.</td></tr><tr><td><strong>Préinscrit / Inscrit</strong></td><td>Statuts d'un joueur qui n'a pas encore rejoint activement le tournoi. Ces joueurs ne sont jamais appariés et apparaissent en bas du classement.</td></tr><tr><td><strong>Relancer (Reroll)</strong></td><td>Action permettant de régénérer entièrement les appariements d'une ronde non validée, par exemple en cas d'erreur ou d'alerte de pairing. Non disponible en élimination directe, où les appariements dépendent uniquement des résultats du tour précédent.</td></tr><tr><td><strong>Score libre / Score scénario</strong></td><td>Points additionnels indépendants du résultat classique (victoire/nulle/défaite), par exemple un « Kill Count » personnalisé par tournoi.</td></tr><tr><td><strong>SOS (Strength of Schedule)</strong></td><td>Force du calendrier : somme des points des adversaires déjà rencontrés par un joueur. Sert de critère de départage en cas d'égalité de points.</td></tr><tr><td><strong>Suisse + Top Cut</strong></td><td>Format hybride en deux phases. Phase 1 : un nombre défini de rondes suisses classiques permettent d'établir un classement général. Phase 2 (« Top Cut ») : les meilleurs joueurs du classement (Top 4, 8, 16 ou 32 selon le choix fait au lancement du tournoi) s'affrontent en élimination directe pour désigner le vainqueur final. Les joueurs non qualifiés passent au statut « Éliminé (Cut) » et ne participent plus. En cas d'égalité parfaite sur la ligne de coupure, l'organisateur doit désigner manuellement le ou les qualifiés restants avant de lancer le bracket.</td></tr><tr><td><strong>Système suisse</strong></td><td>Format de tournoi où chaque ronde apparie les joueurs de niveau proche, sans élimination, afin de départager un classement final sur plusieurs rondes.</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -618,13 +618,16 @@
 
     <div class="section-block" style="margin-bottom:14px">
       <div style="font-weight:700;font-size:0.9rem;margin-bottom:10px">🏁 Scoring</div>
-      <div style="font-size:0.85rem;font-weight:600;color:var(--text2);margin-bottom:8px">Scoring principal</div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Victoire</label><input class="form-input" id="nt-win" type="number" value="3"></div>
-        <div class="form-group"><label class="form-label">Nul</label><input class="form-input" id="nt-draw" type="number" value="1"></div>
-        <div class="form-group"><label class="form-label">Défaite</label><input class="form-input" id="nt-loss" type="number" value="0"></div>
+      <div id="nt-main-scoring-wrap">
+        <div style="font-size:0.85rem;font-weight:600;color:var(--text2);margin-bottom:8px">Scoring principal</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Victoire</label><input class="form-input" id="nt-win" type="number" value="3"></div>
+          <div class="form-group"><label class="form-label">Nul</label><input class="form-input" id="nt-draw" type="number" value="1"></div>
+          <div class="form-group"><label class="form-label">Défaite</label><input class="form-input" id="nt-loss" type="number" value="0"></div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text3);margin-top:-6px;margin-bottom:10px">En élimination directe, seul le résultat du match (victoire/défaite) compte pour la progression dans le tableau : ce barème ne s'applique pas.</div>
+        <div class="divider"></div>
       </div>
-      <div class="divider"></div>
       <div style="font-size:0.85rem;font-weight:600;color:var(--text2);margin-bottom:6px">Scoring secondaire : points de scénario</div>
       <div style="font-size:0.75rem;color:var(--text3);margin-bottom:10px">Renseignés directement à chaque match, ronde par ronde.</div>
       <div class="divider"></div>
@@ -1214,6 +1217,8 @@ function onPairFormatChange(){
     var wrap=roundsGroup.closest('.form-group');
     if(wrap)wrap.style.display=isBracket?'none':'';
   }
+  var mainScoringWrap=document.getElementById('nt-main-scoring-wrap');
+  if(mainScoringWrap)mainScoringWrap.style.display=isBracket?'none':'block';
 }
 function createTournament(){
   let valid=true;
@@ -1405,7 +1410,7 @@ function setPlayersSort(val){
   renderPlayers(document.querySelector('#panel-joueurs input[type="text"]')?document.querySelector('#panel-joueurs input[type="text"]').value:'');
 }
 function sortPlayersList(players, t, mode){
-  const statusOrder={active:0,inscrit:1,preinscrit:2,absent:3,eliminated_cut:4,dropped:5};
+  const statusOrder={active:0,inscrit:1,preinscrit:2,absent:3,eliminatedcut:4,dropped:5};
   const arr=players.slice();
   if(mode==='name-asc'){
     arr.sort(function(a,b){return a.name.localeCompare(b.name,'fr',{sensitivity:'base'});});
@@ -1446,7 +1451,10 @@ function renderPlayers(filter=''){
   const players=sortPlayersList(filteredPlayers, t, playersSortMode);
   const tbody=document.getElementById('players-tbody');
   if(!players.length){tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">Aucun joueur</div></div></td></tr>`;return;}
-  tbody.innerHTML=players.map((p,i)=>`<tr><td>${i+1}</td><td><strong>${escapeHtml(p.name)}</strong>${(t.awards||[]).filter(a=>a.playerId===p.id).map(a=>`<span title="${a.name}" style="cursor:default;margin-left:4px">⭐</span>`).join('')}${p.penalties&&p.penalties.length?`<span title="Bonus/Malus appliqué" style="cursor:default;margin-left:4px">⚖️</span>`:''}`+(p.note?'<br><span style="font-size:0.72rem;color:var(--text3)">'+escapeHtml(p.note)+'</span>':'')+(()=>{const bc=(t.blocks||[]).filter(b=>b.p1===p.id||b.p2===p.id).length;return bc?' <span class="badge badge-warning" title="Blocages actifs">🚫'+bc+'</span>':'';})()+`</td><td><span style="color:var(--accent2)">${escapeHtml(p.faction)||'—'}</span></td><td>${p.compo!=null?p.compo:'—'}</td><td><select class="form-input" style="padding:4px 8px;font-size:0.78rem;width:auto" onchange="setPlayerStatus('${p.id}',this.value)"><option value="preinscrit" ${normalizePlayerStatus(p.status)==='preinscrit'?'selected':''}>Préinscrit</option><option value="inscrit" ${normalizePlayerStatus(p.status)==='inscrit'?'selected':''}>Inscrit</option><option value="active" ${normalizePlayerStatus(p.status)==='active'?'selected':''}>Actif</option><option value="absent" ${normalizePlayerStatus(p.status)==='absent'?'selected':''}>Forfait</option><option value="dropped" ${normalizePlayerStatus(p.status)==='dropped'?'selected':''}>❌ Drop</option></select></td><td><button class="btn btn-secondary btn-sm" onclick="openEditPlayer('${p.id}')">✏️</button> <button class="btn btn-warning btn-sm" onclick="openPenalty('${p.id}')" title="Bonus / Malus">⚖️</button> <button class="btn btn-secondary btn-sm" onclick="openBlockModal('${p.id}')" title="Bloquer avec...">🚫</button> ${!locked?(p.status!=='dropped'?`<button style="background:rgba(231,76,60,0.15);border:1px solid var(--danger);color:var(--danger);border-radius:6px;padding:4px 8px;font-size:0.78rem;cursor:pointer" onclick="dropPlayer('${p.id}')" title="Drop">❌</button>`:`<button class="btn btn-secondary btn-sm" onclick="undropPlayer('${p.id}')" title="Réactiver">↩️</button>`)+` <button class="btn btn-danger btn-sm" onclick="deletePlayer('${p.id}')">🗑️</button>`:''}</td></tr>`).join('');
+  tbody.innerHTML=players.map((p,i)=>`<tr><td>${i+1}</td><td><strong>${escapeHtml(p.name)}</strong>${(t.awards||[]).filter(a=>a.playerId===p.id).map(a=>`<span title="${a.name}" style="cursor:default;margin-left:4px">⭐</span>`).join('')}${p.penalties&&p.penalties.length?`<span title="Bonus/Malus appliqué" style="cursor:default;margin-left:4px">⚖️</span>`:''}`+(p.note?'<br><span style="font-size:0.72rem;color:var(--text3)">'+escapeHtml(p.note)+'</span>':'')+(()=>{const bc=(t.blocks||[]).filter(b=>b.p1===p.id||b.p2===p.id).length;return bc?' <span class="badge badge-warning" title="Blocages actifs">🚫'+bc+'</span>':'';})()+`</td><td><span style="color:var(--accent2)">${escapeHtml(p.faction)||'—'}</span></td><td>${p.compo!=null?p.compo:'—'}</td><td>${normalizePlayerStatus(p.status)==='eliminatedcut'
+  ? '<span class=\"badge badge-neutral\" title=\"Éliminé du tableau\">🚫 Éliminé</span>'
+  : `<select class=\"form-input\" style=\"padding:4px 8px;font-size:0.78rem;width:auto\" onchange=\"setPlayerStatus('${p.id}',this.value)\"><option value=\"preinscrit\" ${normalizePlayerStatus(p.status)==='preinscrit'?'selected':''}>Préinscrit</option><option value=\"inscrit\" ${normalizePlayerStatus(p.status)==='inscrit'?'selected':''}>Inscrit</option><option value=\"active\" ${normalizePlayerStatus(p.status)==='active'?'selected':''}>Actif</option><option value=\"absent\" ${normalizePlayerStatus(p.status)==='absent'?'selected':''}>Forfait</option><option value=\"dropped\" ${normalizePlayerStatus(p.status)==='dropped'?'selected':''}>❌ Drop</option></select>`
+}</td><td><button class="btn btn-secondary btn-sm" onclick="openEditPlayer('${p.id}')">✏️</button> <button class="btn btn-warning btn-sm" onclick="openPenalty('${p.id}')" title="Bonus / Malus">⚖️</button> <button class="btn btn-secondary btn-sm" onclick="openBlockModal('${p.id}')" title="Bloquer avec...">🚫</button> ${!locked?(p.status!=='dropped'?`<button style="background:rgba(231,76,60,0.15);border:1px solid var(--danger);color:var(--danger);border-radius:6px;padding:4px 8px;font-size:0.78rem;cursor:pointer" onclick="dropPlayer('${p.id}')" title="Drop">❌</button>`:`<button class="btn btn-secondary btn-sm" onclick="undropPlayer('${p.id}')" title="Réactiver">↩️</button>`)+` <button class="btn btn-danger btn-sm" onclick="deletePlayer('${p.id}')">🗑️</button>`:''}</td></tr>`).join('');
 }
 function filterPlayers(v){renderPlayers(v);}
 function openAddPlayer(){openModal('modal-add-player');setTimeout(()=>buildFactionInput('ap-faction-wrap'),0);}
@@ -1618,30 +1626,89 @@ function importCSV(){
 }
 
 // STANDINGS
-function normalizePlayerStatus(s){if(s==='preinscrit'||s==='inscrit'||s==='active'||s==='absent'||s==='dropped')return s;return 'inscrit';}
+function normalizePlayerStatus(s){if(s==='preinscrit'||s==='inscrit'||s==='active'||s==='absent'||s==='dropped'||s==='eliminatedcut')return s;return 'inscrit';}
+function getBracketDepth(t){
+  const depth={};
+  if(!isBracketFormat(t))return depth;
+  const cutStart=(t.pairFormat==='hybrid'&&typeof t.cutStartIndex==='number')?t.cutStartIndex:0;
+  const allRounds=t.roundsData.slice(cutStart);
+  const bracketRounds=allRounds.filter(r=>(r.bracketKey||'main')==='main');
+  const thirdRound=allRounds.find(r=>r.bracketKey==='3rd-place');
+  t.players.forEach(p=>{depth[p.id]={wins:0,eliminatedAt:-1,champion:false,thirdPlaceWin:false,thirdPlaceLoss:false};});
+  bracketRounds.forEach((r,ri)=>{
+    if(!r.validated)return;
+    r.matches.forEach(m=>{
+      if(m.bye){if(depth[m.p1]){depth[m.p1].wins++;}return;}
+      if(!m.result)return;
+      const winnerId=m.result==='p1'?m.p1:m.result==='p2'?m.p2:null;
+      const loserId=m.result==='p1'?m.p2:m.result==='p2'?m.p1:null;
+      if(winnerId&&depth[winnerId]){depth[winnerId].wins++;}
+      if(loserId&&depth[loserId]){depth[loserId].eliminatedAt=ri;}
+    });
+  });
+  const lastRound=bracketRounds.length?bracketRounds[bracketRounds.length-1]:null;
+  if(lastRound&&lastRound.validated){
+    const winners=[];
+    lastRound.matches.forEach(m=>{
+      if(m.bye){winners.push(m.p1);return;}
+      if(m.result==='p1')winners.push(m.p1);
+      else if(m.result==='p2')winners.push(m.p2);
+    });
+    if(winners.length===1&&depth[winners[0]])depth[winners[0]].champion=true;
+  }
+  if(thirdRound&&thirdRound.validated&&thirdRound.matches.length){
+    const m=thirdRound.matches[0];
+    if(m.result==='p1'){if(depth[m.p1])depth[m.p1].thirdPlaceWin=true;if(depth[m.p2])depth[m.p2].thirdPlaceLoss=true;}
+    else if(m.result==='p2'){if(depth[m.p2])depth[m.p2].thirdPlaceWin=true;if(depth[m.p1])depth[m.p1].thirdPlaceLoss=true;}
+  }
+  return depth;
+}
 function getStandings(tournament){
   const sc=tournament.scoring||{win:3,draw:1,loss:0},hasFree=!!tournament.freeScoreName;
   const players=tournament.players.map(p=>({id:p.id,name:p.name,faction:p.faction,status:normalizePlayerStatus(p.status),compo:p.compo!=null?parseInt(p.compo)||0:null,pts:0,scenario:0,free:0,sos:0,wins:0,draws:0,losses:0,opponents:[],bonusMalus:0}));
   const pm={};players.forEach(p=>{pm[p.id]=p;});
-  tournament.roundsData.forEach(r=>{
+  const swissCutoff = tournament.pairFormat==='bracket' ? 0
+    : (tournament.pairFormat==='hybrid' && typeof tournament.cutStartIndex==='number') ? tournament.cutStartIndex
+    : tournament.roundsData.length;
+  tournament.roundsData.forEach((r,ri)=>{
     if(!r.validated)return;
+    const isSwissRound = ri < swissCutoff;
     r.matches.forEach(m=>{
-      if(m.bye){if(pm[m.p1]){pm[m.p1].pts+=sc.win;pm[m.p1].wins++;pm[m.p1].scenario+=m.byeScenario||0;if(hasFree)pm[m.p1].free+=m.byeFree||0;}return;}
+      if(m.bye){
+        if(pm[m.p1]){
+          if(isSwissRound){pm[m.p1].pts+=sc.win;pm[m.p1].wins++;}
+          pm[m.p1].scenario+=m.byeScenario||0;if(hasFree)pm[m.p1].free+=m.byeFree||0;
+        }
+        return;
+      }
       if(!m.result||!pm[m.p1]||!pm[m.p2])return;
-      pm[m.p1].opponents.push(m.p2);pm[m.p2].opponents.push(m.p1);
-      if(m.result==='p1'){pm[m.p1].pts+=sc.win;pm[m.p1].wins++;pm[m.p2].pts+=sc.loss;pm[m.p2].losses++;}
-      else if(m.result==='p2'){pm[m.p2].pts+=sc.win;pm[m.p2].wins++;pm[m.p1].pts+=sc.loss;pm[m.p1].losses++;}
-      else{pm[m.p1].pts+=sc.draw;pm[m.p1].draws++;pm[m.p2].pts+=sc.draw;pm[m.p2].draws++;}
+      if(isSwissRound){
+        pm[m.p1].opponents.push(m.p2);pm[m.p2].opponents.push(m.p1);
+        if(m.result==='p1'){pm[m.p1].pts+=sc.win;pm[m.p1].wins++;pm[m.p2].pts+=sc.loss;pm[m.p2].losses++;}
+        else if(m.result==='p2'){pm[m.p2].pts+=sc.win;pm[m.p2].wins++;pm[m.p1].pts+=sc.loss;pm[m.p1].losses++;}
+        else{pm[m.p1].pts+=sc.draw;pm[m.p1].draws++;pm[m.p2].pts+=sc.draw;pm[m.p2].draws++;}
+      }
       pm[m.p1].scenario+=m.s1||0;pm[m.p2].scenario+=m.s2||0;
       if(hasFree){pm[m.p1].free+=m.f1||0;pm[m.p2].free+=m.f2||0;}
     });
   });
   players.forEach(p=>{p.sos=p.opponents.reduce((s,oid)=>s+(pm[oid]?.pts||0),0);});
   tournament.players.forEach(pl=>{if(pl.penalties&&pl.penalties.length){const pen=pl.penalties.reduce((s,pe)=>s+pe.points,0);if(pm[pl.id]){pm[pl.id].pts+=pen;pm[pl.id].bonusMalus=pen;}}});
-  const statusPriority={active:0,absent:0,dropped:0,inscrit:1,preinscrit:1};
+  const statusPriority={active:0,absent:0,dropped:0,eliminatedcut:2,inscrit:1,preinscrit:1};
+  const bracketMode=isBracketFormat(tournament);
+  const bdepth=bracketMode?getBracketDepth(tournament):{};
   players.sort((a,b)=>{
     const pa=statusPriority[a.status]??0,pb=statusPriority[b.status]??0;
     if(pa!==pb)return pa-pb;
+    if(bracketMode){
+      const da=bdepth[a.id]||{wins:0,eliminatedAt:-1,champion:false,thirdPlaceWin:false,thirdPlaceLoss:false};
+      const db=bdepth[b.id]||{wins:0,eliminatedAt:-1,champion:false,thirdPlaceWin:false,thirdPlaceLoss:false};
+      if(da.champion!==db.champion)return da.champion?-1:1;
+      if(da.wins!==db.wins)return db.wins-da.wins;
+      if(da.eliminatedAt!==db.eliminatedAt)return db.eliminatedAt-da.eliminatedAt;
+      if(da.thirdPlaceWin!==db.thirdPlaceWin)return da.thirdPlaceWin?-1:1;
+      if(da.thirdPlaceLoss!==db.thirdPlaceLoss)return da.thirdPlaceLoss?1:-1;
+    }
     if(b.pts!==a.pts)return b.pts-a.pts;
     if(b.scenario!==a.scenario)return b.scenario-a.scenario;
     if(hasFree&&b.free!==a.free)return b.free-a.free;
@@ -1665,11 +1732,14 @@ function generatePairings(tournament,roundIndex){
   const active=tournament.players.filter(p=>p.status==='active');
   if(active.length<2)return null;
 
-  // Build history of past encounters
+  // Build history of past encounters (on exclut la ronde qu'on régénère)
   const hist={};active.forEach(p=>{hist[p.id]=new Set();});
-  tournament.roundsData.forEach(r=>r.matches.forEach(m=>{
-    if(m.p1&&m.p2){hist[m.p1]?.add(m.p2);hist[m.p2]?.add(m.p1);}
-  }));
+  tournament.roundsData.forEach((r,ri)=>{
+    if(ri===roundIndex)return;
+    r.matches.forEach(m=>{
+      if(m.p1&&m.p2){hist[m.p1]?.add(m.p2);hist[m.p2]?.add(m.p1);}
+    });
+  });
 
   const noteCriteria=tournament.noteMatchCriteria||'none';
   const gs=getGS(tournament.gameSystemId);
@@ -1870,7 +1940,13 @@ function getSeededActivePlayers(tournament){
 function generateBracketRound1(tournament){
   const seeded=getSeededActivePlayers(tournament);
   if(seeded.length<2)return null;
-  const isAvail=function(p){return p && p.status!=='dropped';};
+  const isAvail=function(p){return p && p.status!=='dropped' && p.status!=='absent';};
+  const markEliminatedIfAbsent=function(p){
+    if(p && p.status==='absent'){
+      p.status='eliminatedcut';
+      toast(p.name+' est forfait et est automatiquement éliminé du tableau.','warning',5000);
+    }
+  };
   const size=nextPow2(seeded.length);
   const order=seedOrder(size);
   const slots=order.map(seedNum=>seeded[seedNum-1]||null);
@@ -1881,9 +1957,14 @@ function generateBracketRound1(tournament){
     if(p1ok&&p2ok){
       matches.push({p1:p1.id,p2:p2.id,result:null,s1:0,s2:0,f1:0,f2:0,table:matches.length+1});
     } else if(p1ok&&!p2ok){
+      markEliminatedIfAbsent(p2);
       matches.push({p1:p1.id,p2:null,bye:true,result:'bye',byeScenario:0,byeFree:0,table:matches.length+1});
     } else if(!p1ok&&p2ok){
+      markEliminatedIfAbsent(p1);
       matches.push({p1:p2.id,p2:null,bye:true,result:'bye',byeScenario:0,byeFree:0,table:matches.length+1});
+    } else {
+      markEliminatedIfAbsent(p1);
+      markEliminatedIfAbsent(p2);
     }
   }
   return matches;
@@ -1896,7 +1977,7 @@ function generateBracketNextRound(tournament, bracketKey){
   if(!rounds.length)return null;
   const lastRound = rounds[rounds.length-1];
   const pm={};tournament.players.forEach(function(p){pm[p.id]=p;});
-  const isAvailGBNR=function(id){ var p=pm[id]; return p && p.status!=='dropped'; };
+  const isAvailGBNR=function(id){ var p=pm[id]; return p && p.status!=='dropped' && p.status!=='absent'; };
   const winners = [];
   lastRound.matches.forEach(m=>{
     if(m.bye){ winners.push(m.p1); return; }
@@ -1904,11 +1985,16 @@ function generateBracketNextRound(tournament, bracketKey){
     else if(m.result==='p2')winners.push(m.p2);
   });
   const availableWinners = winners.filter(isAvailGBNR);
-  const droppedWinners = winners.filter(function(id){return !isAvailGBNR(id);});
-  if(droppedWinners.length>0){
-    droppedWinners.forEach(function(id){
+  const unavailableWinners = winners.filter(function(id){return !isAvailGBNR(id);});
+  if(unavailableWinners.length>0){
+    unavailableWinners.forEach(function(id){
       var p=pm[id];
-      toast((p?p.name:'Un joueur qualifié')+' a été droppé et reçoit un bye au tour suivant.','warning',5000);
+      if(p&&p.status==='absent'){
+        p.status='eliminatedcut';
+        toast(p.name+' est forfait et est automatiquement éliminé du tableau.','warning',5000);
+      } else if(p){
+        toast(p.name+' a été droppé et reçoit un bye au tour suivant.','warning',5000);
+      }
     });
   }
   if(availableWinners.length<1)return null;
@@ -2025,7 +2111,7 @@ function confirmTopCut(){
   var eliminatedCount=0;
   t.players.forEach(function(p){
     if(finalQualified.indexOf(p.id)===-1 && p.status==='active'){
-      p.status='eliminated_cut';
+      p.status='eliminatedcut';
       eliminatedCount++;
     }
   });
@@ -2077,7 +2163,8 @@ function renderRoundContent(idx,container){
   var validateOnclick=allScored?'openValidate('+idx+')':'toast(\'Scores manquants\',\'warning\')';
   var validateStyle=allScored?'':'style="opacity:0.5"';
   var pendingMsg=allScored?'✅ Tous les scores saisis':'⚠️ '+pending+' manquant'+(pending>1?'s':'');
-  container.innerHTML='<div class="card"><div class="card-header"><span class="card-title">⚔️ Ronde '+(idx+1)+(r2.scenarioName?' · <span style="color:var(--accent2);font-size:0.85rem;font-weight:400">'+escapeHtml(r2.scenarioName)+'</span>':'')+'</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" onclick="printTableSheets('+idx+')">🖨️ Feuilles de table</button><button class="btn btn-secondary btn-sm" onclick="openEditPairings('+idx+')">✏️ Éditer</button><button class="btn btn-secondary btn-sm" onclick="rerollPairings('+idx+')">🔀 Relancer</button><button class="btn btn-primary btn-sm" '+validateStyle+' onclick="'+validateOnclick+'">✅ Valider</button></div></div>'+scenBanner+'<div style="margin-bottom:14px"><div style="font-size:0.8rem;color:var(--text2);margin-bottom:4px">'+pendingMsg+'</div><div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div></div>'+renderAlertPanel(pairingAlerts)+matchesHtml+'</div>';
+  var rerollBtn=isBracketFormat(t)?'':'<button class="btn btn-secondary btn-sm" onclick="rerollPairings('+idx+')">🔀 Relancer</button>';
+  container.innerHTML='<div class="card"><div class="card-header"><span class="card-title">⚔️ Ronde '+(idx+1)+(r2.scenarioName?' · <span style="color:var(--accent2);font-size:0.85rem;font-weight:400">'+escapeHtml(r2.scenarioName)+'</span>':'')+'</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" onclick="printTableSheets('+idx+')">🖨️ Feuilles de table</button><button class="btn btn-secondary btn-sm" onclick="openEditPairings('+idx+')">✏️ Éditer</button>'+rerollBtn+'<button class="btn btn-primary btn-sm" '+validateStyle+' onclick="'+validateOnclick+'">✅ Valider</button></div></div>'+scenBanner+'<div style="margin-bottom:14px"><div style="font-size:0.8rem;color:var(--text2);margin-bottom:4px">'+pendingMsg+'</div><div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div></div>'+renderAlertPanel(pairingAlerts)+matchesHtml+'</div>';
 }
 function setResult(ri,mi,result){const t=getActiveT();t.roundsData[ri].matches[mi].result=result;save();renderRoundContent(ri,document.getElementById('rounds-content'));}
 function clearResult(ri,mi){const t=getActiveT();const m=t.roundsData[ri].matches[mi];m.result=null;m.s1=0;m.s2=0;m.f1=0;m.f2=0;save();renderRoundContent(ri,document.getElementById('rounds-content'));}
@@ -2145,7 +2232,7 @@ function startNewRound(manual){
   var t=getActiveT(),idx=t.roundsData.length;
   if(t.players.filter(function(p){return p.status==='active';}).length<2){toast('Pas assez de joueurs','warning');return;}
   pendingManualRound=manual===true||t.pairFormat==='manual';
-  var notActive=t.players.filter(function(p){return p.status!=='active'&&p.status!=='eliminated_cut';});
+  var notActive=t.players.filter(function(p){return p.status!=='active'&&p.status!=='eliminatedcut';});
   if(notActive.length>0){
     var statusLabels={preinscrit:'Préinscrit',inscrit:'Inscrit',absent:'Forfait',dropped:'Drop'};
     var listStr=notActive.map(function(p){return p.name+' ('+(statusLabels[p.status]||p.status)+')';}).join(', ');
@@ -2337,26 +2424,51 @@ function openValidate(idx){
   openModal('modal-validate');
 }
 function confirmValidate(){const t=getActiveT(),idx=validateIdx;const alerts=getRoundAlerts(t,idx);if(alerts.length){toast('Alerte pairing: certains marqueurs rouges sont présents, validation autorisée.','warning');}
+  var vroundPre=t.roundsData[idx];
+  if(isBracketFormat(t)){
+    vroundPre.matches.forEach(function(m){
+      if(m.bye||m.result)return;
+      var p1=t.players.find(function(p){return p.id===m.p1;});
+      var p2=m.p2?t.players.find(function(p){return p.id===m.p2;}):null;
+      var p1Absent=p1&&p1.status==='absent';
+      var p2Absent=p2&&p2.status==='absent';
+      if(p1Absent&&!p2Absent&&p2){ m.result='p2'; toast(p1.name+' est forfait, victoire automatique de '+p2.name+'.','warning',5000); }
+      else if(p2Absent&&!p1Absent&&p1){ m.result='p1'; toast(p2.name+' est forfait, victoire automatique de '+p1.name+'.','warning',5000); }
+      else if(p1Absent&&p2Absent){ m.result='p1'; toast('Les deux joueurs sont forfait, '+ (p1?p1.name:'') +' avance par défaut.','warning',5000); }
+    });
+  }
   t.roundsData[idx].validated=true;
   if(isBracketFormat(t)){
     var vround=t.roundsData[idx];
+    var vroundKey=vround.bracketKey||'main';
     var vwinners=[];
+    var veliminated=[];
     vround.matches.forEach(function(m){
       if(m.bye){vwinners.push(m.p1);return;}
-      if(m.result==='p1')vwinners.push(m.p1);
-      else if(m.result==='p2')vwinners.push(m.p2);
+      if(m.result==='p1'){vwinners.push(m.p1);veliminated.push(m.p2);}
+      else if(m.result==='p2'){vwinners.push(m.p2);veliminated.push(m.p1);}
     });
-    if(vwinners.length===1){
+    if(vroundKey==='main'){
+      veliminated.forEach(function(pid){
+        var pl=t.players.find(function(p){return p.id===pid;});
+        if(pl&&pl.status!=='dropped')pl.status='eliminatedcut';
+      });
+    }
+    var isMainFinal = vroundKey==='main' && vwinners.length===1;
+    if(isMainFinal){
       t.status='completed';
       var wp=t.players.find(function(p){return p.id===vwinners[0];});
-      closeModal('modal-validate');renderTopbar();renderSidebar();renderRounds();renderClassement();save();
+      t.players.forEach(function(p){
+        if(p.id!==vwinners[0]&&p.status==='active')p.status='eliminatedcut';
+      });
+      closeModal('modal-validate');renderTopbar();renderSidebar();renderRounds();renderClassement();renderPlayers();save();
       toast('🏆 '+(wp?wp.name:'Le vainqueur')+' remporte le tournoi !','success');
       return;
     }
   } else if(t.pairFormat==='hybrid'){
     // Rondes suisses terminées : on attend le lancement manuel du Top Cut, ne jamais clôturer le tournoi ici.
   } else if(t.roundsData.filter(function(r){return r.validated;}).length>=t.rounds){ t.status='finished'; }
-  closeModal('modal-validate');renderTopbar();renderSidebar();renderRounds();renderClassement();save();toast(`Ronde ${idx+1} validée !`,'success');}
+  closeModal('modal-validate');renderTopbar();renderSidebar();renderRounds();renderClassement();renderPlayers();save();toast(`Ronde ${idx+1} validée !`,'success');}
 
 // CLASSEMENT
 function renderClassement(){
@@ -2366,7 +2478,7 @@ function renderClassement(){
   if(!standings.length){wrap.innerHTML='<div class="empty-state"><div class="empty-desc">Aucune donnée</div></div>';return;}
   const bracketHtml = isBracketFormat(t) ? `<div class="bracket-wrap" style="margin-bottom:24px">${renderBracketTree(t)}</div>` : '';
   const extraTh=`<th>Scénario</th>${hasFree?`<th>${t.freeScoreName}</th>`:''}`;
-  wrap.innerHTML=`${bracketHtml}<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="data-table" style="min-width:420px"><thead><tr><th>Rang</th><th>Joueur</th><th>Faction</th><th>Pts</th>${extraTh}<th>SOS</th><th>Compo</th><th>Statut</th></tr></thead><tbody>${standings.map((p,i)=>{const dropped=normalizePlayerStatus(p.status)==='dropped';const rc=dropped?'':i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';const medal=dropped?'—':i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;const extraTd=`<td><strong>${p.scenario}</strong></td>${hasFree?`<td>${p.free}</td>`:''}`;const rowStyle=dropped?'opacity:0.5;':'';return `<tr class="${rc}" style="${rowStyle}"><td>${medal}${!dropped&&i===0?' 👑':''}</td><td><strong>${dropped?`<s>${escapeHtml(p.name)}</s>`:escapeHtml(p.name)}</strong>${(t.awards||[]).filter(a=>a.playerId===p.id).map(a=>`<span title="${a.name}" style="cursor:default;margin-left:4px">⭐</span>`).join('')}${(()=>{const pl=t.players.find(x=>x.id===p.id);return pl&&pl.penalties&&pl.penalties.length?`<span title="Bonus/Malus appliqué" style="cursor:default;margin-left:4px">⚖️</span>`:'';})()}</td><td style="color:var(--accent2)">${p.faction}</td><td><strong>${p.pts}</strong></td>${extraTd}<td>${p.sos}</td><td>${p.compo!=null?p.compo:'—'}</td><td>${(()=>{const st=normalizePlayerStatus(p.status);if(st==='dropped')return '<span class=\"badge badge-drop\">❌ Drop</span>';if(st==='absent')return '<span class=\"badge badge-danger\">Forfait</span>';if(st==='preinscrit')return '<span class=\"badge badge-neutral\">Préinscrit</span>';if(st==='inscrit')return '<span class=\"badge badge-neutral\">Inscrit</span>';return '<span class=\"badge badge-success\">Actif</span>';})()}</td></tr>`;}).join('')}</tbody></table></div>`;
+  wrap.innerHTML=`${bracketHtml}<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="data-table" style="min-width:420px"><thead><tr><th>Rang</th><th>Joueur</th><th>Faction</th><th>Pts</th>${extraTh}<th>SOS</th><th>Compo</th><th>Statut</th></tr></thead><tbody>${standings.map((p,i)=>{const dropped=normalizePlayerStatus(p.status)==='dropped';const rc=dropped?'':i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';const medal=dropped?'—':i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;const extraTd=`<td><strong>${p.scenario}</strong></td>${hasFree?`<td>${p.free}</td>`:''}`;const rowStyle=dropped?'opacity:0.5;':'';return `<tr class="${rc}" style="${rowStyle}"><td>${medal}${!dropped&&i===0?' 👑':''}</td><td><strong>${dropped?`<s>${escapeHtml(p.name)}</s>`:escapeHtml(p.name)}</strong>${(t.awards||[]).filter(a=>a.playerId===p.id).map(a=>`<span title="${a.name}" style="cursor:default;margin-left:4px">⭐</span>`).join('')}${(()=>{const pl=t.players.find(x=>x.id===p.id);return pl&&pl.penalties&&pl.penalties.length?`<span title="Bonus/Malus appliqué" style="cursor:default;margin-left:4px">⚖️</span>`:'';})()}</td><td style="color:var(--accent2)">${p.faction}</td><td><strong>${p.pts}</strong></td>${extraTd}<td>${p.sos}</td><td>${p.compo!=null?p.compo:'—'}</td><td>${(()=>{const st=normalizePlayerStatus(p.status);if(st==='dropped')return '<span class=\"badge badge-drop\">❌ Drop</span>';if(st==='absent')return '<span class=\"badge badge-danger\">Forfait</span>';if(st==='eliminatedcut')return '<span class=\"badge badge-neutral\">🚫 Éliminé</span>';if(st==='preinscrit')return '<span class=\"badge badge-neutral\">Préinscrit</span>';if(st==='inscrit')return '<span class=\"badge badge-neutral\">Inscrit</span>';return '<span class=\"badge badge-success\">Actif</span>';})()}</td></tr>`;}).join('')}</tbody></table></div>`;
 }
 
 // STATS
@@ -2430,7 +2542,7 @@ function renderStats(){
     <div class="stat-grid">
       <div class="stat-card"><div class="stat-value">${activeP}</div><div class="stat-label">Joueurs actifs</div></div>
       <div class="stat-card"><div class="stat-value warning">${forfaits}</div><div class="stat-label">Forfaits</div></div>
-      <div class="stat-card"><div class="stat-value">${validated.length}/${t.rounds}</div><div class="stat-label">Rondes jouées</div></div>
+      <div class="stat-card"><div class="stat-value">${validated.length}/${isBracketFormat(t)?t.roundsData.length:t.rounds}</div><div class="stat-label">Rondes jouées</div></div>
       <div class="stat-card"><div class="stat-value success">${totalW}</div><div class="stat-label">Victoires totales</div></div>
       <div class="stat-card"><div class="stat-value warning">${totalD}</div><div class="stat-label">Matchs nuls</div></div>
       <div class="stat-card"><div class="stat-value">${avgScen}</div><div class="stat-label">Moy. scénario</div></div>
@@ -2758,17 +2870,20 @@ function renderParams(){
       <div class="form-group"><label class="form-label">Date</label><input class="form-input" type="date" value="${t.date||''}" onchange="updParam('date',this.value)"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Rondes</label><input class="form-input" type="number" value="${t.rounds}" onchange="updParam('rounds',parseInt(this.value))"></div>
+      ${t.pairFormat!=='bracket' ? `<div class="form-group"><label class="form-label">Rondes</label><input class="form-input" type="number" value="${t.rounds}" onchange="updParam('rounds',parseInt(this.value))"></div>` : ''}
       <div class="form-group"><label class="form-label">Taille de liste</label><input class="form-input" type="number" value="${t.listSize}" onchange="updParam('listSize',parseInt(this.value))"></div>
     </div>
-    <div class="divider"></div>
+    <div class="divider"></div>${t.pairFormat!=='bracket' ? `
     <div style="font-weight:700;font-size:0.9rem;margin-bottom:12px">🎯 Barème</div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Victoire</label><input class="form-input" type="number" value="${sc.win}" onchange="updScoring('win',parseInt(this.value))"></div>
       <div class="form-group"><label class="form-label">Nul</label><input class="form-input" type="number" value="${sc.draw}" onchange="updScoring('draw',parseInt(this.value))"></div>
       <div class="form-group"><label class="form-label">Défaite</label><input class="form-input" type="number" value="${sc.loss}" onchange="updScoring('loss',parseInt(this.value))"></div>
     </div>
-    <div class="divider"></div>
+    <div class="divider"></div>` : `
+    <div style="font-size:0.78rem;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:14px">
+      ℹ️ Format élimination directe : le barème victoire/nul/défaite ne s'applique pas, seule la progression dans le tableau compte.
+    </div>`}
     <div class="form-group"><label class="form-label">Score libre <span style="color:var(--text3);font-weight:400">(vide = désactivé)</span></label><input class="form-input" value="${t.freeScoreName||''}" placeholder="Ex: Kill Count" onchange="updParam('freeScoreName',this.value.trim()||null)"></div>
     <div class="form-group"><label class="form-label">Système de jeu</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input" value="${gs.name}" disabled><button class="btn btn-secondary btn-sm" onclick="openEditTournamentSystem()">Modifier</button></div></div>
     <div class="form-group"><label class="form-label">Notes</label><textarea class="form-input" rows="3" onchange="updParam('notes',this.value)">${t.notes||''}</textarea>
@@ -3006,7 +3121,7 @@ function exportStatsCSV() {
   let out = [];
   out.push('VUE D\'ENSEMBLE');
   out.push('Joueurs actifs;Forfaits;Rondes jouées;Victoires totales;Matchs nuls;Moy. scénario');
-  out.push(`${activeP};${forfaits};${validated.length}/${t.rounds};${totalW};${totalD};${avgScen}`);
+  out.push(`${activeP};${forfaits};${validated.length}/${isBracketFormat(t)?t.roundsData.length:t.rounds};${totalW};${totalD};${avgScen}`);
   out.push('');
   out.push('STATS PAR FACTION');
   out.push(`Faction;Joueurs;V;N;D;% Victoire;Moy. Scénario${hasFree?';Moy. '+t.freeScoreName:''}`);
@@ -3102,7 +3217,7 @@ function exportStatsPDF() {
     <div class="stat-grid">
       <div class="stat-card"><div class="stat-value">${activeP}</div><div class="stat-label">Joueurs actifs</div></div>
       <div class="stat-card"><div class="stat-value">${forfaits}</div><div class="stat-label">Forfaits</div></div>
-      <div class="stat-card"><div class="stat-value">${validated.length}/${t.rounds}</div><div class="stat-label">Rondes jouées</div></div>
+      <div class="stat-card"><div class="stat-value">${validated.length}/${isBracketFormat(t)?t.roundsData.length:t.rounds}</div><div class="stat-label">Rondes jouées</div></div>
       <div class="stat-card"><div class="stat-value">${totalW}</div><div class="stat-label">Victoires</div></div>
       <div class="stat-card"><div class="stat-value">${totalD}</div><div class="stat-label">Nuls</div></div>
       <div class="stat-card"><div class="stat-value">${avgScen}</div><div class="stat-label">Moy. scénario</div></div>
