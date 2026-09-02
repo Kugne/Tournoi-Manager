@@ -20,7 +20,7 @@ Idéal pour :
 
 ✨ Fonctionnalités
 
-    3 formats d'appariement : système suisse automatique, élimination directe(bracket avec tableau SVG), et composition manuelle des tables
+    4 formats d'appariement : système suisse automatique, élimination directe(bracket avec tableau SVG), hybride suisse + élimination directe et composition manuelle des tables
     Moteur suisse avancé : évite les revanches, les miroirs de faction, gèreles allégeances, les blocages manuels, la compo et les notes libres
     Gestion complète des joueurs : import CSV, statuts (préinscrit, actif,absent, drop), blocages, bonus/malus
     Scoring personnalisable : barème V/N/D libre, points de scénario, scorelibre (Kill Count...), pénalités
