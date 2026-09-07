@@ -395,7 +395,7 @@
 
           <div class="info-panel" id="info-panel-suisse" style="display:none">
             <h2 style="margin-top:0">⚔️ Système d'appariement suisse</h2>
-            <p style="color:var(--text2);font-size:0.9rem">Le moteur construit toutes les paires possibles de joueurs, calcule un score pour chacune, puis choisit greedy les meilleures paires en évitant de réutiliser un joueur déjà appairé.</p>
+            <p style="color:var(--text2);font-size:0.9rem">Le moteur calcule le score de chaque paire possible, puis sélectionne les meilleures paires disponibles sans réutiliser un joueur déjà appairé (méthode greedy). Il essaie ensuite d’échanger les adversaires entre deux matchs pour améliorer leur score total. Cette correction ne garantit pas le meilleur ensemble possible de rencontres. Ce fonctionnement s’applique au format suisse et à la phase suisse du format hybride.</p>
             <h3>Barème du score</h3>
             <table class="data-table">
               <thead><tr><th>Critère</th><th>Poids</th><th>Effet</th></tr></thead>
@@ -407,7 +407,7 @@
                 <tr><td>Note libre non respectée</td><td>-50</td><td>Actif selon le mode choisi (Regrouper/Séparer)</td></tr>
                 <tr><td>Écart de points</td><td>-100 / point</td><td>Cœur du système suisse : rapproche les niveaux</td></tr>
                 <tr><td>Écart de compo</td><td>-50 / point</td><td>Actif si « Compo » est coché</td></tr>
-                <tr><td>Écart de SOS</td><td>-10 / point</td><td>Départage fin, discret</td></tr>
+                <tr><td>Écart de SOS</td><td>-1 / point</td><td>Départage fin, discret</td></tr>
               </tbody>
             </table>
             <h3>Ordre de tri initial</h3>
@@ -418,7 +418,7 @@
             <h3>Gestion du bye</h3>
             <p style="color:var(--text2);font-size:0.9rem">Si le nombre de joueurs actifs est impair, le joueur qui n'a jamais eu de bye est prioritaire pour le recevoir, en partant du bas du classement.</p>
             <h3>Sécurités</h3>
-            <p style="color:var(--text2);font-size:0.9rem">Le moteur avertit par un message quand il doit forcer un appariement malgré une répétition, un blocage ou une même allégeance, ce qui peut arriver si le nombre de joueurs est trop faible pour respecter toutes les contraintes.</p>
+            <p style="color:var(--text2);font-size:0.9rem">Le moteur avertit par un message si un appariement proposé comporte une répétition, un blocage manuel ou, lorsque l’option correspondante est activée, une même faction ou une même allégeance. Ces alertes signalent les contraintes non respectées ; elles ne signifient pas qu’aucune autre combinaison ne permettrait de les éviter.</p>
           </div>
 
           <div class="info-panel" id="info-panel-elimination" style="display:none">
@@ -591,13 +591,13 @@
       </div>
       <div class="form-group">
         <div style="display:flex;align-items:center;gap:8px">
-          <input type="checkbox" id="nt-free-pairing" style="width:18px;height:18px;cursor:pointer;flex:0 0 auto">
+          <input type="checkbox" id="nt-free-pairing" onchange="document.getElementById('nt-free-pairing-mode').disabled=!this.checked" style="width:18px;height:18px;cursor:pointer;flex:0 0 auto">
           <label for="nt-free-pairing" style="cursor:pointer;font-size:0.85rem;display:inline-flex;align-items:center;gap:6px;line-height:1">
             <span title="Lors de la création des joueurs, vous pourrez ajouter une note libre qui sera prise en compte pour les appariements">Note libre</span>
           </label>
         </div>
         <div style="margin-left:26px;margin-top:6px;max-width:280px">
-          <select class="form-input" id="nt-free-pairing-mode">
+          <select class="form-input" id="nt-free-pairing-mode" disabled>
             <option value="group">Regrouper</option>
             <option value="separate">Séparer</option>
           </select>
@@ -930,6 +930,7 @@ function getAudioCtx(){if(!sharedAudioCtx){try{sharedAudioCtx=new(window.AudioCo
 
 let undoStack=[],lastSnapshot=null;
 const UNDO_LIMIT=20;
+let saveFailureActive=false;
 function save(){
   const current=JSON.stringify(S);
   if(lastSnapshot!==null&&lastSnapshot!==current){
@@ -938,8 +939,19 @@ function save(){
     updateUndoButton();
   }
   lastSnapshot=current;
-  localStorage.setItem('tm4',current);
-  document.getElementById('save-ind').textContent='💾 Sauvegardé';
+  const indicator=document.getElementById('save-ind');
+  try{
+    localStorage.setItem('tm4',current);
+  }catch(error){
+    if(indicator)indicator.textContent='⚠️ Échec de sauvegarde';
+    if(!saveFailureActive){
+      saveFailureActive=true;
+      toast('⚠️ Échec de sauvegarde dans le navigateur. Les tentatives continuent automatiquement.','error',7000);
+    }
+    return;
+  }
+  saveFailureActive=false;
+  if(indicator)indicator.textContent='💾 Sauvegardé';
 }
 function load(){try{const r=localStorage.getItem('tm4');if(r)S=JSON.parse(r);}catch(e){}lastSnapshot=JSON.stringify(S);}
 function updateUndoButton(){
@@ -1196,7 +1208,7 @@ function setActiveT(id){
   if(t){document.getElementById('welcome').style.display='none';document.getElementById('view-gs').style.display='none';document.getElementById('view-info').style.display='none';document.getElementById('tabs').style.display='flex';document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));S.view='tournaments';document.getElementById('nav-t').classList.add('active');document.getElementById('nav-gs').classList.remove('active');document.getElementById('nav-info').classList.remove('active');switchTab('joueurs');}
   save();
 }
-function openNewTournament(){updateGSSelects();document.getElementById('nt-pair-format').value='swiss';onPairFormatChange();openModal('modal-new-tournament');}
+function openNewTournament(){document.getElementById('nt-free-pairing-mode').disabled=!document.getElementById('nt-free-pairing').checked;updateGSSelects();document.getElementById('nt-pair-format').value='swiss';onPairFormatChange();openModal('modal-new-tournament');}
 function onPairFormatChange(){
   var val=document.getElementById('nt-pair-format').value;
   var isBracket=(val==='bracket');
@@ -1220,6 +1232,10 @@ function onPairFormatChange(){
   var mainScoringWrap=document.getElementById('nt-main-scoring-wrap');
   if(mainScoringWrap)mainScoringWrap.style.display=isBracket?'none':'block';
 }
+function readScoringValue(id,fallback){
+  const value=parseInt(document.getElementById(id).value,10);
+  return Number.isNaN(value)?fallback:value;
+}
 function createTournament(){
   let valid=true;
   const name=document.getElementById('nt-name').value.trim();
@@ -1234,7 +1250,7 @@ function createTournament(){
   if(!valid){toast('Merci de remplir les champs obligatoires','warning');return;}
   const freeScore=document.getElementById('nt-freescore').value.trim();
   const dateEnd=document.getElementById('nt-date-end').value;
-  const t={id:uid(),name,rounds:parseInt(roundsVal)||4,date:document.getElementById('nt-date').value,dateEnd:dateEnd||null,listSize:parseInt(document.getElementById('nt-listsize').value)||2000,gameSystemId:gsVal,scoring:{win:parseInt(document.getElementById('nt-win').value)||3,draw:parseInt(document.getElementById('nt-draw').value)||1,loss:parseInt(document.getElementById('nt-loss').value)||0},freeScoreName:freeScore||null,notes:document.getElementById('nt-notes').value,compoPairing:document.getElementById('nt-compo-pairing').checked,pairFormat:document.getElementById('nt-pair-format').value,secondaryCriteria:{compo:document.getElementById('nt-compo-pairing').checked,free:document.getElementById('nt-free-pairing').checked?document.getElementById('nt-free-pairing-mode').value:'none',allegiance:document.getElementById('nt-allegiance-pairing').checked,mirror:document.getElementById('nt-no-mirror').checked}, noteMatchCriteria:document.getElementById('nt-free-pairing').checked?document.getElementById('nt-free-pairing-mode').value:'none',thirdPlaceMatch:document.getElementById('nt-pair-format').value==='bracket'&&document.getElementById('nt-third-place')?document.getElementById('nt-third-place').checked:(document.getElementById('nt-pair-format').value==='hybrid'&&document.getElementById('nt-third-place-hybrid')?document.getElementById('nt-third-place-hybrid').checked:false),status:'waiting',players:[],roundsData:[],currentRound:0,createdAt:new Date().toISOString(),awards:[],hybridPhase:document.getElementById('nt-pair-format').value==='hybrid'?'swiss':null,cutSize:document.getElementById('nt-pair-format').value==='hybrid'&&document.getElementById('nt-cut-size')?parseInt(document.getElementById('nt-cut-size').value):null,cutSeeds:[],cutStartIndex:null};
+  const t={id:uid(),name,rounds:parseInt(roundsVal)||4,date:document.getElementById('nt-date').value,dateEnd:dateEnd||null,listSize:parseInt(document.getElementById('nt-listsize').value)||2000,gameSystemId:gsVal,scoring:{win:readScoringValue('nt-win',3),draw:readScoringValue('nt-draw',1),loss:readScoringValue('nt-loss',0)},freeScoreName:freeScore||null,notes:document.getElementById('nt-notes').value,compoPairing:document.getElementById('nt-compo-pairing').checked,pairFormat:document.getElementById('nt-pair-format').value,secondaryCriteria:{compo:document.getElementById('nt-compo-pairing').checked,free:document.getElementById('nt-free-pairing').checked?document.getElementById('nt-free-pairing-mode').value:'none',allegiance:document.getElementById('nt-allegiance-pairing').checked,mirror:document.getElementById('nt-no-mirror').checked}, noteMatchCriteria:document.getElementById('nt-free-pairing').checked?document.getElementById('nt-free-pairing-mode').value:'none',thirdPlaceMatch:document.getElementById('nt-pair-format').value==='bracket'&&document.getElementById('nt-third-place')?document.getElementById('nt-third-place').checked:(document.getElementById('nt-pair-format').value==='hybrid'&&document.getElementById('nt-third-place-hybrid')?document.getElementById('nt-third-place-hybrid').checked:false),status:'waiting',players:[],roundsData:[],currentRound:0,createdAt:new Date().toISOString(),awards:[],hybridPhase:document.getElementById('nt-pair-format').value==='hybrid'?'swiss':null,cutSize:document.getElementById('nt-pair-format').value==='hybrid'&&document.getElementById('nt-cut-size')?parseInt(document.getElementById('nt-cut-size').value):null,cutSeeds:[],cutStartIndex:null};
   const prepAll = t.pairFormat==='manual' && document.getElementById('nt-prep-all-rounds') && document.getElementById('nt-prep-all-rounds').checked;
   t.prepAllRoundsOption = prepAll;
   S.tournaments.unshift(t);closeModal('modal-new-tournament');document.getElementById('nt-name').value='';document.getElementById('nt-freescore').value='';document.getElementById('nt-date-end').value='';setActiveT(t.id);
@@ -1807,7 +1823,7 @@ function generatePairings(tournament,roundIndex){
     }
     // SOS tiebreaker proximity
     const sosDiff=Math.abs(s1.sos-s2.sos);
-    score-=sosDiff*10;
+    score-=sosDiff*1;
     return score;
   }
 
@@ -1865,24 +1881,16 @@ function generatePairings(tournament,roundIndex){
     }
   }
 
-  // Warn on any remaining hard/soft-penalized forced pairings after optimization
+  // Report actual constraint violations independently of the total pair score.
   pairs.forEach(m=>{
     const c1=idMap[m.p1],c2=idMap[m.p2];
-    const sc=getScore(c1,c2);
-    if(sc<=-8000){
-      const fn1=(tournament.players.find(x=>x.id===m.p1)||{name:'?'}).name;
-      const fn2=(tournament.players.find(x=>x.id===m.p2)||{name:'?'}).name;
-      if(isBlocked(tournament,m.p1,m.p2))toast('⚠️ Blocage ignoré : '+fn1+' vs '+fn2+' — forcé','warning',7000);
-      else if(hist[m.p1]?.has(m.p2))toast('⚠️ Déjà rencontrés : '+fn1+' vs '+fn2+' — forcé','warning',7000);
-    } else if(sc<=-2000&&sc>-8000){
+    const fn1=c1.name||'?',fn2=c2.name||'?';
+    if(isBlocked(tournament,m.p1,m.p2))toast('⚠️ Blocage ignoré : '+fn1+' vs '+fn2+' — forcé','warning',7000);
+    if(hist[m.p1]?.has(m.p2))toast('⚠️ Déjà rencontrés : '+fn1+' vs '+fn2+' — forcé','warning',7000);
+    if(tournament.secondaryCriteria?.mirror&&c1.faction&&c2.faction&&c1.faction===c2.faction)toast('⚠️ Match miroir ('+c1.faction+') : '+fn1+' vs '+fn2+' — forcé','warning',7000);
+    if(tournament.secondaryCriteria?.allegiance){
       const al1=getAllegiance(gs,c1.faction),al2=getAllegiance(gs,c2.faction);
-      const fn1=(tournament.players.find(x=>x.id===m.p1)||{name:'?'}).name;
-      const fn2=(tournament.players.find(x=>x.id===m.p2)||{name:'?'}).name;
       if(al1&&al2&&al1===al2)toast('⚠️ Même allégeance ('+al1+') : '+fn1+' vs '+fn2+' — forcé','warning',7000);
-    } else if(sc<=-3000&&sc>-2000){
-      const fn1=(tournament.players.find(x=>x.id===m.p1)||{name:'?'}).name;
-      const fn2=(tournament.players.find(x=>x.id===m.p2)||{name:'?'}).name;
-      if(c1.faction&&c2.faction&&c1.faction===c2.faction)toast('⚠️ Match miroir ('+c1.faction+') : '+fn1+' vs '+fn2+' — forcé','warning',7000);
     }
   });
 
@@ -2918,7 +2926,7 @@ function renderParams(){
           </label>
         </div>
         <div style="margin-left:26px;margin-top:6px;max-width:320px">
-          <select class="form-input" id="param-free-pairing-mode" onchange="updParam('noteMatchCriteria',this.value)">
+          <select class="form-input" id="param-free-pairing-mode" ${(t.noteMatchCriteria||'none')==='none'?'disabled':''} onchange="if(document.getElementById('param-free-pairing').checked)updParam('noteMatchCriteria',this.value)">
             <option value="group" ${t.noteMatchCriteria==='group'?'selected':''}>Regrouper — même note jouent ensemble</option>
             <option value="separate" ${t.noteMatchCriteria==='separate'?'selected':''}>Séparer — même note évitent de se rencontrer</option>
             </select>
@@ -2964,7 +2972,14 @@ function updParam(k,v){
     t[k]=n;renderTopbar();save();
     return;
   }
-  t[k]=v;renderTopbar();save();
+  t[k]=v;
+  if(k==='noteMatchCriteria'){
+    const checkbox=document.getElementById('param-free-pairing');
+    const mode=document.getElementById('param-free-pairing-mode');
+    if(checkbox)checkbox.checked=v!=='none';
+    if(mode){mode.disabled=v==='none';if(v!=='none')mode.value=v;}
+  }
+  renderTopbar();save();
 }
 function updSecondaryCriteria(k,v){const t=getActiveT();if(!t)return;if(!t.secondaryCriteria)t.secondaryCriteria={};t.secondaryCriteria[k]=v;renderTopbar();save();}
 function updScoring(k,v){const t=getActiveT();if(!t)return;if(!t.scoring)t.scoring={win:3,draw:1,loss:0};t.scoring[k]=v;save();}
