@@ -110,6 +110,6 @@ Terminé : le solveur est porté en ESM strict et `BigInt`, audité indépendamm
 
 ### 2C — Variantes et performances
 
-En cours : l'énumération Lawler/Murty des variantes optimales est implémentée avec une limite sûre d'une variante par appel, des signatures injectives, l'exclusion des variantes persistées et des états distincts pour limite, interruption et épuisement prouvé. Restent le Worker, les seuils temporels et les mesures dans les navigateurs ciblés.
+En cours : l'énumération Lawler/Murty des variantes optimales est implémentée avec une limite sûre d'une variante par appel, des signatures injectives, l'exclusion des variantes persistées et des états distincts pour limite, interruption et épuisement prouvé. Le protocole Worker et son exécuteur couvrent l'alerte à trois secondes, l'annulation, l'arrêt forcé à quinze secondes et le rejet des réponses tardives. Restent les mesures dans les navigateurs ciblés et l'intégration applicative ultérieure.
 
 Le lot 2 reste isolé : aucun de ces sous-lots ne remplace `generatePairings()` dans l'application.
