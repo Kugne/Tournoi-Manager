@@ -39,6 +39,8 @@ Les idées sont conservées pour en discuter à la prochaine séance de travail.
 
 ## Décisions et suivi
 
+- 2026-09-27 — Sous-lots 2A et 2B du moteur Suisse optimal réalisés sur la branche `feat/swiss-optimizer-phase1` : encodage lexicographique exact en `BigInt`, solveur Blossom exact à couplage parfait, provenance et licence conservées, puis assemblage validé contre l'oracle exhaustif. Les blocages produisent une infaisabilité explicite et aucun résultat partiel. Les tests couvrent toutes les topologies simples à six sommets, des graphes pondérés aléatoires, les cycles impairs, les poids au-delà de `Number.MAX_SAFE_INTEGER` et 64 sommets. L'application V1.9.32 reste inchangée ; le sous-lot 2C (variantes, Worker, délais et mesures navigateurs) est la prochaine étape.
+
 - 2026-09-26 — Méthodologie de réalisation validée : conduire la phase 1 par lots autonomes et reprenables, dans l'ordre cadrage Git, socle de tests et oracle, moteur optimal isolé, intégration Suisse, intégration hybride, byes/forfaits/SOS, éditeur d'appariements, puis validation finale et version. Chaque lot doit laisser le dépôt utilisable et être vérifié avant le suivant ; `main` et la V1.9.32 restent intacts tant que l'ensemble n'est pas validé. Le détail et les critères de sortie sont conservés dans [le plan de réalisation](docs/PLAN-PHASE-1-SUISSE-INDIVIDUEL.md).
 
 - 2026-09-26 — Cas d'un seul joueur actif validé : refuser de lancer une ronde Suisse et afficher un message demandant de réactiver un participant, de terminer le tournoi ou d'annuler l'opération. Ne jamais créer une ronde composée uniquement d'un bye, qui attribuerait artificiellement une victoire sans aucune rencontre possible.

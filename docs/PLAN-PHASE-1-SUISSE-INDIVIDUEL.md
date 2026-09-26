@@ -36,12 +36,12 @@ Critère de sortie : les tests caractérisent l'existant et peuvent prouver l'op
 
 ### Lot 2 — Moteur optimal isolé
 
-- Réaliser le sous-lot 2A : encodage exact des objectifs lexicographiques en coûts additifs `BigInt`.
-- Réaliser le sous-lot 2B : solveur de couplage parfait pondéré Blossom audité et compatible `BigInt`.
-- Réaliser le sous-lot 2C : variantes optimales, délais, annulation et mesures de performance.
-- Implémenter une fonction pure recevant un contexte d'appariement et retournant appariements, bye, vecteur d'objectif et diagnostics.
-- Comparer systématiquement ses résultats à l'oracle sur les petits effectifs.
-- Tester les performances jusqu'à 64 joueurs.
+- [x] Sous-lot 2A : encodage exact des objectifs lexicographiques en coûts additifs `BigInt`.
+- [x] Sous-lot 2B : solveur de couplage parfait pondéré Blossom audité et compatible `BigInt`.
+- [ ] Sous-lot 2C : variantes optimales, délais, annulation et mesures de performance.
+- [x] Implémenter une fonction pure recevant un contexte d'appariement sans bye et retournant appariements, coût et diagnostics.
+- [x] Comparer systématiquement ses résultats à l'oracle sur les petits effectifs.
+- [ ] Compléter les mesures de performance à 64 joueurs dans les navigateurs ciblés ; la mesure Node locale est déjà couverte.
 - Appliquer les seuils validés : objectif inférieur à une seconde, alerte à trois secondes, arrêt sécurisé à quinze secondes.
 
 Critère de sortie : moteur exact testé, mesuré et encore non activé dans l'application.

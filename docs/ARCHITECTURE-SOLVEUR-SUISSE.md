@@ -1,7 +1,7 @@
 # Architecture du solveur Suisse optimal
 
 Date : 2026-09-26
-Statut : architecture de travail du lot 2, avant intégration dans l'application
+Statut : sous-lots 2A et 2B réalisés et testés, avant intégration dans l'application
 
 ## Décision
 
@@ -57,7 +57,9 @@ Les critères désactivés n'ajoutent aucune coordonnée. La diversité des fact
 
 ## Solveur Blossom
 
-La base d'audit privilégiée est `networkx.algorithms.matching.max_weight_matching`, épinglée sur la version **NetworkX 3.4.2**, commit signé **`2acf159`**. NetworkX documente une complexité `O(n³)` et recommande les poids entiers pour éviter les erreurs de précision. Le projet est sous licence BSD-3-Clause.
+Le port effectivement retenu est `mattkrick/EdmondsBlossom`, commit **`fab7ca8505e1577b009696c038dc804cf0acbea2`**, sous licence MIT. Il dérive de l'implémentation de Joris van Rantwijk utilisée historiquement par NetworkX. La notice complète, la licence et les adaptations sont conservées dans `src/swiss/THIRD_PARTY_BLOSSOM.md`.
+
+NetworkX 3.4.2, commit signé **`2acf159`**, reste la seconde base d'audit algorithmique. Sa documentation indique une complexité `O(n³)` et recommande les poids entiers pour éviter les erreurs de précision.
 
 Références :
 
@@ -68,7 +70,7 @@ Références :
 
 Avant intégration, conserver dans le dépôt :
 
-- le commit amont exact (`2acf159`) ;
+- le commit amont exact du port (`fab7ca8505e1577b009696c038dc804cf0acbea2`) ;
 - le copyright et la licence ;
 - la liste des adaptations Python vers JavaScript et entier vers `BigInt` ;
 - les tests amont pertinents portés ou reproduits ;
@@ -100,11 +102,11 @@ Il est impossible de matérialiser toutes les variantes d'un grand graphe symét
 
 ### 2A — Encodage BigInt
 
-Prouver l'équivalence exacte entre l'objectif de l'oracle et la somme des coûts encodés.
+Terminé : l'équivalence exacte entre l'objectif de l'oracle et la somme des coûts encodés est couverte par les tests exhaustifs et pseudo-aléatoires.
 
 ### 2B — Blossom BigInt
 
-Porter et auditer le solveur, puis le comparer à l'oracle sur tous les petits graphes et sur des graphes pondérés aléatoires.
+Terminé : le solveur est porté en ESM strict et `BigInt`, audité indépendamment, comparé à l'oracle sur tous les graphes simples à six sommets et sur des graphes pondérés aléatoires. L'assemblage 2A + 2B est également comparé à l'oracle Suisse.
 
 ### 2C — Variantes et performances
 
