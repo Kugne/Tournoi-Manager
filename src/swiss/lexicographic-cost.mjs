@@ -232,6 +232,9 @@ export const buildLexicographicCostModel = (participants, context = {}) => {
   if (participants.some((participant) => participant?.id == null || String(participant.id).trim() === '')) {
     throw new Error('Chaque participant doit avoir un identifiant non vide');
   }
+  if (participants.some((participant) => String(participant.id).includes('\u0000'))) {
+    throw new Error('Les identifiants ne peuvent pas contenir le caractère NUL');
+  }
   const ids = participants.map((participant) => String(participant.id));
   if (new Set(ids).size !== ids.length) throw new Error('Les identifiants des participants doivent être uniques');
   const normalizedParticipants = participants.map((participant) => ({ ...participant, id: String(participant.id) }));

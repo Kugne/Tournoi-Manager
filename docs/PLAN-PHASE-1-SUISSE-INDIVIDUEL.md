@@ -39,6 +39,9 @@ Critère de sortie : les tests caractérisent l'existant et peuvent prouver l'op
 - [x] Sous-lot 2A : encodage exact des objectifs lexicographiques en coûts additifs `BigInt`.
 - [x] Sous-lot 2B : solveur de couplage parfait pondéré Blossom audité et compatible `BigInt`.
 - [ ] Sous-lot 2C : variantes optimales, délais, annulation et mesures de performance.
+  - [x] Énumération bornée des variantes optimales inédites et preuve d'épuisement.
+  - [ ] Exécution en Worker, alerte à trois secondes et arrêt sécurisé à quinze secondes.
+  - [ ] Mesures dans les navigateurs ciblés.
 - [x] Implémenter une fonction pure recevant un contexte d'appariement sans bye et retournant appariements, coût et diagnostics.
 - [x] Comparer systématiquement ses résultats à l'oracle sur les petits effectifs.
 - [ ] Compléter les mesures de performance à 64 joueurs dans les navigateurs ciblés ; la mesure Node locale est déjà couverte.

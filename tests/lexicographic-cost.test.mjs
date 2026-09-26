@@ -125,6 +125,7 @@ test('les données numériques non finies sont refusées', () => {
   );
   assert.throws(() => buildLexicographicCostModel([{ id: '' }, { id: 'B' }]), /identifiant non vide/);
   assert.throws(() => buildLexicographicCostModel([{ id: null }, { id: 'B' }]), /identifiant non vide/);
+  assert.throws(() => buildLexicographicCostModel([{ id: 'A\u0000B' }, { id: 'C' }]), /caractère NUL/);
 });
 
 test('les blocages retirent les arêtes sans fabriquer de couplage', () => {

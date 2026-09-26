@@ -110,6 +110,6 @@ Terminé : le solveur est porté en ESM strict et `BigInt`, audité indépendamm
 
 ### 2C — Variantes et performances
 
-Implémenter l'énumération des variantes, les délais, l'annulation et les mesures à 32/64 joueurs.
+En cours : l'énumération Lawler/Murty des variantes optimales est implémentée avec une limite sûre d'une variante par appel, des signatures injectives, l'exclusion des variantes persistées et des états distincts pour limite, interruption et épuisement prouvé. Restent le Worker, les seuils temporels et les mesures dans les navigateurs ciblés.
 
 Le lot 2 reste isolé : aucun de ces sous-lots ne remplace `generatePairings()` dans l'application.
