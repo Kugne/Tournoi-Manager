@@ -70,6 +70,7 @@ Le cadrage de la phase 1 de fiabilisation du Suisse individuel est conservé dan
 
 - [la spécification fonctionnelle et technique](docs/SPECIFICATIONS-SUISSE-INDIVIDUEL-2026-09-26.md) ;
 - [le plan de réalisation par lots reprenables](docs/PLAN-PHASE-1-SUISSE-INDIVIDUEL.md) ;
+- [l'architecture du solveur exact](docs/ARCHITECTURE-SOLVEUR-SUISSE.md) ;
 - [le carnet des idées et décisions](IDEES.md).
 
 La phase 2 consacrée au Suisse par équipes reste hors périmètre de l'implémentation actuelle.
