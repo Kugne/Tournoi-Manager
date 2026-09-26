@@ -1,7 +1,7 @@
 # Architecture du solveur Suisse optimal
 
 Date : 2026-09-26
-Statut : sous-lots 2A et 2B réalisés et testés, avant intégration dans l'application
+Statut : lot 2 réalisé et testé, avant intégration dans l'application
 
 ## Décision
 
@@ -78,7 +78,7 @@ Avant intégration, conserver dans le dépôt :
 
 ## Worker et délais
 
-Le solveur fonctionnera dans un Web Worker créé depuis un Blob embarqué dans le HTML final :
+Le solveur fonctionne dans un Web Worker de type module chargé directement depuis son URL :
 
 - l'interface reste réactive ;
 - à trois secondes, afficher le calcul anormalement long et proposer l'annulation ;
@@ -86,7 +86,7 @@ Le solveur fonctionnera dans un Web Worker créé depuis un Blob embarqué dans 
 - associer un identifiant unique à chaque calcul afin qu'une réponse tardive ne soit jamais appliquée ;
 - appliquer le résultat uniquement après réception atomique d'un couplage complet vérifié.
 
-La source du Worker restera également sous forme de module testable dans le dépôt. Une génération déterministe l'intégrera au HTML et un test vérifiera l'identité de la source embarquée.
+Le lancement direct du module est retenu après validation en navigateur : l'enveloppe intermédiaire par URL Blob ne recevait pas les messages dans le Chromium embarqué, alors que le Worker module direct exécute le même protocole correctement. Lors de l'intégration au HTML monofichier, la génération devra donc produire un module Worker adressable sans réintroduire cette enveloppe défaillante.
 
 ## Variantes optimales
 
@@ -110,6 +110,8 @@ Terminé : le solveur est porté en ESM strict et `BigInt`, audité indépendamm
 
 ### 2C — Variantes et performances
 
-En cours : l'énumération Lawler/Murty des variantes optimales est implémentée avec une limite sûre d'une variante par appel, des signatures injectives, l'exclusion des variantes persistées et des états distincts pour limite, interruption et épuisement prouvé. Le protocole Worker et son exécuteur couvrent l'alerte à trois secondes, l'annulation, l'arrêt forcé à quinze secondes et le rejet des réponses tardives. Restent les mesures dans les navigateurs ciblés et l'intégration applicative ultérieure.
+Terminé dans le moteur isolé : l'énumération Lawler/Murty des variantes optimales est implémentée avec une limite sûre d'une variante par appel, des signatures injectives, l'exclusion des variantes persistées et des états distincts pour limite, interruption et épuisement prouvé. Le protocole Worker et son exécuteur couvrent l'alerte à trois secondes, l'annulation, l'arrêt forcé à quinze secondes et le rejet des réponses tardives.
+
+Le 2026-09-27, le banc reproductible `tests/browser-benchmark.html` a été exécuté dans le Chromium disponible (Chrome 154) avec 64 joueurs et jusqu'à 2 016 arêtes : 30 calculs initiaux, médiane 34 ms, 95e centile 37 ms, maximum 57 ms ; puis 10 demandes successives de variante optimale, médiane 306 ms, 95e centile 411 ms, maximum 442 ms. Les 32 paires sont complètes et aucun Worker ne reste en attente. L'objectif inférieur à une seconde est donc satisfait sur ce navigateur. Chrome, Edge et Firefox autonomes n'étaient pas exposés dans l'environnement de validation ; leur contrôle reste inclus au lot 7 avec l'application intégrée.
 
 Le lot 2 reste isolé : aucun de ces sous-lots ne remplace `generatePairings()` dans l'application.

@@ -251,27 +251,14 @@ export class SwissWorkerExecutor {
 
 export const createSwissWorkerExecutor = (options) => new SwissWorkerExecutor(options);
 
-/** Deterministic Blob source used by the eventual HTML integration. */
-export const createSwissWorkerBlobSource = ({ workerModuleUrl }) => {
-  if (!workerModuleUrl) throw new TypeError('workerModuleUrl est obligatoire');
-  return `import(${JSON.stringify(String(workerModuleUrl))});`;
-};
-
 export const createBrowserWorkerFactory = ({
   workerModuleUrl,
   WorkerCtor = globalThis.Worker,
-  BlobCtor = globalThis.Blob,
-  URLApi = globalThis.URL,
 } = {}) => {
-  if (typeof WorkerCtor !== 'function' || typeof BlobCtor !== 'function'
-    || !URLApi || typeof URLApi.createObjectURL !== 'function') {
-    throw new TypeError('Worker, Blob et URL.createObjectURL sont nécessaires');
-  }
-  const blob = new BlobCtor([createSwissWorkerBlobSource({ workerModuleUrl })], {
-    type: 'text/javascript',
-  });
-  const objectUrl = URLApi.createObjectURL(blob);
-  return () => new WorkerCtor(objectUrl, { type: 'module' });
+  if (!workerModuleUrl) throw new TypeError('workerModuleUrl est obligatoire');
+  if (typeof WorkerCtor !== 'function') throw new TypeError('Worker est nécessaire');
+  const moduleUrl = String(workerModuleUrl);
+  return () => new WorkerCtor(moduleUrl, { type: 'module' });
 };
 
 export { FINAL_STATES };

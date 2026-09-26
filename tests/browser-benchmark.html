@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<title>Benchmark navigateur — moteur Suisse</title>
+<style>
+  body { font: 16px/1.45 system-ui; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+  pre { white-space: pre-wrap; background: #111827; color: #e5e7eb; padding: 20px; border-radius: 10px; }
+</style>
+<h1>Benchmark navigateur — moteur Suisse</h1>
+<p id="status">Calcul en cours…</p>
+<pre id="result"></pre>
+<script type="module">
+  import {
+    createBrowserWorkerFactory,
+    SwissWorkerExecutor,
+  } from '../src/swiss/worker-executor.mjs?benchmark';
+
+  const participants = Array.from({ length: 64 }, (_, index) => ({
+    id: `P${index}`,
+    points: (index % 13) / 2,
+    faction: `F${index % 9}`,
+    allegiance: `A${index % 4}`,
+    compo: index % 3,
+    note: index % 5 ? `G${index % 7}` : '',
+  }));
+  const history = [];
+  for (let round = 1; round <= 8; round += 1) {
+    for (let index = 0; index < 64; index += 2) {
+      history.push({
+        a: `P${(index + round * 3) % 64}`,
+        b: `P${(index + round * 3 + 1) % 64}`,
+        round,
+      });
+    }
+  }
+  const context = {
+    history,
+    options: {
+      avoidMirrors: true,
+      avoidAlliances: true,
+      useCompo: true,
+      noteMode: 'separer',
+    },
+  };
+  const workerFactory = createBrowserWorkerFactory({
+    workerModuleUrl: new URL('../src/swiss/swiss-worker.mjs?benchmark', import.meta.url),
+  });
+  const executor = new SwissWorkerExecutor({ workerFactory });
+  const summarize = (values) => {
+    const sorted = [...values].sort((a, b) => a - b);
+    return {
+      min: sorted[0],
+      median: sorted[Math.floor(sorted.length / 2)],
+      p95: sorted[Math.floor((sorted.length - 1) * 0.95)],
+      max: sorted.at(-1),
+    };
+  };
+  try {
+    const initialTimes = [];
+    let first;
+    for (let run = 0; run < 30; run += 1) {
+      const result = await executor.run({ participants, context });
+      if (!['success', 'alerted'].includes(result.status)) throw new Error(`Échec initial : ${result.status}`);
+      if (!first) first = result.result;
+      initialTimes.push(result.durationMs);
+    }
+    const variantTimes = [];
+    const signatures = [];
+    for (let run = 0; run < 10; run += 1) {
+      const result = await executor.run({
+        operation: 'next-variant',
+        participants,
+        context,
+        excludedSignatures: signatures,
+      });
+      if (!['success', 'alerted'].includes(result.status)) throw new Error(`Échec variante : ${result.status}`);
+      const variant = result.result.variants[0];
+      if (!variant) break;
+      signatures.push(variant.signature);
+      variantTimes.push(result.durationMs);
+    }
+    const report = {
+      ok: true,
+      userAgent: navigator.userAgent,
+      participants: participants.length,
+      edgesMaximum: 2016,
+      initialRuns: initialTimes.length,
+      initialMs: summarize(initialTimes),
+      variantRuns: variantTimes.length,
+      variantMs: summarize(variantTimes),
+      pairs: first.pairs.length,
+      pendingWorkers: executor.pendingCount,
+    };
+    document.querySelector('#status').textContent = 'Terminé — succès';
+    document.querySelector('#result').textContent = JSON.stringify(report, null, 2);
+    document.body.dataset.status = 'done';
+  } catch (error) {
+    document.querySelector('#status').textContent = 'Échec';
+    document.querySelector('#result').textContent = error.stack ?? String(error);
+    document.body.dataset.status = 'error';
+  }
+</script>
+</html>

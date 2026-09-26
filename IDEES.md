@@ -39,6 +39,8 @@ Les idées sont conservées pour en discuter à la prochaine séance de travail.
 
 ## Décisions et suivi
 
+- 2026-09-27 — Sous-lot 2C du moteur Suisse optimal terminé dans son périmètre isolé. Le banc navigateur reproductible valide 64 joueurs dans Chromium (Chrome 154) : 30 calculs initiaux à 34 ms de médiane et 37 ms au 95e centile ; 10 recherches successives de variante à 306 ms de médiane et 411 ms au 95e centile, sans Worker résiduel. La validation réelle a détecté puis permis d'écarter l'enveloppe Worker par URL Blob, muette dans ce navigateur, au profit d'un Worker module direct. Les contrôles multi-navigateurs seront rejoués au lot 7 sur l'application intégrée. La V1.9.32 et `index.html` restent inchangés.
+
 - 2026-09-27 — Deuxième morceau du sous-lot 2C réalisé : protocole et exécuteur Worker isolés, avec sérialisation sûre des `BigInt`, identifiant unique par calcul, résultat complet appliqué atomiquement, alerte non bloquante à trois secondes, annulation explicite et terminaison forcée à quinze secondes. Toute réponse tardive est ignorée. L'intégration dans le HTML et les mesures réelles dans les navigateurs restent à effectuer ; la V1.9.32 n'est pas modifiée.
 
 - 2026-09-27 — Premier morceau du sous-lot 2C réalisé : les rerolls peuvent énumérer des appariements inédits strictement égaux à l'optimum initial par sous-problèmes forcés/interdits. La recherche est bornée à une variante par défaut, les signatures persistées sont injectives même avec des identifiants contenant des séparateurs, et une interruption reste distincte d'un épuisement mathématiquement prouvé. Le Worker et les seuils 3 s / 15 s restent à réaliser avant l'intégration applicative.

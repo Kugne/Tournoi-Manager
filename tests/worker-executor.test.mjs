@@ -10,7 +10,6 @@ import {
 } from '../src/swiss/worker-protocol.mjs';
 import {
   createBrowserWorkerFactory,
-  createSwissWorkerBlobSource,
   SwissWorkerExecutor,
 } from '../src/swiss/worker-executor.mjs';
 import { dispatchSwissWorkerMessage, solveWorkerRequest } from '../src/swiss/swiss-worker.mjs';
@@ -218,19 +217,14 @@ test('un résultat partiel et une erreur Worker ne deviennent jamais un résulta
   assert.match(errorResult.error.message, /indisponible/);
 });
 
-test('la source Blob et le dispatch de protocole sont prêts pour le navigateur', async () => {
-  assert.equal(createSwissWorkerBlobSource({ workerModuleUrl: './swiss-worker.mjs' }),
-    'import("./swiss-worker.mjs");');
-  class BlobStub { constructor(parts, options) { this.parts = parts; this.options = options; } }
+test('le Worker module direct et le dispatch de protocole sont prêts pour le navigateur', async () => {
   class WorkerStub { constructor(url, options) { this.url = url; this.options = options; } }
-  const URLApi = { createObjectURL: (blob) => blob.parts[0] };
   const factory = createBrowserWorkerFactory({
     workerModuleUrl: './swiss-worker.mjs',
-    BlobCtor: BlobStub,
     WorkerCtor: WorkerStub,
-    URLApi,
   });
   const worker = factory();
+  assert.equal(worker.url, './swiss-worker.mjs');
   assert.equal(worker.options.type, 'module');
   const responses = [];
   await dispatchSwissWorkerMessage(
