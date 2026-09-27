@@ -126,7 +126,7 @@ const edgeFeatures = (left, right, indexes, options) => {
     && hasValue(left.allegiance)
     && hasValue(right.allegiance)
     && left.allegiance === right.allegiance ? 1 : 0;
-  const compoGap = options.useCompo
+  const compoGap = options.useCompo && hasValue(left.compo) && hasValue(right.compo)
     ? Math.abs(
       finiteNumber(left.compo, `Compo de ${left.id}`) - finiteNumber(right.compo, `Compo de ${right.id}`),
     )

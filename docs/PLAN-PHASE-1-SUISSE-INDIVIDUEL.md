@@ -51,10 +51,15 @@ Critère de sortie : moteur exact testé, mesuré et encore non activé dans l'a
 
 ### Lot 3 — Intégration Suisse individuel
 
-- Intégrer le moteur dans le Suisse classique.
-- Implémenter le reroll parmi toutes les variantes optimales inédites.
-- Produire des explications et alertes issues d'une source unique.
-- Conserver les données de l'ancien format sans réinterprétation silencieuse.
+- [x] Sous-lot 3A : adaptateur pur entre le format historique de l'application et le moteur exact.
+  - [x] Transmettre les points de tournoi calculés par l'application, bonus/malus compris, sans transmettre le SOS.
+  - [x] Traduire historique validé, blocages, allégeances et critères optionnels sans muter les sauvegardes.
+  - [x] Sélectionner ou conserver le bye avant le solveur et restituer les matchs au format historique.
+  - [x] Conserver une compo absente comme valeur neutre et ignorer réellement toute option désactivée.
+- [ ] Sous-lot 3B : intégrer le calcul initial dans le Suisse classique.
+- [ ] Sous-lot 3C : implémenter le reroll parmi toutes les variantes optimales inédites et sa persistance.
+- [ ] Sous-lot 3D : produire des explications et alertes issues d'une source unique.
+- [ ] Sous-lot 3E : valider les scénarios Suisse et les anciennes sauvegardes sans réinterprétation silencieuse.
 
 Critère de sortie : scénarios Suisse et tests de régression réussis.
 

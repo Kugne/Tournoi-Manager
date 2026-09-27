@@ -128,6 +128,21 @@ test('les données numériques non finies sont refusées', () => {
   assert.throws(() => buildLexicographicCostModel([{ id: 'A\u0000B' }, { id: 'C' }]), /caractère NUL/);
 });
 
+test('une compo absente reste neutre au lieu d’être réinterprétée comme zéro', () => {
+  const participants = [
+    { id: 'A', points: 0, compo: null },
+    { id: 'B', points: 0, compo: 0 },
+    { id: 'C', points: 0, compo: 2 },
+    { id: 'D', points: 0, compo: 2 },
+  ];
+  const model = buildLexicographicCostModel(participants, { options: { useCompo: true } });
+  const missingAgainstTwo = model.edges.find((edge) => edge.a === 'A' && edge.b === 'C');
+  const zeroAgainstTwo = model.edges.find((edge) => edge.a === 'B' && edge.b === 'C');
+  assert.equal(missingAgainstTwo.features.compoGap, 0);
+  assert.equal(zeroAgainstTwo.features.compoGap, 2);
+  verifyContext(participants, { options: { useCompo: true } });
+});
+
 test('les blocages retirent les arêtes sans fabriquer de couplage', () => {
   const participants = ['A', 'B', 'C', 'D'].map((id) => ({ id, points: 0 }));
   const model = buildLexicographicCostModel(participants, {

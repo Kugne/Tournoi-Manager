@@ -246,9 +246,12 @@ export const objectiveForPairing = (participants, pairing, context = {}) => {
       && left.allegiance === right.allegiance;
   }).length;
   const compoGaps = options.useCompo
-    ? descending(pairs.map((pair) => Math.abs(
-      Number(byId.get(String(pair.a))?.compo ?? 0) - Number(byId.get(String(pair.b))?.compo ?? 0),
-    )))
+    ? descending(pairs.map((pair) => {
+      const left = byId.get(String(pair.a));
+      const right = byId.get(String(pair.b));
+      if (!hasValue(left?.compo) || !hasValue(right?.compo)) return 0;
+      return Math.abs(Number(left.compo) - Number(right.compo));
+    }))
     : [];
   const noteMatches = pairs.filter((pair) => {
     const left = normalizeNote(byId.get(String(pair.a))?.note);
