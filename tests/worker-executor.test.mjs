@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { enumerateOptimalVariants } from '../src/swiss/optimal-variants.mjs';
+import { pairingSignature } from '../src/swiss/pairing-signature.mjs';
 import { solveSwissPairing } from '../src/swiss/solve-swiss.mjs';
 import {
   createWorkerRequest,
@@ -208,6 +209,61 @@ test('un résultat partiel et une erreur Worker ne deviennent jamais un résulta
   const incompleteResult = await incomplete.promise;
   assert.equal(incompleteResult.status, 'error');
   assert.equal(incompleteResult.result, null);
+
+  const variantSetup = setup();
+  const incompleteVariant = variantSetup.executor.start({
+    operation: 'next-variant',
+    participants: participants(),
+  });
+  variantSetup.worker.respond({
+    protocolVersion: 1,
+    type: 'result',
+    requestId: incompleteVariant.requestId,
+    result: {
+      variants: [{ pairs: [], signature: 'incomplète', cost: 0n }],
+      optimalCost: 0n,
+      exhausted: false,
+      interrupted: false,
+    },
+  });
+  assert.equal((await incompleteVariant.promise).status, 'error');
+
+  const validPairs = [{ a: 'P0', b: 'P1' }, { a: 'P2', b: 'P3' }];
+  const wrongSignatureSetup = setup();
+  const wrongSignature = wrongSignatureSetup.executor.start({
+    operation: 'next-variant',
+    participants: participants(),
+  });
+  wrongSignatureSetup.worker.respond({
+    protocolVersion: 1,
+    type: 'result',
+    requestId: wrongSignature.requestId,
+    result: {
+      variants: [{ pairs: validPairs, signature: 'fausse', cost: 0n }],
+      optimalCost: 0n,
+      exhausted: false,
+      interrupted: false,
+    },
+  });
+  assert.equal((await wrongSignature.promise).status, 'error');
+
+  const wrongCostSetup = setup();
+  const wrongCost = wrongCostSetup.executor.start({
+    operation: 'next-variant',
+    participants: participants(),
+  });
+  wrongCostSetup.worker.respond({
+    protocolVersion: 1,
+    type: 'result',
+    requestId: wrongCost.requestId,
+    result: {
+      variants: [{ pairs: validPairs, signature: pairingSignature(validPairs), cost: 1n }],
+      optimalCost: 0n,
+      exhausted: false,
+      interrupted: false,
+    },
+  });
+  assert.equal((await wrongCost.promise).status, 'error');
 
   const second = setup();
   const failed = second.executor.start({ participants: participants() });

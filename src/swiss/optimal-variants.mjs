@@ -3,18 +3,10 @@ import {
   NoPerfectMatchingError,
 } from './blossom-bigint.mjs';
 import { buildLexicographicCostModel, pairKey } from './lexicographic-cost.mjs';
-
-// Identifiers are compared by code point: they are stable identifiers, not
-// user-facing labels. This also makes signatures independent of locale.
-const compareIds = (left, right) => {
-  const a = String(left);
-  const b = String(right);
-  return a === b ? 0 : a < b ? -1 : 1;
-};
-
-const signatureOf = (pairing) => JSON.stringify((pairing?.pairs ?? pairing)
-  .map((pair) => [String(pair.a), String(pair.b)].sort(compareIds))
-  .sort((left, right) => compareIds(JSON.stringify(left), JSON.stringify(right))));
+import {
+  compareStableIds as compareIds,
+  pairingSignature as signatureOf,
+} from './pairing-signature.mjs';
 
 const asSignatureSet = (values) => {
   if (values == null) return new Set();

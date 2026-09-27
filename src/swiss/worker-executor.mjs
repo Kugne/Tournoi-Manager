@@ -4,6 +4,7 @@ import {
   deserializeWorkerMessage,
   serializeWorkerMessage,
 } from './worker-protocol.mjs';
+import { pairingSignature } from './pairing-signature.mjs';
 
 const FINAL_STATES = new Set(['success', 'alerted', 'cancelled', 'timeout', 'error']);
 
@@ -73,7 +74,14 @@ const isCompleteResult = (operation, result, participantIds) => {
       && typeof result.totalWeight === 'bigint';
   }
   return Array.isArray(result.variants)
+    && result.variants.length <= 1
     && typeof result.optimalCost === 'bigint'
+    && result.variants.every((variant) => (
+      variant && typeof variant.signature === 'string' && typeof variant.cost === 'bigint'
+      && isCompletePairing(variant.pairs, participantIds)
+      && variant.signature === pairingSignature(variant.pairs)
+      && variant.cost === result.optimalCost
+    ))
     && typeof result.exhausted === 'boolean'
     && typeof result.interrupted === 'boolean';
 };

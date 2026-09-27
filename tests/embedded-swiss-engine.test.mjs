@@ -50,8 +50,13 @@ test('le Suisse classique appelle exclusivement le moteur exact dans le parcours
   assert.match(exactFunction, /current\.roundsData\.length!==roundIndex/);
   assert.match(exactFunction, /onStarted:function\(task\)/);
   assert.match(exactFunction, /toastAction\([^;]+Annuler/);
-  assert.match(html, /else if\(t\.pairFormat==='swiss'\)matches=await generateExactSwissPairings\(t,idx\)/);
-  assert.match(html, /t\.pairFormat==='swiss'\?'<button[^']+disabled[^']+Relancer/);
+  assert.match(html, /pairingOutcome=await generateExactSwissPairings\(t,idx\)/);
+  assert.match(html, /t\.pairFormat==='swiss'\?\(rerollRunning\?/);
+  assert.match(html, /onclick="rerollSwissPairings\('\+idx\+'\)"/);
+  assert.match(html, /runNextSwissPairingVariant/);
+  assert.match(html, /Toutes les variantes optimales disponibles ont déjà été proposées/);
+  assert.match(html, /swissPairingSignatures=outcome\.seenSignatures/);
+  assert.match(html, /delete t\.roundsData\[idx\]\.swissPairingSignatures/);
   assert.equal([...html.matchAll(/idx!==t\.roundsData\.length/g)].length, 2);
   assert.match(html, /disabled>⏳ Calcul de la ronde/);
 });

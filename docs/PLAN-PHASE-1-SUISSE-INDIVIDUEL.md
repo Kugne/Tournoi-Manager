@@ -63,7 +63,12 @@ Critère de sortie : moteur exact testé, mesuré et encore non activé dans l'a
   - [x] Désactiver le lancement pendant le calcul, refuser tout indice de ronde devenu obsolète et proposer l'annulation après l'alerte à trois secondes.
   - [x] Désactiver temporairement la relance du Suisse classique jusqu'au sous-lot 3C plutôt que d'utiliser l'ancien moteur.
   - [x] Valider dans Chromium le parcours réel de création d'une ronde de quatre joueurs et le contrôle de dérive du moteur embarqué.
-- [ ] Sous-lot 3C : implémenter le reroll parmi toutes les variantes optimales inédites et sa persistance.
+- [x] Sous-lot 3C : implémenter le reroll parmi toutes les variantes optimales inédites et sa persistance.
+  - [x] Exclure la combinaison courante et toutes les signatures déjà proposées, y compris après rechargement.
+  - [x] Conserver le bénéficiaire du bye et refuser toute variante qui dégraderait l'optimum exact.
+  - [x] Conserver la ronde actuelle lors d'une erreur, d'une annulation, d'un résultat obsolète ou de l'épuisement prouvé.
+  - [x] Effacer l'historique temporaire à la validation tout en conservant la signature finale dans les métadonnées de la ronde.
+  - [x] Reprendre sans migration destructive une ronde créée avant 3C en reconstruisant sa signature courante.
 - [ ] Sous-lot 3D : produire des explications et alertes issues d'une source unique.
 - [ ] Sous-lot 3E : valider les scénarios Suisse et les anciennes sauvegardes sans réinterprétation silencieuse.
 
