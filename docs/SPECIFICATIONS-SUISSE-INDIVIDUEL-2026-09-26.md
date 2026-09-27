@@ -1,6 +1,6 @@
 # Spécifications — Fiabilisation du Suisse individuel
 
-Statut : **spécification fonctionnelle validée sur ses règles principales, cas limites ouverts identifiés**
+Statut : **spécification fonctionnelle validée, y compris les cas limites du lot 5**
 
 Date : 26 septembre 2026
 
@@ -517,16 +517,16 @@ L'abstraction `Entrant` prépare le futur mode équipes sans l'implémenter : un
 - Aucun changement des résultats validés lors d'une migration.
 - Fonctionnement hors ligne et distribution autonome préservés.
 
-## 15. Cas à trancher avant codage de leur sous-partie
+## 15. Arbitrages complémentaires du lot 5
 
-Ces points ne doivent pas recevoir une règle implicite :
+Ces six cas limites ont été validés le 27 septembre 2026 :
 
-1. **Moyenne impossible :** valeur de scénario/score libre si aucune partie réelle de la ronde ne fournit de score calculable.
-2. **Population du SOS virtuel :** inclure exactement quels participants dans la moyenne (actifs au moment de la ronde, tous ceux ayant joué une ronde suisse, joueurs droppés compris ou non).
-3. **Rotation après victoire administrative :** une victoire administrative sans partie consomme-t-elle aussi le droit prioritaire à un futur bye ?
-4. **Abandon après début :** valeurs secondaires par défaut si aucun score exploitable n'a été saisi.
-5. **Début observable d'une partie :** action explicite « Partie commencée », question posée au moment du forfait, ou autre mécanisme fiable ; définir aussi le traitement de `started=null`.
-6. **Côté absent d'une victoire administrative :** points/statistiques du joueur absent lorsque le barème de défaite n'est pas zéro, et cas où les deux joueurs sont absents.
+1. **Moyenne impossible :** si aucune partie réellement jouée ne fournit de valeur calculable, demander à l'organisateur une valeur neutre à confirmer, avec `0` proposé par défaut. Bloquer la validation jusque-là et ne jamais reprendre une moyenne des rondes précédentes.
+2. **Population du SOS virtuel :** figer pour chaque ronde les autres joueurs encore participants au début de cette ronde, hors bénéficiaire et hors joueurs déjà absents ou droppés. Conserver dans cette population ceux qui droppent plus tard. Faire évoluer sa valeur avec leurs points sportifs ultérieurs, sans bonus ni malus.
+3. **Rotation après victoire administrative :** une victoire administrative sans partie jouée ne compte pas comme un bye reçu et ne réduit pas la priorité à un futur bye.
+4. **Abandon après début :** conserver les scores secondaires déjà saisis ; toute valeur requise manquante doit être saisie ou confirmée explicitement. Ne proposer aucune moyenne ou valeur automatique et bloquer la validation tant que nécessaire.
+5. **Début observable d'une partie :** ne pas ajouter d'action permanente « Partie commencée ». Lors d'un forfait, d'une absence ou d'un drop, demander obligatoirement si la partie avait commencé. Préserver `started=null` sur les anciennes données sans l'interpréter ; imposer un choix explicite si le résultat est ensuite modifié.
+6. **Côté absent d'une victoire administrative :** le présent reçoit les points de victoire et les compensations neutres ; l'absent reçoit les points de défaite configurés, même non nuls, sans score secondaire ni SOS. Aucun adversaire réel n'est ajouté. Si les deux joueurs sont absents, chacun reçoit une défaite administrative et les points de défaite configurés, sans victoire, adversaire ni score secondaire.
 
 ## 16. Hors périmètre
 
