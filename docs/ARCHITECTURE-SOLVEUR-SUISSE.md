@@ -141,3 +141,11 @@ Chaque table expose désormais « Pourquoi ce match ? » avec les points de tour
 Les états `timeout`, `stale`, `cancelled`, `interrupted`, `exhausted`, `unavailable` et l'infaisabilité par blocages passent par le même catalogue. Lorsqu'aucun couplage complet n'existe, le message rappelle les blocages actifs à vérifier. La validation relit cette même analyse : une préférence sacrifiée reste autorisée et expliquée, tandis qu'une paire bloquée, un doublon, un auto-match, un joueur inactif ou l'absence d'un joueur actif interdit la validation.
 
 Le 2026-09-27, les contrôles automatisés couvrent les critères actifs et désactivés, les revanches, les blocages, les byes répétés et le catalogue d'états. Le rendu a également été vérifié dans Edge headless à 1 400 px, panneau global et explication détaillée dépliée. L'interface d'édition guidée consommera cette même analyse lors de sa refonte au lot 6 ; son ancien parcours visuel n'est pas refondu dans 3D.
+
+### 3E — Scénarios applicatifs et anciennes sauvegardes
+
+Le test de régression `tests/swiss-application-scenarios.test.mjs` traverse l'adaptateur, le runner et le solveur exact avec les effectifs fonctionnels de 2, 3, 4, 5, 8, 16, 32 et 64 joueurs. Il vérifie pour chaque cas la couverture exhaustive des joueurs, l'unicité du bye sur les effectifs impairs et l'absence de mutation du tournoi fourni au calcul.
+
+Un objet de tournoi sérialisé au schéma V1.9.32, dépourvu de `pairingMeta` et de `swissPairingSignatures`, sert de cas de compatibilité de l'adaptateur et du runner. Ses résultats, scores, scénario, blocages et options sont relus sans réécrire les rondes validées. La ronde suivante utilise leur historique ; une ronde ouverte ancienne peut être relancée en reconstruisant sa signature courante, qui est exclue avant de chercher une variante. Les champs explicites modernes ont priorité sur leurs anciens doublons ; lorsqu'ils sont tous absents, les critères restent neutres sans mutation. Le parcours complet d'import et de restauration reste au lot 7.
+
+Ce sous-lot ne migre volontairement pas les anciens forfaits ou `bye_forced` ambigus. Leur qualification, leurs effets sur le SOS et la conservation de leur calcul historique appartiennent au lot 5, après les derniers arbitrages correspondants. Les traiter ici aurait inventé une information absente de la sauvegarde.

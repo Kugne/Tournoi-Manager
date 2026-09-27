@@ -75,7 +75,12 @@ Critère de sortie : moteur exact testé, mesuré et encore non activé dans l'a
   - [x] Centraliser les messages de calcul, d'annulation, de délai, d'épuisement et d'infaisabilité par blocages.
   - [x] Réutiliser cette analyse dans le panneau de ronde, la validation et les notifications de génération ou de relance.
   - [x] Refuser blocage, doublon, auto-match, joueur inactif ou actif manquant, et garder les critères désactivés entièrement silencieux.
-- [ ] Sous-lot 3E : valider les scénarios Suisse et les anciennes sauvegardes sans réinterprétation silencieuse.
+- [x] Sous-lot 3E : valider les scénarios Suisse et les anciennes sauvegardes sans réinterprétation silencieuse.
+  - [x] Exécuter le parcours applicatif exact sur 2, 3, 4, 5, 8, 16, 32 et 64 joueurs, avec couverture des effectifs pairs et impairs.
+  - [x] Relire dans l'adaptateur un tournoi sérialisé au schéma V1.9.32, sans métadonnées du nouveau moteur, et générer la ronde suivante sans modifier les rondes validées ; l'import/restauration complet reste au lot 7.
+  - [x] Reprendre une ronde ouverte antérieure à 3C : reconstruire sa signature, exclure sa combinaison courante et ne pas lui inventer de métadonnées pendant le calcul.
+  - [x] Verrouiller la précédence des anciens et nouveaux champs de critères, avec des valeurs neutres lorsque l'information manque.
+  - [x] Conserver les migrations ambiguës de bye, forfait et victoire administrative dans le lot 5, sans les qualifier implicitement dans le lot 3.
 
 Critère de sortie : scénarios Suisse et tests de régression réussis.
 
