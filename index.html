@@ -400,7 +400,7 @@
 
           <div class="info-panel" id="info-panel-suisse" style="display:none">
             <h2 style="margin-top:0">⚔️ Système d'appariement suisse</h2>
-            <p style="color:var(--text2);font-size:0.9rem">En Suisse classique, le moteur examine l’ensemble des rencontres autorisées et calcule un appariement complet optimal. Il compare les critères dans l’ordre ci-dessous : un critère inférieur ne peut jamais dégrader un critère supérieur. Si aucun appariement complet n’existe ou si le calcul dépasse la limite de sécurité, la ronde reste inchangée ; l’application ne revient jamais silencieusement à l’ancien calcul. La phase suisse du format hybride sera raccordée au même moteur dans un lot dédié.</p>
+            <p style="color:var(--text2);font-size:0.9rem">En Suisse classique comme pendant la phase suisse du format hybride, le moteur examine l’ensemble des rencontres autorisées et calcule un appariement complet optimal. Il compare les critères dans l’ordre ci-dessous : un critère inférieur ne peut jamais dégrader un critère supérieur. Si aucun appariement complet n’existe ou si le calcul dépasse la limite de sécurité, la ronde reste inchangée ; l’application ne revient jamais silencieusement à l’ancien calcul.</p>
             <h3>Hiérarchie des critères</h3>
             <table class="data-table">
               <thead><tr><th>Priorité</th><th>Critère</th><th>Effet</th></tr></thead>
@@ -2482,6 +2482,7 @@ function swissWorkerSource(){
   return bytes;
 }
 async function generateExactSwissPairings(tournament,roundIndex){
+  if(!isSwissPairingPhase(tournament)){toast('Le moteur Suisse exact n’est disponible que pendant une phase Suisse.','error');return null;}
   const lockKey=tournament.id+':'+roundIndex;
   if(swissRoundCalculations.has(lockKey)){toast('Un calcul d’appariement est déjà en cours','warning');return null;}
   const calculation={cancel:null};
@@ -2539,6 +2540,7 @@ async function generateExactSwissPairings(tournament,roundIndex){
 }
 
 async function generateExactSwissVariant(tournament,roundIndex){
+  if(!isSwissPairingPhase(tournament)){toast('La relance Suisse n’est disponible que pendant une phase Suisse.','error');return null;}
   const lockKey=tournament.id+':'+roundIndex;
   if(swissRoundCalculations.has(lockKey)){toast('Un calcul d’appariement est déjà en cours','warning');return null;}
   const calculation={cancel:null};
@@ -3622,6 +3624,7 @@ function seedOrder(n){
 function nextPow2(n){let p=1;while(p<n)p*=2;return p;}
 function isBracketFormat(t){ return t.pairFormat==='bracket' || (t.pairFormat==='hybrid' && t.hybridPhase==='cut'); }
 function isHybridFormat(t){ return t.pairFormat==='hybrid'; }
+function isSwissPairingPhase(t){ return t?.pairFormat==='swiss' || (t?.pairFormat==='hybrid' && t?.hybridPhase==='swiss'); }
 
 function bracketRoundColTitle(matchCount){
   if(matchCount===1)return 'Finale';
@@ -3867,7 +3870,7 @@ function renderRoundContent(idx,container){
   var validateStyle=allScored?'':'style="opacity:0.5"';
   var pendingMsg=allScored?'✅ Tous les scores saisis':'⚠️ '+pending+' manquant'+(pending>1?'s':'');
   var rerollRunning=swissRoundCalculations.has(t.id+':'+idx);
-  var rerollBtn=isBracketFormat(t)?'':t.pairFormat==='swiss'?(rerollRunning?'<button class="btn btn-secondary btn-sm" disabled>⏳ Recherche…</button>':'<button class="btn btn-secondary btn-sm" onclick="rerollSwissPairings('+idx+')">🔀 Relancer</button>'):'<button class="btn btn-secondary btn-sm" onclick="rerollPairings('+idx+')">🔀 Relancer</button>';
+  var rerollBtn=isBracketFormat(t)?'':isSwissPairingPhase(t)?(rerollRunning?'<button class="btn btn-secondary btn-sm" disabled>⏳ Recherche…</button>':'<button class="btn btn-secondary btn-sm" onclick="rerollSwissPairings('+idx+')">🔀 Relancer</button>'):'<button class="btn btn-secondary btn-sm" onclick="rerollPairings('+idx+')">🔀 Relancer</button>';
   container.innerHTML='<div class="card"><div class="card-header"><span class="card-title">⚔️ Ronde '+(idx+1)+(r2.scenarioName?' · <span style="color:var(--accent2);font-size:0.85rem;font-weight:400">'+escapeHtml(r2.scenarioName)+'</span>':'')+'</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" onclick="printTableSheets('+idx+')">🖨️ Feuilles de table</button><button class="btn btn-secondary btn-sm" onclick="openEditPairings('+idx+')">✏️ Éditer</button>'+rerollBtn+'<button class="btn btn-primary btn-sm" '+validateStyle+' onclick="'+validateOnclick+'">✅ Valider</button></div></div>'+scenBanner+'<div style="margin-bottom:14px"><div style="font-size:0.8rem;color:var(--text2);margin-bottom:4px">'+pendingMsg+'</div><div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div></div>'+renderAlertPanel(pairingAnalysis)+matchesHtml+'</div>';
 }
 function setResult(ri,mi,result){const t=getActiveT();t.roundsData[ri].matches[mi].result=result;save();renderRoundContent(ri,document.getElementById('rounds-content'));}
@@ -4112,7 +4115,7 @@ function renderBracketTree(t){
 function rerollPairings(idx){confirmAction('Relancer','Regénérer les pairings ?',()=>{const t=getActiveT();const matches=generateLegacyPairings(t,idx);if(!matches){toast('Impossible','error');return;}t.roundsData[idx].matches=matches;save();renderRounds();toast('Relancé','info');},false);}
 function rerollSwissPairings(idx){
   const t=getActiveT(),round=t?.roundsData?.[idx];
-  if(!t||!round||round.validated)return;
+  if(!t||!round||round.validated||!isSwissPairingPhase(t))return;
   if(swissRoundCalculations.has(t.id+':'+idx)){toast('Une recherche est déjà en cours','warning');return;}
   const hasEnteredResults=round.matches.some(function(match){return !match.bye&&(match.result!==null||(match.s1||0)!==0||(match.s2||0)!==0||(match.f1||0)!==0||(match.f2||0)!==0);});
   const message=hasEnteredResults
@@ -5008,7 +5011,7 @@ async function confirmChooseScenario(){
   closeModal('modal-choose-scenario');
   var matches,pairingOutcome=null;
   if(manualMode)matches=generateEmptyPairings(t);
-  else if(t.pairFormat==='swiss'){
+  else if(isSwissPairingPhase(t)){
     pairingOutcome=await generateExactSwissPairings(t,idx);
     matches=pairingOutcome?.matches;
   }
@@ -5221,7 +5224,7 @@ function savePairingEdits(){
   Object.keys(usage).forEach(function(id){if(usage[id]>1)dups.push(pm[id]?pm[id].name:id);});
   if(dups.length){toast('Appairé plusieurs fois : '+dups.join(', '),'warning');return;}
   r.matches=newMatches;
-  if(t.pairFormat==='swiss'&&!r.validated&&pairingChanged){
+  if(isSwissPairingPhase(t)&&!r.validated&&pairingChanged){
     try{
       var editedEngineSignature=TMSwiss.engineSignatureFromMatches(newMatches);
       r.swissPairingSignatures=[...new Set([...(r.swissPairingSignatures||[]),editedEngineSignature])];
@@ -5351,7 +5354,7 @@ function getLegacyPairingAlerts(t,roundIdx){
   return alerts;
 }
 function getPairingAnalysis(t,roundIdx){
-  if(t.pairFormat==='swiss'){
+  if(isSwissPairingPhase(t)){
     try{
       const gs=getGS(t.gameSystemId);
       return TMSwiss.analyzeApplicationSwissRound({

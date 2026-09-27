@@ -86,9 +86,12 @@ Critère de sortie : scénarios Suisse et tests de régression réussis.
 
 ### Lot 4 — Intégration hybride
 
-- Réutiliser exactement le même moteur pendant la phase Suisse.
-- Figer une photographie des points et départages lors du passage au Top Cut.
-- Empêcher la phase éliminatoire de modifier les valeurs suisses.
+- [x] Sous-lot 4A : raccorder le moteur exact à la phase Suisse du format hybride.
+  - [x] Utiliser le même calcul initial, le même reroll optimal, les mêmes métadonnées et les mêmes explications que le Suisse classique.
+  - [x] Centraliser la reconnaissance d'une phase Suisse et exclure explicitement le Top Cut, le bracket pur et le manuel du moteur exact.
+  - [x] Conserver le chemin historique du bracket après la bascule en phase `cut`.
+- [ ] Sous-lot 4B : prouver que le Suisse classique et la phase Suisse hybride produisent les mêmes appariements pour un contexte identique.
+- [ ] Sous-lot 4C : figer une photographie des points et départages au passage au Top Cut, puis empêcher la phase éliminatoire de modifier les valeurs suisses.
 
 Critère de sortie : mêmes appariements en Suisse classique et en phase Suisse hybride pour un contexte identique ; transitions Top Cut validées.
 

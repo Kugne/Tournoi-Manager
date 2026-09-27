@@ -52,18 +52,20 @@ test('les notifications affichent les messages comme du texte non interprété',
   assert.doesNotMatch(toastFunction, /innerHTML/);
 });
 
-test('le Suisse classique appelle exclusivement le moteur exact dans le parcours initial', () => {
+test('les phases Suisses classique et hybride appellent exclusivement le moteur exact', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const exactStart = html.indexOf('async function generateExactSwissPairings');
   const exactEnd = html.indexOf('let undoStack', exactStart);
   assert.ok(exactStart >= 0 && exactEnd > exactStart);
   const exactFunction = html.slice(exactStart, exactEnd);
   assert.doesNotMatch(exactFunction, /generateLegacyPairings/);
+  assert.equal([...exactFunction.matchAll(/if\(!isSwissPairingPhase\(tournament\)\)/g)].length, 2);
   assert.match(exactFunction, /current\.roundsData\.length!==roundIndex/);
   assert.match(exactFunction, /onStarted:function\(task\)/);
   assert.match(exactFunction, /toastAction\([^;]+Annuler/);
-  assert.match(html, /pairingOutcome=await generateExactSwissPairings\(t,idx\)/);
-  assert.match(html, /t\.pairFormat==='swiss'\?\(rerollRunning\?/);
+  assert.match(html, /function isSwissPairingPhase\(t\)\{ return t\?\.pairFormat==='swiss' \|\| \(t\?\.pairFormat==='hybrid' && t\?\.hybridPhase==='swiss'\); \}/);
+  assert.match(html, /else if\(isSwissPairingPhase\(t\)\)\{\s*pairingOutcome=await generateExactSwissPairings\(t,idx\)/);
+  assert.match(html, /isSwissPairingPhase\(t\)\?\(rerollRunning\?/);
   assert.match(html, /onclick="rerollSwissPairings\('\+idx\+'\)"/);
   assert.match(html, /runNextSwissPairingVariant/);
   assert.match(html, /Toutes les variantes optimales disponibles ont déjà été proposées/);
@@ -75,11 +77,30 @@ test('le Suisse classique appelle exclusivement le moteur exact dans le parcours
   assert.match(html, /TMSwiss\.analyzeApplicationSwissRound/);
   assert.match(html, /Validation refusée : un appariement interdit doit être corrigé/);
   assert.match(html, /showSwissFeedback\('initial',outcome,tournament\)/);
+  assert.match(html, /function getPairingAnalysis\(t,roundIdx\)\{\s*if\(isSwissPairingPhase\(t\)\)/);
   assert.doesNotMatch(html, /function getRoundAlerts\(/);
   const editStart = html.indexOf('function savePairingEdits()');
   const editEnd = html.indexOf('// PENALTIES', editStart);
   const editFunction = html.slice(editStart, editEnd);
   assert.ok(editStart >= 0 && editEnd > editStart);
   assert.match(editFunction, /var pairingChanged=newMatches\.some/);
-  assert.match(editFunction, /!r\.validated&&pairingChanged/);
+  assert.match(editFunction, /isSwissPairingPhase\(t\)&&!r\.validated&&pairingChanged/);
+  assert.doesNotMatch(html, /else if\(t\.pairFormat==='swiss'\)\{\s*pairingOutcome=/);
+});
+
+test('le routage exact exclut toujours le Top Cut et les formats non Suisses', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const start = html.indexOf('function isSwissPairingPhase');
+  const end = html.indexOf('\n', start);
+  assert.ok(start >= 0 && end > start);
+  const sandbox = {};
+  vm.runInNewContext(`${html.slice(start, end)}; result = [
+    isSwissPairingPhase({ pairFormat: 'swiss' }),
+    isSwissPairingPhase({ pairFormat: 'hybrid', hybridPhase: 'swiss' }),
+    isSwissPairingPhase({ pairFormat: 'hybrid', hybridPhase: 'cut' }),
+    isSwissPairingPhase({ pairFormat: 'bracket' }),
+    isSwissPairingPhase({ pairFormat: 'manual' }),
+    isSwissPairingPhase(null),
+  ];`, sandbox);
+  assert.deepEqual(Array.from(sandbox.result), [true, true, false, false, false, false]);
 });
