@@ -90,7 +90,11 @@ Critère de sortie : scénarios Suisse et tests de régression réussis.
   - [x] Utiliser le même calcul initial, le même reroll optimal, les mêmes métadonnées et les mêmes explications que le Suisse classique.
   - [x] Centraliser la reconnaissance d'une phase Suisse et exclure explicitement le Top Cut, le bracket pur et le manuel du moteur exact.
   - [x] Conserver le chemin historique du bracket après la bascule en phase `cut`.
-- [ ] Sous-lot 4B : prouver que le Suisse classique et la phase Suisse hybride produisent les mêmes appariements pour un contexte identique.
+- [x] Sous-lot 4B : prouver que le Suisse classique et la phase Suisse hybride produisent les mêmes appariements pour un contexte identique.
+  - [x] Comparer la génération initiale sur des effectifs pairs et impairs avec historique, blocages et critères optionnels identiques.
+  - [x] Comparer le premier reroll optimal, les signatures persistées et la conservation du bye.
+  - [x] Comparer intégralement les alertes, explications et interdictions produites pour la ronde.
+  - [x] Vérifier que ni le tournoi Suisse ni le tournoi hybride ne sont mutés pendant les calculs purs.
 - [ ] Sous-lot 4C : figer une photographie des points et départages au passage au Top Cut, puis empêcher la phase éliminatoire de modifier les valeurs suisses.
 
 Critère de sortie : mêmes appariements en Suisse classique et en phase Suisse hybride pour un contexte identique ; transitions Top Cut validées.

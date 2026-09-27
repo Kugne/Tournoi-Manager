@@ -155,3 +155,9 @@ Ce sous-lot ne migre volontairement pas les anciens forfaits ou `bye_forced` amb
 La fonction applicative `isSwissPairingPhase()` reconnaît désormais deux contextes et seulement deux : le format Suisse classique et le format hybride tant que `hybridPhase === 'swiss'`. Ces deux chemins appellent le même calcul initial, le même énumérateur de variantes optimales, la même analyse métier et la même gestion des métadonnées de ronde. Une modification manuelle d'une ronde hybride Suisse conserve donc également sa signature et sa provenance.
 
 Le routage exclut explicitement le format manuel, le bracket pur et l'hybride après passage à `hybridPhase === 'cut'`. Le Top Cut continue d'utiliser ses fonctions de tableau à élimination directe ; aucun appel au moteur Suisse exact n'est possible depuis cette phase. Le sous-lot 4A ne modifie ni le classement ni la transition de phase : la preuve de parité appartient à 4B et la photographie des départages au Top Cut à 4C.
+
+### 4B — Parité Suisse classique et hybride
+
+Le test `tests/hybrid-swiss-parity.test.mjs` soumet des copies d'un même contexte métier au format Suisse classique et à l'hybride en phase `swiss`. La génération initiale est comparée sur des effectifs pairs et impairs, avec les mêmes points, factions, allégeances, compos, notes et blocages. Les matchs, le bénéficiaire du bye, les signatures applicative et moteur ainsi que l'empreinte d'entrée doivent être strictement identiques.
+
+Le même contrôle couvre le premier reroll d'une ronde symétrique : les deux formats excluent la combinaison courante, trouvent la même variante optimale et conservent le même bye. Enfin, l'analyse complète de la ronde — validité, alertes, explications et interdictions — est comparée sans simplification. Aucun des tournois fournis n'est muté par ces calculs. La transition vers le Top Cut reste volontairement hors de ce test et appartient à 4C.
