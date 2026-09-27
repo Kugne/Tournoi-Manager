@@ -56,7 +56,13 @@ Critère de sortie : moteur exact testé, mesuré et encore non activé dans l'a
   - [x] Traduire historique validé, blocages, allégeances et critères optionnels sans muter les sauvegardes.
   - [x] Sélectionner ou conserver le bye avant le solveur et restituer les matchs au format historique.
   - [x] Conserver une compo absente comme valeur neutre et ignorer réellement toute option désactivée.
-- [ ] Sous-lot 3B : intégrer le calcul initial dans le Suisse classique.
+- [x] Sous-lot 3B : intégrer le calcul initial dans le Suisse classique.
+  - [x] Embarquer de façon déterministe le moteur hôte et le Worker complet dans le fichier HTML autonome.
+  - [x] Appliquer le résultat seulement s'il est complet et si les données du tournoi n'ont pas changé pendant le calcul.
+  - [x] Conserver la ronde intacte en cas d'erreur, d'impossibilité ou de dépassement des quinze secondes, sans retour au greedy.
+  - [x] Désactiver le lancement pendant le calcul, refuser tout indice de ronde devenu obsolète et proposer l'annulation après l'alerte à trois secondes.
+  - [x] Désactiver temporairement la relance du Suisse classique jusqu'au sous-lot 3C plutôt que d'utiliser l'ancien moteur.
+  - [x] Valider dans Chromium le parcours réel de création d'une ronde de quatre joueurs et le contrôle de dérive du moteur embarqué.
 - [ ] Sous-lot 3C : implémenter le reroll parmi toutes les variantes optimales inédites et sa persistance.
 - [ ] Sous-lot 3D : produire des explications et alertes issues d'une source unique.
 - [ ] Sous-lot 3E : valider les scénarios Suisse et les anciennes sauvegardes sans réinterprétation silencieuse.
