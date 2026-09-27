@@ -69,7 +69,12 @@ Critère de sortie : moteur exact testé, mesuré et encore non activé dans l'a
   - [x] Conserver la ronde actuelle lors d'une erreur, d'une annulation, d'un résultat obsolète ou de l'épuisement prouvé.
   - [x] Effacer l'historique temporaire à la validation tout en conservant la signature finale dans les métadonnées de la ronde.
   - [x] Reprendre sans migration destructive une ronde créée avant 3C en reconstruisant sa signature courante.
-- [ ] Sous-lot 3D : produire des explications et alertes issues d'une source unique.
+- [x] Sous-lot 3D : produire des explications et alertes issues d'une source unique.
+  - [x] Analyser les rondes depuis le même contexte normalisé que le moteur, sans relire d'anciens champs d'alerte UI.
+  - [x] Afficher par table les points, revanches, critères actifs, compromis visibles et exposition historique aux factions.
+  - [x] Centraliser les messages de calcul, d'annulation, de délai, d'épuisement et d'infaisabilité par blocages.
+  - [x] Réutiliser cette analyse dans le panneau de ronde, la validation et les notifications de génération ou de relance.
+  - [x] Refuser blocage, doublon, auto-match, joueur inactif ou actif manquant, et garder les critères désactivés entièrement silencieux.
 - [ ] Sous-lot 3E : valider les scénarios Suisse et les anciennes sauvegardes sans réinterprétation silencieuse.
 
 Critère de sortie : scénarios Suisse et tests de régression réussis.

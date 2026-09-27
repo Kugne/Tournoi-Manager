@@ -139,7 +139,7 @@ const edgeFeatures = (left, right, indexes, options) => {
   const noteCost = options.noteMode === 'separer' || options.noteMode === 'separate'
     ? Number(sameNonEmptyNote)
     : options.noteMode === 'regrouper' || options.noteMode === 'group'
-      ? Number(!sameNonEmptyNote)
+      ? Number(leftNote !== '') + Number(rightNote !== '') - 2 * Number(sameNonEmptyNote)
       : 0;
   const leftFactionExposure = hasValue(right.faction)
     ? indexes.factionExposures.get(`${left.id}\u0000${String(right.faction)}`) ?? 0
@@ -202,7 +202,10 @@ const buildDimensions = (edges, matchCount, options) => {
   }
   if (options.noteMode === 'separer' || options.noteMode === 'separate'
     || options.noteMode === 'regrouper' || options.noteMode === 'group') {
-    dimensions.push({ name: 'notes', bound: matchCount, contribution: (edge) => edge.features.noteCost });
+    const noteBound = options.noteMode === 'regrouper' || options.noteMode === 'group'
+      ? matchCount * 2
+      : matchCount;
+    dimensions.push({ name: 'notes', bound: noteBound, contribution: (edge) => edge.features.noteCost });
   }
   addHistogramDimensions(
     dimensions,

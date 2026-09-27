@@ -13,8 +13,13 @@ import {
   runNextSwissPairingVariant,
   swissInputFingerprint,
 } from './application-runner.mjs';
+import {
+  analyzeApplicationSwissRound,
+  swissOperationFeedback,
+} from './pairing-analysis.mjs';
 
 export {
+  analyzeApplicationSwissRound,
   applicationPairingSignature,
   buildApplicationMatches,
   buildSwissEngineInput,
@@ -23,5 +28,6 @@ export {
   runInitialSwissPairing,
   runNextSwissPairingVariant,
   swissInputFingerprint,
+  swissOperationFeedback,
   SwissWorkerExecutor,
 };

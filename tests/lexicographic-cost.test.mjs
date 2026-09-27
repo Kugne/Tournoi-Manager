@@ -143,6 +143,27 @@ test('une compo absente reste neutre au lieu d’être réinterprétée comme z�
   verifyContext(participants, { options: { useCompo: true } });
 });
 
+test('Regrouper maximise les notes identiques sans biaiser les notes vides', () => {
+  const participants = [
+    { id: 'A', points: 0, note: 'Rookie' },
+    { id: 'B', points: 0, note: 'Club' },
+    { id: 'C', points: 0, note: '' },
+    { id: 'D', points: 0, note: '' },
+  ];
+  const model = buildLexicographicCostModel(participants, { options: { noteMode: 'regrouper' } });
+  const costs = [
+    [{ a: 'A', b: 'B' }, { a: 'C', b: 'D' }],
+    [{ a: 'A', b: 'C' }, { a: 'B', b: 'D' }],
+    [{ a: 'A', b: 'D' }, { a: 'B', b: 'C' }],
+  ].map((pairing) => model.costOfPairing(pairing));
+  assert.equal(new Set(costs).size, 1);
+
+  participants[1].note = 'Rookie';
+  const grouped = buildLexicographicCostModel(participants, { options: { noteMode: 'regrouper' } });
+  assert.ok(grouped.costOfPairing([{ a: 'A', b: 'B' }, { a: 'C', b: 'D' }])
+    < grouped.costOfPairing([{ a: 'A', b: 'C' }, { a: 'B', b: 'D' }]));
+});
+
 test('les blocages retirent les arêtes sans fabriquer de couplage', () => {
   const participants = ['A', 'B', 'C', 'D'].map((id) => ({ id, points: 0 }));
   const model = buildLexicographicCostModel(participants, {

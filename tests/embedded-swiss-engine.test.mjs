@@ -13,6 +13,8 @@ test('le bundle hôte expose l’adaptateur et l’exécuteur sans import résid
   const { code } = bundleModuleGraph('src/swiss/application-runtime.mjs', { globalName: 'TMSwiss' });
   assert.doesNotMatch(code, /\bimport\s*\{/);
   assert.match(code, /buildSwissEngineInput/);
+  assert.match(code, /analyzeApplicationSwissRound/);
+  assert.match(code, /swissOperationFeedback/);
   assert.match(code, /SwissWorkerExecutor/);
   assert.match(code, /globalThis\["TMSwiss"\]/);
   assert.doesNotThrow(() => new vm.Script(code));
@@ -40,6 +42,16 @@ test('le script complet du HTML monofichier reste syntaxiquement valide', () => 
   assert.doesNotThrow(() => new vm.Script(scripts[0][1], { filename: 'index.html' }));
 });
 
+test('les notifications affichent les messages comme du texte non interprété', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const toastStart = html.indexOf('function toast(msg');
+  const toastEnd = html.indexOf('function toastAction', toastStart);
+  const toastFunction = html.slice(toastStart, toastEnd);
+  assert.ok(toastStart >= 0 && toastEnd > toastStart);
+  assert.match(toastFunction, /text\.textContent=msg/);
+  assert.doesNotMatch(toastFunction, /innerHTML/);
+});
+
 test('le Suisse classique appelle exclusivement le moteur exact dans le parcours initial', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const exactStart = html.indexOf('async function generateExactSwissPairings');
@@ -59,4 +71,15 @@ test('le Suisse classique appelle exclusivement le moteur exact dans le parcours
   assert.match(html, /delete t\.roundsData\[idx\]\.swissPairingSignatures/);
   assert.equal([...html.matchAll(/idx!==t\.roundsData\.length/g)].length, 2);
   assert.match(html, /disabled>⏳ Calcul de la ronde/);
+  assert.match(html, /Pourquoi ce match \?/);
+  assert.match(html, /TMSwiss\.analyzeApplicationSwissRound/);
+  assert.match(html, /Validation refusée : un appariement interdit doit être corrigé/);
+  assert.match(html, /showSwissFeedback\('initial',outcome,tournament\)/);
+  assert.doesNotMatch(html, /function getRoundAlerts\(/);
+  const editStart = html.indexOf('function savePairingEdits()');
+  const editEnd = html.indexOf('// PENALTIES', editStart);
+  const editFunction = html.slice(editStart, editEnd);
+  assert.ok(editStart >= 0 && editEnd > editStart);
+  assert.match(editFunction, /var pairingChanged=newMatches\.some/);
+  assert.match(editFunction, /!r\.validated&&pairingChanged/);
 });
