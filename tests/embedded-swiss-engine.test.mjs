@@ -15,6 +15,8 @@ test('le bundle hôte expose l’adaptateur et l’exécuteur sans import résid
   assert.match(code, /buildSwissEngineInput/);
   assert.match(code, /analyzeApplicationSwissRound/);
   assert.match(code, /swissOperationFeedback/);
+  assert.match(code, /createHybridSwissSnapshot/);
+  assert.match(code, /restoreHybridSwissStandings/);
   assert.match(code, /SwissWorkerExecutor/);
   assert.match(code, /globalThis\["TMSwiss"\]/);
   assert.doesNotThrow(() => new vm.Script(code));
@@ -103,4 +105,35 @@ test('le routage exact exclut toujours le Top Cut et les formats non Suisses', (
     isSwissPairingPhase(null),
   ];`, sandbox);
   assert.deepEqual(Array.from(sandbox.result), [true, true, false, false, false, false]);
+});
+
+test('le Top Cut crée puis relit une photographie Suisse avant toute mutation de statut', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const standingsStart = html.indexOf('function getStandings(tournament)');
+  const standingsEnd = html.indexOf('function getSortedForPairing', standingsStart);
+  const standingsFunction = html.slice(standingsStart, standingsEnd);
+  assert.match(standingsFunction, /snapshotActive=hasValidSwissSnapshot/);
+  assert.match(standingsFunction, /restoreHybridSwissStandings/);
+  assert.match(standingsFunction, /if\(!snapshotActive\)tournament\.roundsData\.forEach/);
+  assert.match(standingsFunction, /includeSecondary=isSwissRound\|\|tournament\.pairFormat==='bracket'/);
+  assert.match(standingsFunction, /if\(!snapshotActive\)\{/);
+
+  const confirmStart = html.indexOf('function confirmTopCut()');
+  const confirmEnd = html.indexOf('function renderRounds()', confirmStart);
+  const confirmFunction = html.slice(confirmStart, confirmEnd);
+  const createIndex = confirmFunction.indexOf('TMSwiss.createHybridSwissSnapshot');
+  const statusMutationIndex = confirmFunction.indexOf('t.players.forEach');
+  assert.ok(createIndex >= 0 && statusMutationIndex > createIndex);
+  assert.match(confirmFunction, /t\.swissSnapshot=snapshot/);
+  assert.match(confirmFunction, /t\.cutStartIndex=cutBoundary/);
+
+  const duplicateStart = html.indexOf('function duplicateT(id)');
+  const duplicateEnd = html.indexOf('function archiveT', duplicateStart);
+  const duplicateFunction = html.slice(duplicateStart, duplicateEnd);
+  assert.match(duplicateFunction, /statusAtCut=new Map/);
+  assert.match(duplicateFunction, /p\.status==='eliminatedcut'/);
+  assert.match(duplicateFunction, /copy\.swissSnapshot=null;copy\.cutSeeds=\[\];copy\.cutStartIndex=null/);
+  assert.equal([...html.matchAll(/if\(isHybridCutPhase\(t\)\)/g)].length >= 4, true);
+  assert.match(html, /Ronde;Phase;Adversaire/);
+  assert.match(html, /Points et départages suisses figés au lancement du Top Cut/);
 });

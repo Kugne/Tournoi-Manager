@@ -17,6 +17,12 @@ import {
   analyzeApplicationSwissRound,
   swissOperationFeedback,
 } from './pairing-analysis.mjs';
+import {
+  createHybridSwissSnapshot,
+  HYBRID_SWISS_SNAPSHOT_VERSION,
+  isValidHybridSwissSnapshot,
+  restoreHybridSwissStandings,
+} from './hybrid-snapshot.mjs';
 
 export {
   analyzeApplicationSwissRound,
@@ -30,4 +36,8 @@ export {
   swissInputFingerprint,
   swissOperationFeedback,
   SwissWorkerExecutor,
+  createHybridSwissSnapshot,
+  HYBRID_SWISS_SNAPSHOT_VERSION,
+  isValidHybridSwissSnapshot,
+  restoreHybridSwissStandings,
 };

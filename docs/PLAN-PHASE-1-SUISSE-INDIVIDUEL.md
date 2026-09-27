@@ -95,7 +95,12 @@ Critère de sortie : scénarios Suisse et tests de régression réussis.
   - [x] Comparer le premier reroll optimal, les signatures persistées et la conservation du bye.
   - [x] Comparer intégralement les alertes, explications et interdictions produites pour la ronde.
   - [x] Vérifier que ni le tournoi Suisse ni le tournoi hybride ne sont mutés pendant les calculs purs.
-- [ ] Sous-lot 4C : figer une photographie des points et départages au passage au Top Cut, puis empêcher la phase éliminatoire de modifier les valeurs suisses.
+- [x] Sous-lot 4C : figer une photographie des points et départages au passage au Top Cut, puis empêcher la phase éliminatoire de modifier les valeurs suisses.
+  - [x] Persister avant toute mutation de statut les points, scénario, score libre, SOS, bilan V/N/D, bonus/malus, rang Suisse, éligibilité, qualification et seed.
+  - [x] Relire exclusivement cette photographie après la coupure tout en conservant les statuts et la progression du bracket vivants.
+  - [x] Exclure les scores secondaires du Top Cut du calcul de secours des anciennes sauvegardes dépourvues de photographie, sans leur inventer de migration.
+  - [x] Verrouiller bonus/malus et réouverture du tournoi après la coupure, et nettoyer tout état de cut lors d'une duplication.
+  - [x] Afficher le score libre dans la confirmation du cut et distinguer les phases dans les exports individuels.
 
 Critère de sortie : mêmes appariements en Suisse classique et en phase Suisse hybride pour un contexte identique ; transitions Top Cut validées.
 
