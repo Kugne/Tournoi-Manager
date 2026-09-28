@@ -17,6 +17,9 @@ test('le bundle hôte expose l’adaptateur et l’exécuteur sans import résid
   assert.match(code, /swissOperationFeedback/);
   assert.match(code, /createHybridSwissSnapshot/);
   assert.match(code, /restoreHybridSwissStandings/);
+  assert.match(code, /readMatchOutcome/);
+  assert.match(code, /writeMatchOutcome/);
+  assert.match(code, /MATCH_OUTCOME_VERSION/);
   assert.match(code, /SwissWorkerExecutor/);
   assert.match(code, /globalThis\["TMSwiss"\]/);
   assert.doesNotThrow(() => new vm.Script(code));
@@ -42,6 +45,24 @@ test('le script complet du HTML monofichier reste syntaxiquement valide', () => 
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
   assert.equal(scripts.length, 1);
   assert.doesNotThrow(() => new vm.Script(scripts[0][1], { filename: 'index.html' }));
+});
+
+test('le conteneur persistant versionne le nouveau modèle sans réécrire les anciens matchs', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  assert.match(html, /const STATE_SCHEMA_VERSION=1/);
+  assert.match(html, /let S=\{schemaVersion:STATE_SCHEMA_VERSION,/);
+  assert.match(html, /if\(S\.schemaVersion===undefined\)S\.schemaVersion=STATE_SCHEMA_VERSION/);
+  assert.match(html, /version de données plus récente : import refusé/);
+  assert.doesNotMatch(html, /forEach\([^)]*match[^)]*=>[^\n]*outcomeVersion/);
+});
+
+test('la saisie et l’effacement d’un résultat conservent un tuple explicite valide', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const start = html.indexOf('function setResult(');
+  const end = html.indexOf('function printTableSheets', start);
+  const functions = html.slice(start, end);
+  assert.match(functions, /writeMatchOutcome\(m,\{kind:'played',result:result,started:true\}\)/);
+  assert.match(functions, /writeMatchOutcome\(m,\{kind:null,result:null,started:null\}\)/);
 });
 
 test('les notifications affichent les messages comme du texte non interprété', () => {

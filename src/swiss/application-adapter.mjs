@@ -1,3 +1,5 @@
+import { writeMatchOutcome } from '../results/match-outcome.mjs';
+
 const finiteNumber = (value, label) => {
   const number = Number(value ?? 0);
   if (!Number.isFinite(number)) throw new TypeError(`${label} doit être un nombre fini`);
@@ -159,25 +161,22 @@ export const buildApplicationMatches = ({
     return `${left.p1}\u0000${left.p2}`.localeCompare(`${right.p1}\u0000${right.p2}`);
   });
 
-  const matches = pairs.map((pair, index) => ({
+  const matches = pairs.map((pair, index) => writeMatchOutcome({
     ...pair,
-    result: null,
     s1: 0,
     s2: 0,
     f1: 0,
     f2: 0,
     table: index + 1,
-  }));
+  }, { kind: null, result: null, started: null }));
   if (byePlayerId != null) {
-    matches.push({
+    matches.push(writeMatchOutcome({
       p1: String(byePlayerId),
       p2: null,
-      bye: true,
-      result: 'bye',
       byeScenario: finiteNumber(byeScenario, 'Score scénario du bye'),
       byeFree: finiteNumber(byeFree, 'Score libre du bye'),
       table: matches.length + 1,
-    });
+    }, { kind: 'bye', result: null, started: false }));
   }
   return matches;
 };

@@ -106,8 +106,15 @@ Critère de sortie : mêmes appariements en Suisse classique et en phase Suisse 
 
 ### Lot 5 — Byes, forfaits, drops et SOS
 
-- Implémenter les types de résultats administratifs explicites.
-- Finaliser les cas fonctionnels encore ouverts avant leur sous-partie.
+- [x] Sous-lot 5A : implémenter les types de résultats administratifs explicites et leur lecture compatible V1.9.32.
+  - [x] Distinguer match joué, bye, victoire administrative non jouée, abandon après le début, double forfait et ancien résultat forcé ambigu.
+  - [x] Versionner le résultat au niveau du match et le conteneur persistant sans réécrire les anciennes rondes.
+  - [x] Préserver sans mutation l'interprétation historique des anciens `bye_forced`, sans inventer `started`.
+  - [x] Produire des résultats explicites pour les nouvelles rondes issues du moteur Suisse exact.
+- [x] Finaliser les cas fonctionnels ouverts avant leur sous-partie.
+- [ ] Sous-lot 5B : appliquer les moyennes de ronde, le SOS sportif et les adversaires virtuels.
+- [ ] Sous-lot 5C : intégrer les parcours absence, forfait et drop dans l'interface.
+- [ ] Sous-lot 5D : valider compatibilité, exports, restauration et cohérence entre formats.
 - Migrer les anciennes sauvegardes sans inventer d'information absente.
 
 Critère de sortie : classement, historique, SOS, exports et restauration cohérents pour tous les statuts.

@@ -142,7 +142,11 @@ test('convertit atomiquement le résultat et numérote les meilleures tables en 
     ['P4', null, 3],
   ]);
   assert.equal(matches[0].result, null);
-  assert.equal(matches[2].result, 'bye');
+  assert.equal(matches[0].outcomeVersion, 1);
+  assert.equal(matches[0].kind, null);
+  assert.equal(matches[2].result, null);
+  assert.equal(matches[2].kind, 'bye');
+  assert.equal(matches[2].started, false);
   assert.equal(matches[2].byeScenario, 12.5);
 });
 

@@ -411,12 +411,15 @@ Changer de mode ne doit pas confondre les opérations. Une réorganisation de ta
 
 ## 12. Modèle de données cible
 
-La forme définitive sera choisie pendant l'implémentation, mais le modèle doit distinguer explicitement :
+La forme retenue au sous-lot 5A distingue explicitement :
 
 ```text
-match.kind = played | bye | administrative_no_show | forfeit_after_start | legacy_forced_win_unknown
+state.schemaVersion = 1
+match.outcomeVersion = 1
+match.kind = null | played | bye | administrative_no_show | forfeit_after_start | double_forfeit | legacy_forced_win_unknown
 match.result = p1 | p2 | draw | null
 match.started = true | false | null
+match.administrativeReason = absence | forfeit | drop | unknown | null
 round.pairingMeta = {
   engineVersion,
   seed,
@@ -425,6 +428,8 @@ round.pairingMeta = {
   byePlayerId
 }
 ```
+
+`kind=null` représente un match encore en attente. Un `double_forfeit` est au contraire résolu avec `result=null` : aucun vainqueur n'est inventé et les deux côtés reçoivent une défaite administrative selon le barème. Le lecteur des données historiques expose une provenance `legacy` sans l'écrire dans la sauvegarde.
 
 Exigences :
 

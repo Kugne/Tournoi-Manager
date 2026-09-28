@@ -23,6 +23,16 @@ import {
   isValidHybridSwissSnapshot,
   restoreHybridSwissStandings,
 } from './hybrid-snapshot.mjs';
+import {
+  assertExplicitMatchOutcome,
+  consumesSwissBye,
+  hasRealOpponent,
+  isResolvedMatch,
+  MATCH_OUTCOME_KINDS,
+  MATCH_OUTCOME_VERSION,
+  readMatchOutcome,
+  writeMatchOutcome,
+} from '../results/match-outcome.mjs';
 
 export {
   analyzeApplicationSwissRound,
@@ -40,4 +50,12 @@ export {
   HYBRID_SWISS_SNAPSHOT_VERSION,
   isValidHybridSwissSnapshot,
   restoreHybridSwissStandings,
+  assertExplicitMatchOutcome,
+  consumesSwissBye,
+  hasRealOpponent,
+  isResolvedMatch,
+  MATCH_OUTCOME_KINDS,
+  MATCH_OUTCOME_VERSION,
+  readMatchOutcome,
+  writeMatchOutcome,
 };
