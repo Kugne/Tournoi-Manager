@@ -135,9 +135,11 @@ test('le Top Cut crée puis relit une photographie Suisse avant toute mutation d
   const standingsFunction = html.slice(standingsStart, standingsEnd);
   assert.match(standingsFunction, /snapshotActive=hasValidSwissSnapshot/);
   assert.match(standingsFunction, /restoreHybridSwissStandings/);
-  assert.match(standingsFunction, /if\(!snapshotActive\)tournament\.roundsData\.forEach/);
+  assert.match(standingsFunction, /calculateSwissStandings/);
+  assert.match(standingsFunction, /rounds:tournament\.roundsData\.slice\(0,swissCutoff\)/);
+  assert.match(standingsFunction, /if\(!snapshotActive&&swissCutoff===0\)tournament\.roundsData\.forEach/);
   assert.match(standingsFunction, /includeSecondary=isSwissRound\|\|tournament\.pairFormat==='bracket'/);
-  assert.match(standingsFunction, /if\(!snapshotActive\)\{/);
+  assert.match(standingsFunction, /if\(!snapshotActive&&swissCutoff===0\)\{/);
 
   const confirmStart = html.indexOf('function confirmTopCut()');
   const confirmEnd = html.indexOf('function renderRounds()', confirmStart);
@@ -157,4 +159,15 @@ test('le Top Cut crée puis relit une photographie Suisse avant toute mutation d
   assert.equal([...html.matchAll(/if\(isHybridCutPhase\(t\)\)/g)].length >= 4, true);
   assert.match(html, /Ronde;Phase;Adversaire/);
   assert.match(html, /Points et départages suisses figés au lancement du Top Cut/);
+});
+
+test('les nouvelles rondes figent leur population et finalisent leurs valeurs neutres à la validation', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  assert.match(html, /newRound\.scoringMeta=TMSwiss\.createRoundScoringMeta/);
+  assert.match(html, /TMSwiss\.finalizeRoundNeutralScores\(round,/);
+  assert.match(html, /if\(!finalizeNeutralScoresForValidation\(t,idx\)\)return/);
+  assert.doesNotMatch(html, /calcAvgScenario/);
+  assert.match(html, /adversaire:'Victoire administrative'/);
+  assert.match(html, /adversaire:'Défaite administrative'/);
+  assert.match(html, /outcome\.kind==='double_forfeit'/);
 });

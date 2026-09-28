@@ -112,7 +112,12 @@ Critère de sortie : mêmes appariements en Suisse classique et en phase Suisse 
   - [x] Préserver sans mutation l'interprétation historique des anciens `bye_forced`, sans inventer `started`.
   - [x] Produire des résultats explicites pour les nouvelles rondes issues du moteur Suisse exact.
 - [x] Finaliser les cas fonctionnels ouverts avant leur sous-partie.
-- [ ] Sous-lot 5B : appliquer les moyennes de ronde, le SOS sportif et les adversaires virtuels.
+- [x] Sous-lot 5B : appliquer les moyennes de ronde, le SOS sportif et les adversaires virtuels.
+  - [x] Séparer points sportifs, bonus/malus et total affiché ; calculer le SOS sur les seuls points sportifs.
+  - [x] Figer la population de l'adversaire virtuel au lancement de chaque nouvelle ronde et conserver les drops ultérieurs.
+  - [x] Finaliser scénario et score libre à la validation sur la moyenne réelle de la ronde, arrondie au centième.
+  - [x] Bloquer la validation sans moyenne calculable jusqu'à confirmation d'une valeur manuelle proposée à `0`.
+  - [x] Préserver sans migration inventée les anciens byes et `bye_forced`, et versionner les photographies hybrides avec lecture du schéma précédent.
 - [ ] Sous-lot 5C : intégrer les parcours absence, forfait et drop dans l'interface.
 - [ ] Sous-lot 5D : valider compatibilité, exports, restauration et cohérence entre formats.
 - Migrer les anciennes sauvegardes sans inventer d'information absente.

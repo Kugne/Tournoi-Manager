@@ -27,6 +27,7 @@ test('fige exactement le classement Suisse, les qualifiés et les seeds sans mut
 
   assert.equal(snapshot.schemaVersion, HYBRID_SWISS_SNAPSHOT_VERSION);
   assert.equal(snapshot.standings[0].pts, 7.5);
+  assert.equal(snapshot.standings[0].sportsPts, 7);
   assert.equal(snapshot.standings[0].swissRank, 1);
   assert.equal(snapshot.standings[0].seed, 2);
   assert.equal(snapshot.standings[1].seed, 1);
@@ -34,6 +35,19 @@ test('fige exactement le classement Suisse, les qualifiés et les seeds sans mut
   assert.deepEqual(source, before);
   assert.equal(isValidHybridSwissSnapshot(snapshot, 3), true);
   assert.equal(isValidHybridSwissSnapshot(snapshot, 4), false);
+});
+
+test('relit une photographie de schéma 1 en retrouvant les points sportifs', () => {
+  const snapshot = createHybridSwissSnapshot({ standings: standings(), cutStartIndex: 3 });
+  snapshot.schemaVersion = 1;
+  snapshot.standings.forEach((row) => { delete row.sportsPts; });
+  const restored = restoreHybridSwissStandings({
+    players: standings().map((standing) => ({ ...standing })),
+    snapshot,
+  });
+  assert.equal(isValidHybridSwissSnapshot(snapshot, 3), true);
+  assert.equal(restored[0].sportsPts, 7);
+  assert.equal(restored[2].sportsPts, 4);
 });
 
 test('restaure les valeurs figées avec les métadonnées et statuts vivants', () => {

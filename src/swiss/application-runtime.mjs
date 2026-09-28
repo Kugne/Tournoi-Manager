@@ -33,6 +33,13 @@ import {
   readMatchOutcome,
   writeMatchOutcome,
 } from '../results/match-outcome.mjs';
+import {
+  calculatePlayedRoundAverages,
+  calculateSwissStandings,
+  createRoundScoringMeta,
+  finalizeRoundNeutralScores,
+  ROUND_SCORING_VERSION,
+} from '../results/swiss-scoring.mjs';
 
 export {
   analyzeApplicationSwissRound,
@@ -58,4 +65,9 @@ export {
   MATCH_OUTCOME_VERSION,
   readMatchOutcome,
   writeMatchOutcome,
+  calculatePlayedRoundAverages,
+  calculateSwissStandings,
+  createRoundScoringMeta,
+  finalizeRoundNeutralScores,
+  ROUND_SCORING_VERSION,
 };
