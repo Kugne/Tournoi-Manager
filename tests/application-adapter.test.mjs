@@ -7,6 +7,7 @@ import {
   selectSwissBye,
 } from '../src/swiss/application-adapter.mjs';
 import { solveSwissPairing } from '../src/swiss/solve-swiss.mjs';
+import { writeMatchOutcome } from '../src/results/match-outcome.mjs';
 
 const players = (count = 4) => Array.from({ length: count }, (_, index) => ({
   id: `P${index}`,
@@ -65,6 +66,39 @@ test('traduit uniquement les données métier nécessaires au moteur exact', () 
   });
   assert.equal(input.participants[0].points, ranking[0].pts);
   assert.equal('sos' in input.participants[0], false);
+});
+
+test('une victoire administrative non jouée ne devient pas un adversaire historique', () => {
+  const source = tournament();
+  source.roundsData.push({
+    validated: true,
+    matches: [
+      writeMatchOutcome({ p1: 'P0', p2: 'P1' }, {
+        kind: 'administrative_no_show', result: 'p1', started: false, administrativeReason: 'absence',
+      }),
+      writeMatchOutcome({ p1: 'P2', p2: 'P3' }, {
+        kind: 'forfeit_after_start', result: 'p2', started: true, administrativeReason: 'forfeit',
+      }),
+    ],
+  });
+  const input = buildSwissEngineInput({ tournament: source, roundIndex: 1, standings: standings() });
+  assert.deepEqual(input.context.history, [{ a: 'P2', b: 'P3', round: 1 }]);
+});
+
+test('l’analyse peut normaliser une ronde résolue avec moins de deux joueurs encore actifs', () => {
+  const source = tournament(2);
+  source.players[1].status = 'absent';
+  assert.throws(() => buildSwissEngineInput({
+    tournament: source, roundIndex: 0, standings: standings(2),
+  }), /au moins deux joueurs actifs/);
+  const input = buildSwissEngineInput({
+    tournament: source,
+    roundIndex: 0,
+    standings: standings(2),
+    allowInsufficientActive: true,
+  });
+  assert.equal(input.participants.length, 0);
+  assert.equal(input.byePlayerId, 'P0');
 });
 
 test('exclut la ronde rerollée de l’historique et des comptes de bye', () => {

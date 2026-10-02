@@ -1,4 +1,4 @@
-import { writeMatchOutcome } from '../results/match-outcome.mjs';
+import { hasRealOpponent, writeMatchOutcome } from '../results/match-outcome.mjs';
 
 const finiteNumber = (value, label) => {
   const number = Number(value ?? 0);
@@ -68,13 +68,16 @@ export const buildSwissEngineInput = ({
   roundIndex,
   standings,
   allegianceForFaction = () => null,
+  allowInsufficientActive = false,
 }) => {
   if (!tournament || !Number.isInteger(roundIndex) || roundIndex < 0) {
     throw new TypeError('Tournoi et index de ronde valides requis');
   }
   if (!Array.isArray(standings)) throw new TypeError('Le classement courant est requis');
   const active = activePlayers(tournament);
-  if (active.length < 2) throw new Error('Une ronde Suisse exige au moins deux joueurs actifs');
+  if (!allowInsufficientActive && active.length < 2) {
+    throw new Error('Une ronde Suisse exige au moins deux joueurs actifs');
+  }
   const standingById = standingsIndex(standings);
   const byePlayerId = selectSwissBye({ tournament, roundIndex, standings });
   const useCompo = tournament.compoPairing == null
@@ -99,7 +102,8 @@ export const buildSwissEngineInput = ({
     });
 
   const history = roundMatches(tournament, roundIndex)
-    .filter(({ match }) => !match.bye && match.p1 != null && match.p2 != null)
+    .filter(({ match }) => (match.outcomeVersion == null ? !match.bye : hasRealOpponent(match))
+      && match.p1 != null && match.p2 != null)
     .map(({ match, round }) => ({ a: String(match.p1), b: String(match.p2), round }));
   const blockedPairs = (tournament.blocks ?? [])
     .filter((block) => block.p1 != null && block.p2 != null)

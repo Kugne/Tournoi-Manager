@@ -1,5 +1,10 @@
 import { buildSwissEngineInput } from './application-adapter.mjs';
 import { normalizeNote, pairKey } from './lexicographic-cost.mjs';
+import {
+  isResolvedMatch,
+  MATCH_OUTCOME_KINDS,
+  readMatchOutcome,
+} from '../results/match-outcome.mjs';
 
 const hasValue = (value) => value != null && String(value).trim() !== '';
 
@@ -143,7 +148,13 @@ export const analyzeApplicationSwissRound = ({
 }) => {
   const round = tournament?.roundsData?.[roundIndex];
   if (!round || !Array.isArray(round.matches)) throw new Error('Ronde Suisse à analyser introuvable');
-  const input = buildSwissEngineInput({ tournament, roundIndex, standings, allegianceForFaction });
+  const input = buildSwissEngineInput({
+    tournament,
+    roundIndex,
+    standings,
+    allegianceForFaction,
+    allowInsufficientActive: true,
+  });
   const standingsById = new Map(standings.map((entry) => [String(entry.id), entry]));
   const playersById = new Map((tournament.players ?? []).map((player) => {
     const id = String(player.id);
@@ -173,11 +184,11 @@ export const analyzeApplicationSwissRound = ({
     .map((player) => player.id));
   const seenPlayerTables = new Map();
 
-  const registerPlayer = (player, rawId, table, forbidden) => {
+  const registerPlayer = (player, rawId, table, forbidden, allowInactive = false) => {
     if (rawId == null) return;
     const id = String(rawId);
     if (!player) return;
-    if (player.status !== 'active') {
+    if (!allowInactive && player.status !== 'active') {
       forbidden.push({
         code: 'inactive-player',
         message: `${player.name} n’est plus actif mais apparaît encore à cette table.`,
@@ -201,9 +212,14 @@ export const analyzeApplicationSwissRound = ({
     const p2 = match.p2 == null ? null : playersById.get(String(match.p2));
     const alerts = [];
     const forbidden = [];
+    const outcome = readMatchOutcome(match);
+    const inactivePlayerIsResolved = isResolvedMatch(match)
+      || outcome.kind === MATCH_OUTCOME_KINDS.ADMINISTRATIVE_NO_SHOW
+      || outcome.kind === MATCH_OUTCOME_KINDS.FORFEIT_AFTER_START
+      || outcome.kind === MATCH_OUTCOME_KINDS.DOUBLE_FORFEIT;
     const samePlayer = match.p1 != null && match.p2 != null && String(match.p1) === String(match.p2);
-    registerPlayer(p1, match.p1, table, forbidden);
-    if (!samePlayer) registerPlayer(p2, match.p2, table, forbidden);
+    registerPlayer(p1, match.p1, table, forbidden, inactivePlayerIsResolved);
+    if (!samePlayer) registerPlayer(p2, match.p2, table, forbidden, inactivePlayerIsResolved);
     if (samePlayer) {
       forbidden.push({
         code: 'self-match',

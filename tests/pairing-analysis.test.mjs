@@ -5,6 +5,7 @@ import {
   analyzeApplicationSwissRound,
   swissOperationFeedback,
 } from '../src/swiss/pairing-analysis.mjs';
+import { writeMatchOutcome } from '../src/results/match-outcome.mjs';
 
 const makePlayers = (count = 4) => Array.from({ length: count }, (_, index) => ({
   id: `P${index}`,
@@ -135,6 +136,47 @@ test('refuse doublons, joueurs inactifs, auto-matchs et joueurs actifs manquants
   ];
   const selfMatch = analyze(tournament, 0);
   assert.ok(selfMatch.forbidden.some((item) => item.code === 'self-match'));
+});
+
+test('accepte un joueur devenu inactif quand sa table possède un résultat administratif explicite', () => {
+  const players = makePlayers();
+  players[1].status = 'absent';
+  const tournament = {
+    pairFormat: 'swiss', players, blocks: [], compoPairing: false,
+    noteMatchCriteria: 'none', secondaryCriteria: {},
+    roundsData: [{
+      validated: false,
+      pairingMeta: { manuallyEdited: false },
+      matches: [
+        writeMatchOutcome({ p1: 'P0', p2: 'P1', table: 1 }, {
+          kind: 'administrative_no_show', result: 'p1', started: false, administrativeReason: 'absence',
+        }),
+        { p1: 'P2', p2: 'P3', table: 2 },
+      ],
+    }],
+  };
+  const result = analyze(tournament, 0);
+  assert.equal(result.valid, true);
+  assert.equal(result.forbidden.some((item) => item.code === 'inactive-player'), false);
+});
+
+test('accepte une table résolue puis un statut futur inactif, même s’il ne reste qu’un actif', () => {
+  const players = makePlayers(2);
+  players[1].status = 'dropped';
+  const tournament = {
+    pairFormat: 'swiss', players, blocks: [], compoPairing: false,
+    noteMatchCriteria: 'none', secondaryCriteria: {},
+    roundsData: [{
+      validated: false,
+      pairingMeta: { manuallyEdited: false },
+      matches: [writeMatchOutcome({ p1: 'P0', p2: 'P1', table: 1 }, {
+        kind: 'played', result: 'p1', started: true,
+      })],
+    }],
+  };
+  const result = analyze(tournament, 0);
+  assert.equal(result.valid, true);
+  assert.equal(result.forbidden.some((item) => item.code === 'inactive-player'), false);
 });
 
 test('une revanche créée manuellement est orange et non présentée comme inévitable', () => {

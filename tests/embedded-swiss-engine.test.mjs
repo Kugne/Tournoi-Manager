@@ -94,7 +94,7 @@ test('les phases Suisses classique et hybride appellent exclusivement le moteur 
   assert.match(html, /Toutes les variantes optimales disponibles ont déjà été proposées/);
   assert.match(html, /swissPairingSignatures=outcome\.seenSignatures/);
   assert.match(html, /delete t\.roundsData\[idx\]\.swissPairingSignatures/);
-  assert.equal([...html.matchAll(/idx!==t\.roundsData\.length/g)].length, 2);
+  assert.equal([...html.matchAll(/idx!==t\.roundsData\.length/g)].length, 3);
   assert.match(html, /disabled>⏳ Calcul de la ronde/);
   assert.match(html, /Pourquoi ce match \?/);
   assert.match(html, /TMSwiss\.analyzeApplicationSwissRound/);
@@ -170,4 +170,23 @@ test('les nouvelles rondes figent leur population et finalisent leurs valeurs ne
   assert.match(html, /adversaire:'Victoire administrative'/);
   assert.match(html, /adversaire:'Défaite administrative'/);
   assert.match(html, /outcome\.kind==='double_forfeit'/);
+});
+
+test('le parcours administratif distingue absence, abandon commencé, drop et régénération proposée', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  assert.match(html, /id="modal-administrative"/);
+  assert.match(html, /Attention : un drop est un abandon définitif/);
+  assert.match(html, /La partie avait-elle commencé \?/);
+  assert.match(html, /secondaryScoresConfirmed:confirmed/);
+  assert.match(html, /TMSwiss\.roundHasEnteredResults\(administrativeFlow\.found\.round\)/);
+  assert.match(html, /async function regenerateRoundWithoutAdministrativePlayer/);
+  assert.match(html, /TMSwiss\.resolveAdministrativeMatch/);
+  assert.match(html, /legacy_forced_win_unknown/);
+  assert.match(html, /Effacez d’abord le résultat administratif pour modifier les scores/);
+  assert.match(html, /const administrativeLocked=\['administrative_no_show','forfeit_after_start','double_forfeit'\]/);
+  assert.match(html, /Effacez le résultat administratif pour modifier cette table/);
+  assert.match(html, /const droppedNeedsQualification=p\.status==='dropped'/);
+  assert.match(html, /admin-target-status'\)\.disabled=p\.status==='dropped'/);
+  assert.match(html, /ancien résultat doit être qualifié avant de modifier ses scores/);
+  assert.match(html, /vroundKey==='main'&&vwinners\.length===0/);
 });

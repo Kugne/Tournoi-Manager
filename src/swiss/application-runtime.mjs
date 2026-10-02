@@ -40,6 +40,14 @@ import {
   finalizeRoundNeutralScores,
   ROUND_SCORING_VERSION,
 } from '../results/swiss-scoring.mjs';
+import {
+  ADMINISTRATIVE_FLOW_VERSION,
+  ADMINISTRATIVE_REASONS,
+  findOpenRoundMatch,
+  matchContainsPlayer,
+  resolveAdministrativeMatch,
+  roundHasEnteredResults,
+} from '../results/administrative-flow.mjs';
 
 export {
   analyzeApplicationSwissRound,
@@ -70,4 +78,10 @@ export {
   createRoundScoringMeta,
   finalizeRoundNeutralScores,
   ROUND_SCORING_VERSION,
+  ADMINISTRATIVE_FLOW_VERSION,
+  ADMINISTRATIVE_REASONS,
+  findOpenRoundMatch,
+  matchContainsPlayer,
+  resolveAdministrativeMatch,
+  roundHasEnteredResults,
 };

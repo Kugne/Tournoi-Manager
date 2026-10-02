@@ -118,7 +118,12 @@ Critère de sortie : mêmes appariements en Suisse classique et en phase Suisse 
   - [x] Finaliser scénario et score libre à la validation sur la moyenne réelle de la ronde, arrondie au centième.
   - [x] Bloquer la validation sans moyenne calculable jusqu'à confirmation d'une valeur manuelle proposée à `0`.
   - [x] Préserver sans migration inventée les anciens byes et `bye_forced`, et versionner les photographies hybrides avec lecture du schéma précédent.
-- [ ] Sous-lot 5C : intégrer les parcours absence, forfait et drop dans l'interface.
+- [x] Sous-lot 5C : intégrer les parcours absence, forfait et drop dans l'interface.
+  - [x] Centraliser le signalement depuis la fiche joueur et la table ouverte, avec avertissement explicite pour le drop définitif.
+  - [x] Demander si la partie avait commencé et exiger la confirmation des scores secondaires après le début.
+  - [x] Proposer, sans l'imposer, la régénération d'une ronde Suisse encore vierge après une absence annoncée.
+  - [x] Enregistrer les victoires administratives non jouées, abandons après début et doubles forfaits sans inventer d'adversaire ni de vainqueur.
+  - [x] Imposer la qualification explicite des anciens résultats forcés avant toute modification.
 - [ ] Sous-lot 5D : valider compatibilité, exports, restauration et cohérence entre formats.
 - Migrer les anciennes sauvegardes sans inventer d'information absente.
 

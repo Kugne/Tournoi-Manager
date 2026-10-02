@@ -1,0 +1,63 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+import { writeMatchOutcome } from '../src/results/match-outcome.mjs';
+import {
+  findOpenRoundMatch,
+  resolveAdministrativeMatch,
+  roundHasEnteredResults,
+} from '../src/results/administrative-flow.mjs';
+
+const pending = (p1 = 'A', p2 = 'B') => writeMatchOutcome({ p1, p2, s1: 0, s2: 0, f1: 0, f2: 0 }, {
+  kind: null, result: null, started: null,
+});
+
+test('une partie non commencée devient une victoire administrative sans effacer les scores', () => {
+  const match = { ...pending(), s1: 4, s2: 2 };
+  const result = resolveAdministrativeMatch(match, {
+    unavailablePlayerId: 'B', reason: 'absence', started: false,
+  });
+  assert.deepEqual(
+    [result.kind, result.result, result.started, result.administrativeReason, result.s1, result.s2],
+    ['administrative_no_show', 'p1', false, 'absence', 4, 2],
+  );
+});
+
+test('un abandon après début conserve un adversaire réel et exige la confirmation des scores', () => {
+  assert.throws(() => resolveAdministrativeMatch(pending(), {
+    unavailablePlayerId: 'A', reason: 'drop', started: true,
+  }), /scores secondaires/);
+  const result = resolveAdministrativeMatch({ ...pending(), s1: 8, s2: 3 }, {
+    unavailablePlayerId: 'A', reason: 'drop', started: true, secondaryScoresConfirmed: true,
+  });
+  assert.deepEqual([result.kind, result.result, result.started, result.secondaryScoresConfirmed], [
+    'forfeit_after_start', 'p2', true, true,
+  ]);
+});
+
+test('deux indisponibles produisent deux défaites sans vainqueur avant le début', () => {
+  const result = resolveAdministrativeMatch(pending(), {
+    unavailablePlayerId: 'A', reason: 'forfeit', started: false, otherUnavailable: true,
+  });
+  assert.deepEqual([result.kind, result.result, result.started], ['double_forfeit', null, false]);
+  assert.throws(() => resolveAdministrativeMatch(pending(), {
+    unavailablePlayerId: 'A', reason: 'forfeit', started: true, otherUnavailable: true,
+  }), /décision d’arbitrage/);
+});
+
+test('refuse de transformer un bye en forfait', () => {
+  const bye = writeMatchOutcome({ p1: 'A', p2: null }, { kind: 'bye', result: null, started: false });
+  assert.throws(() => resolveAdministrativeMatch(bye, {
+    unavailablePlayerId: 'A', reason: 'absence', started: false,
+  }), /bye doit être retiré/);
+});
+
+test('retrouve seulement la ronde ouverte et détecte les données déjà saisies', () => {
+  const closed = { validated: true, matches: [pending()] };
+  const open = { validated: false, matches: [pending('C', 'D')] };
+  assert.deepEqual(findOpenRoundMatch([closed, open], 'D').roundIndex, 1);
+  assert.equal(findOpenRoundMatch([closed, open], 'A'), null);
+  assert.equal(roundHasEnteredResults(open), false);
+  open.matches[0].s1 = 1;
+  assert.equal(roundHasEnteredResults(open), true);
+});
