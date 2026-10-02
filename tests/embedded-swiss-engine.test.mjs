@@ -189,4 +189,6 @@ test('le parcours administratif distingue absence, abandon commencé, drop et r�
   assert.match(html, /admin-target-status'\)\.disabled=p\.status==='dropped'/);
   assert.match(html, /ancien résultat doit être qualifié avant de modifier ses scores/);
   assert.match(html, /vroundKey==='main'&&vwinners\.length===0/);
+  assert.match(html, /\.incident-btn\{align-self:flex-start;width:auto;\}/);
+  assert.match(html, /\.match-player\.right \.incident-btn\{align-self:flex-end;\}/);
 });
