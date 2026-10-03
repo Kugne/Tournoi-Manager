@@ -20,6 +20,9 @@ test('le bundle hôte expose l’adaptateur et l’exécuteur sans import résid
   assert.match(code, /readMatchOutcome/);
   assert.match(code, /writeMatchOutcome/);
   assert.match(code, /MATCH_OUTCOME_VERSION/);
+  assert.match(code, /createPairingDraft/);
+  assert.match(code, /previewPairingExchange/);
+  assert.match(code, /undoPairingExchange/);
   assert.match(code, /SwissWorkerExecutor/);
   assert.match(code, /globalThis\["TMSwiss"\]/);
   assert.doesNotThrow(() => new vm.Script(code));

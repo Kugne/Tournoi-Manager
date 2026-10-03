@@ -54,6 +54,20 @@ import {
   inspectPersistedState,
   STATE_SCHEMA_VERSION,
 } from '../results/persistence-compatibility.mjs';
+import {
+  PAIRING_DRAFT_VERSION,
+  PairingDraftError,
+  applyPairingExchange,
+  createPairingDraft,
+  getPairingDraftPosition,
+  listPairingDraftPositions,
+  matchHasRecordedData,
+  pairingDraftMatches,
+  previewPairingExchange,
+  resetPairingDraft,
+  summarizePairingDraft,
+  undoPairingExchange,
+} from '../pairings/pairing-draft.mjs';
 
 export {
   analyzeApplicationSwissRound,
@@ -94,4 +108,16 @@ export {
   describePlayerOutcome,
   inspectPersistedState,
   STATE_SCHEMA_VERSION,
+  PAIRING_DRAFT_VERSION,
+  PairingDraftError,
+  applyPairingExchange,
+  createPairingDraft,
+  getPairingDraftPosition,
+  listPairingDraftPositions,
+  matchHasRecordedData,
+  pairingDraftMatches,
+  previewPairingExchange,
+  resetPairingDraft,
+  summarizePairingDraft,
+  undoPairingExchange,
 };

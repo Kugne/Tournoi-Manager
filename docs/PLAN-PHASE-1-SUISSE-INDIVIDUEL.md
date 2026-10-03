@@ -137,9 +137,25 @@ Critère de sortie : classement, historique, SOS, exports et restauration cohér
 
 ### Lot 6 — Éditeur d'appariements
 
-- Remplacer les listes indépendantes par l'échange guidé validé.
-- Partager le composant avec la préparation du mode manuel.
-- Protéger les résultats saisis et séparer échange de joueurs et réorganisation des tables.
+- [x] Sous-lot 6A : construire la mécanique pure du brouillon d'échanges.
+  - [x] Créer un brouillon indépendant de la ronde persistée et préserver toutes les données des matchs.
+  - [x] Échanger atomiquement deux positions, y compris avec le bénéficiaire du bye, sans doublon transitoire.
+  - [x] Fournir prévisualisation, annulation du dernier échange, remise à zéro et résumé des tables réellement modifiées.
+  - [x] Identifier les seules tables comportant déjà un résultat ou des scores saisis, sans encore les effacer.
+  - [x] Embarquer cette API dans l'application tout en conservant l'éditeur actuel jusqu'à son remplacement complet au 6B.
+- [ ] Sous-lot 6B : remplacer les listes indépendantes par l'interface d'échange guidé.
+  - [ ] Sélectionner un joueur puis afficher un panneau recherchable de candidats avec table et adversaire actuels.
+  - [ ] Évaluer les deux tables après échange avec la source commune d'alertes et classer les candidats par validité.
+  - [ ] Prévisualiser ensemble les deux tables avant d'appliquer l'échange au brouillon.
+- [ ] Sous-lot 6C : sécuriser l'enregistrement et séparer la réorganisation physique des tables.
+  - [ ] Verrouiller visuellement les résultats saisis et exiger une confirmation précise avant leur invalidation.
+  - [ ] Réinitialiser uniquement les résultats des tables effectivement modifiées lors de l'enregistrement final.
+  - [ ] Ajouter le bandeau fixe : échanges, tables modifiées, avertissements, annulation, remise à zéro et enregistrement.
+  - [ ] Isoler le mode de réorganisation des numéros de table sans modifier les paires ni leurs résultats.
+- [ ] Sous-lot 6D : partager l'éditeur avec la préparation manuelle et valider l'expérience complète.
+  - [ ] Réutiliser le même composant pour composer les rondes du mode manuel.
+  - [ ] Vérifier les parcours Suisse, hybride, bracket et manuel sans appeler le moteur Suisse hors de ses phases.
+  - [ ] Valider l'affichage et les interactions sur écrans larges et étroits.
 
 Critère de sortie : parcours bureau et petits écrans validés, contrôles identiques aux alertes du moteur.
 
