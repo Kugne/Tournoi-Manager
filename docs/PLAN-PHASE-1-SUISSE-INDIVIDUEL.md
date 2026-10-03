@@ -161,6 +161,11 @@ Critère de sortie : parcours bureau et petits écrans validés, contrôles iden
 
 ### Lot 7 — Validation et version
 
+- [x] Sous-lot 7A — Tester dans l'application les parcours Suisse, hybride, bracket, manuel et manuel préparé : création, activation des joueurs, lancement, saisie, validation, progression et résultat final. Corriger l'ouverture d'une préparation manuelle sur la dernière ronde et les compteurs joueurs non rafraîchis après import.
+- [ ] Sous-lot 7B — Vérifier imports, exports, sauvegardes et restauration sur les formats concernés.
+- [ ] Sous-lot 7C — Rejouer les navigateurs ciblés, les grands effectifs et les cas de performance/annulation.
+- [ ] Sous-lot 7D — Examiner les modifications finales, corriger les régressions et rejouer toutes les validations.
+- [ ] Sous-lot 7E — Incrémenter la version selon le système existant et préparer la livraison, sans push ni release implicite.
 - Tester Suisse, hybride, bracket et manuel.
 - Vérifier imports, exports, sauvegardes, restauration et navigateurs ciblés.
 - Examiner les modifications finales et corriger les régressions.

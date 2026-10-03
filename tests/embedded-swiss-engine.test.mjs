@@ -319,3 +319,43 @@ test('les formats manuels et les exports conservent les règles du lot 5D', () =
   assert.match(html, /Victoire sur abandon après début/);
   assert.match(html, /Victoire forcée ancienne/);
 });
+
+test('le lot 7A ouvre la première ronde manuelle préparée et rafraîchit les résumés joueurs', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const helperStart = html.indexOf('function getDefaultRoundDisplayIndex(tournament)');
+  const helperEnd = html.indexOf('function renderRounds()', helperStart);
+  const helperSource = html.slice(helperStart, helperEnd);
+  const getDefaultRoundDisplayIndex = Function(`${helperSource}; return getDefaultRoundDisplayIndex;`)();
+
+  assert.equal(getDefaultRoundDisplayIndex({
+    pairFormat: 'manual',
+    prepAllRoundsOption: true,
+    roundsData: [{ validated: false }, { validated: false }, { validated: false }],
+  }), 0);
+  assert.equal(getDefaultRoundDisplayIndex({
+    pairFormat: 'manual',
+    prepAllRoundsOption: true,
+    roundsData: [{ validated: true }, { validated: false }, { validated: false }],
+  }), 1);
+  assert.equal(getDefaultRoundDisplayIndex({
+    pairFormat: 'manual',
+    prepAllRoundsOption: true,
+    roundsData: [{ validated: true }, { validated: true }],
+  }), 1);
+  assert.equal(getDefaultRoundDisplayIndex({
+    pairFormat: 'bracket',
+    roundsData: [{ validated: false }, { validated: false }],
+  }), 1);
+  assert.match(html, /renderRoundContent\(getDefaultRoundDisplayIndex\(t\),content\)/);
+
+  const addPlayer = html.slice(html.indexOf('function addPlayer()'), html.indexOf('function openEditPlayer'));
+  const deletePlayer = html.slice(html.indexOf('function deletePlayer('), html.indexOf('function openImportGSCSV'));
+  const importCsv = html.slice(html.indexOf('function importCSV()'), html.indexOf('// STANDINGS'));
+  const checkin = html.slice(html.indexOf('function checkinAllPlayers()'), html.indexOf('function setPlayerStatus'));
+  const administrativeFinish = html.slice(html.indexOf('function finishAdministrativeFlow('), html.indexOf('function applyAdministrativeFlow'));
+  assert.match(addPlayer, /renderPlayers\(\);renderSidebar\(\);renderTopbar\(\)/);
+  assert.match(deletePlayer, /renderPlayers\(\);renderSidebar\(\);renderTopbar\(\)/);
+  assert.match(importCsv, /renderPlayers\(\);renderSidebar\(\);renderTopbar\(\)/);
+  assert.match(checkin, /renderPlayers\(\);renderTopbar\(\)/);
+  assert.match(administrativeFinish, /renderPlayers\(\);renderTopbar\(\);renderRounds\(\)/);
+});

@@ -4350,7 +4350,7 @@ function addPlayer(){
   const note=document.getElementById('ap-note')?document.getElementById('ap-note').value.trim():'';
   t.players.push({id:uid(),name,faction,compo:compo!==''?parseInt(compo):null,status:'inscrit',note:note,extras:{},penalties:[]});
   closeModal('modal-add-player');document.getElementById('ap-name').value='';document.getElementById('ap-compo').value='';if(document.getElementById('ap-note'))document.getElementById('ap-note').value='';
-  renderPlayers();save();toast(`${name} ajouté !`,'success');
+  renderPlayers();renderSidebar();renderTopbar();save();toast(`${name} ajouté !`,'success');
 }
 function openEditPlayer(id){
   const t=getActiveT(),p=t.players.find(x=>x.id===id);if(!p)return;
@@ -4501,7 +4501,7 @@ function cancelAdministrativeFlow(){
 }
 function finishAdministrativeFlow(message,type){
   closeModal('modal-administrative');administrativeFlow=null;
-  renderPlayers();renderRounds();renderClassement();renderStats();save();toast(message,type||'warning',6000);
+  renderPlayers();renderTopbar();renderRounds();renderClassement();renderStats();save();toast(message,type||'warning',6000);
 }
 function applyAdministrativeFlow(){
   const t=getActiveT(),flow=administrativeFlow;if(!t||!flow)return;
@@ -4545,7 +4545,7 @@ function dropPlayer(id){openAdministrativeFlow(id,'dropped');}
 function undropPlayer(id){
   const t=getActiveT();if(!t)return;
   const p=t.players.find(x=>x.id===id);if(!p)return;
-  p.status='active';renderPlayers();renderClassement();save();toast(p.name+' réactivé ✅','success');
+  p.status='active';renderPlayers();renderTopbar();renderClassement();save();toast(p.name+' réactivé ✅','success');
 }
 function checkinAllPlayers(){
   const t=getActiveT();if(!t)return;
@@ -4553,7 +4553,7 @@ function checkinAllPlayers(){
   if(!toActivate.length){toast('Aucun joueur à activer','info');return;}
   confirmAction('Check-in en masse',`Passer les ${toActivate.length} joueurs inscrits/préinscrits en statut Actif ?`,()=>{
     toActivate.forEach(p=>{p.status='active';});
-    renderPlayers();save();toast(`${toActivate.length} joueur(s) passé(s) en Actif`,'success');
+    renderPlayers();renderTopbar();save();toast(`${toActivate.length} joueur(s) passé(s) en Actif`,'success');
   },false);
 }
 function setPlayerStatus(id,val){
@@ -4562,7 +4562,7 @@ function setPlayerStatus(id,val){
   if(normalized===normalizePlayerStatus(p.status)){renderPlayers();return;}
   if(normalized==='dropped'||normalized==='absent'){openAdministrativeFlow(id,normalized);return;}
   if(p.status==='dropped'){toast('Un drop est définitif.','warning',5000);renderPlayers();return;}
-  p.status=normalized;renderPlayers();save();toast('Statut mis à jour','success');
+  p.status=normalized;renderPlayers();renderTopbar();save();toast('Statut mis à jour','success');
 }
 function saveEditPlayer(){
   const t=getActiveT(),id=document.getElementById('ep-id').value,p=t.players.find(x=>x.id===id);if(!p)return;
@@ -4572,9 +4572,9 @@ function saveEditPlayer(){
   closeModal('modal-edit-player');
   if(nextStatus!==previousStatus&&(nextStatus==='absent'||nextStatus==='dropped')){save();openAdministrativeFlow(id,nextStatus);return;}
   if(previousStatus==='dropped'&&nextStatus!=='dropped'){toast('Un drop est définitif.','warning',5000);renderPlayers();return;}
-  p.status=nextStatus;renderPlayers();save();toast('Mis à jour','success');
+  p.status=nextStatus;renderPlayers();renderTopbar();save();toast('Mis à jour','success');
 }
-function deletePlayer(id){const t=getActiveT(),p=t.players.find(x=>x.id===id);confirmAction('Supprimer',`Supprimer "${p.name}" ?`,()=>{t.players=t.players.filter(x=>x.id!==id);renderPlayers();save();toast('Supprimé','error');});}
+function deletePlayer(id){const t=getActiveT(),p=t.players.find(x=>x.id===id);confirmAction('Supprimer',`Supprimer "${p.name}" ?`,()=>{t.players=t.players.filter(x=>x.id!==id);renderPlayers();renderSidebar();renderTopbar();save();toast('Supprimé','error');});}
 function openImportGSCSV(){document.getElementById('import-gs-csv').value='';openModal('modal-import-gs');}
 function importGSCSV(){
   const text=document.getElementById('import-gs-csv').value.trim();if(!text){toast('Aucune donnée','warning');return;}
@@ -4600,7 +4600,7 @@ function importCSV(){
   const t=getActiveT(),text=document.getElementById('import-csv').value.trim();if(!text){toast('Aucune donnée','warning');return;}
   let added=0,skipped=0;
   text.split('\n').filter(l=>l.trim()).forEach(line=>{const parts=line.split(';');const name=(parts[0]||'').trim(),faction=(parts[1]||'').trim(),compo=(parts[2]||'').trim();if(!name||t.players.find(p=>p.name.toLowerCase()===name.toLowerCase())){skipped++;return;}t.players.push({id:uid(),name,faction,compo:compo!==''?parseInt(compo):null,status:'inscrit',note:'',extras:{}});added++;});
-  closeModal('modal-import');document.getElementById('import-csv').value='';renderPlayers();save();toast(`${added} importé(s), ${skipped} ignoré(s)`,added>0?'success':'warning');
+  closeModal('modal-import');document.getElementById('import-csv').value='';renderPlayers();renderSidebar();renderTopbar();save();toast(`${added} importé(s), ${skipped} ignoré(s)`,added>0?'success':'warning');
 }
 
 // STANDINGS
@@ -5117,6 +5117,13 @@ function confirmTopCut(){
   renderTopbar();renderSidebar();renderRounds();renderClassement();save();
   toast('🏆 Top '+cutSize+' qualifié ! '+eliminatedCount+' joueur(s) éliminé(s), le bracket peut être lancé.','success');
 }
+function getDefaultRoundDisplayIndex(tournament){
+  if(tournament?.pairFormat==='manual'&&tournament?.prepAllRoundsOption===true){
+    const firstOpen=tournament.roundsData.findIndex(function(round){return !round.validated;});
+    if(firstOpen>=0)return firstOpen;
+  }
+  return tournament.roundsData.length-1;
+}
 function renderRounds(){
   const t=getActiveT();if(!t)return;
   const nav=document.getElementById('rounds-nav'),content=document.getElementById('rounds-content');
@@ -5131,7 +5138,7 @@ function renderRounds(){
   if(isBracketFormat(t)&&t.roundsData.length>0)navHtml+=`<button class="btn btn-secondary btn-sm" onclick="showBracketView()">🌳 Voir le tableau</button>`;
   navHtml+=`<button class="btn btn-secondary btn-sm" onclick="printAllRoundsRecap()" style="margin-left:auto">📄 Récap</button><button class="btn btn-secondary btn-sm" onclick="openModal('modal-timer')" style="margin-left:8px">⏱ ${timer.active?'Modifier':'Lancer'} timer</button>`;
   nav.innerHTML=navHtml;renderTimerPanel();
-  if(t.roundsData.length>0)renderRoundContent(t.roundsData.length-1,content);
+  if(t.roundsData.length>0)renderRoundContent(getDefaultRoundDisplayIndex(t),content);
   else content.innerHTML='<div class="empty-state"><div class="empty-icon">⚔️</div><div class="empty-title">Aucune ronde</div></div>';
 }
 function viewRound(idx){const t=getActiveT(),r=t.roundsData[idx];if(!r)return;if(r.validated){document.getElementById('vr-title').textContent=`Ronde ${idx+1}`;document.getElementById('vr-content').innerHTML=renderRoundTable(t,idx);openModal('modal-view-round');}else renderRoundContent(idx,document.getElementById('rounds-content'));}
