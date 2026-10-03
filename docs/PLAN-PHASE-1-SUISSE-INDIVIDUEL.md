@@ -124,8 +124,14 @@ Critère de sortie : mêmes appariements en Suisse classique et en phase Suisse 
   - [x] Proposer, sans l'imposer, la régénération d'une ronde Suisse encore vierge après une absence annoncée.
   - [x] Enregistrer les victoires administratives non jouées, abandons après début et doubles forfaits sans inventer d'adversaire ni de vainqueur.
   - [x] Imposer la qualification explicite des anciens résultats forcés avant toute modification.
-- [ ] Sous-lot 5D : valider compatibilité, exports, restauration et cohérence entre formats.
-- Migrer les anciennes sauvegardes sans inventer d'information absente.
+- [x] Sous-lot 5D : valider compatibilité, exports, restauration et cohérence entre formats.
+  - [x] Refuser avant chargement, import ou restauration les versions imbriquées inconnues des résultats, moyennes de ronde et photographies hybrides, puis bloquer toute sauvegarde automatique tant que les données incompatibles restent en place.
+  - [x] Relire sans mutation les sauvegardes V1.9.32 et conserver l'incertitude des anciennes victoires forcées au lieu d'inventer si la partie avait commencé.
+  - [x] Distinguer dans les historiques et exports les byes, victoires administratives non jouées, abandons après le début, doubles forfaits et anciens résultats ambigus.
+  - [x] Exporter séparément points sportifs, bonus/malus et total afin de préserver le calcul du SOS et le classement affiché.
+  - [x] Appliquer les contrôles de participants aux formats manuel et bracket, et cibler la première ronde ouverte lorsque plusieurs rondes manuelles sont préparées.
+  - [x] Figer les métadonnées de score neutre au démarrage effectif de chaque ronde manuelle préparée à l'avance.
+- [x] Migrer les anciennes sauvegardes sans inventer d'information absente.
 
 Critère de sortie : classement, historique, SOS, exports et restauration cohérents pour tous les statuts.
 

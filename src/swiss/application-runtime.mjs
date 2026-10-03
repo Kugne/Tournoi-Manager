@@ -47,7 +47,13 @@ import {
   matchContainsPlayer,
   resolveAdministrativeMatch,
   roundHasEnteredResults,
+  analyzeRoundParticipantIntegrity,
 } from '../results/administrative-flow.mjs';
+import { describePlayerOutcome } from '../results/result-presentation.mjs';
+import {
+  inspectPersistedState,
+  STATE_SCHEMA_VERSION,
+} from '../results/persistence-compatibility.mjs';
 
 export {
   analyzeApplicationSwissRound,
@@ -84,4 +90,8 @@ export {
   matchContainsPlayer,
   resolveAdministrativeMatch,
   roundHasEnteredResults,
+  analyzeRoundParticipantIntegrity,
+  describePlayerOutcome,
+  inspectPersistedState,
+  STATE_SCHEMA_VERSION,
 };

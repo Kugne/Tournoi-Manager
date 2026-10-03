@@ -1,4 +1,5 @@
 import {
+  isResolvedMatch,
   MATCH_OUTCOME_KINDS,
   readMatchOutcome,
   writeMatchOutcome,
@@ -18,13 +19,50 @@ export const matchContainsPlayer = (match, playerId) => (
 );
 
 export const findOpenRoundMatch = (rounds, playerId) => {
-  for (let roundIndex = (rounds?.length ?? 0) - 1; roundIndex >= 0; roundIndex -= 1) {
+  for (let roundIndex = 0; roundIndex < (rounds?.length ?? 0); roundIndex += 1) {
     const round = rounds[roundIndex];
     if (!round || round.validated) continue;
     const matchIndex = (round.matches ?? []).findIndex((match) => matchContainsPlayer(match, playerId));
     if (matchIndex >= 0) return { round, roundIndex, match: round.matches[matchIndex], matchIndex };
   }
   return null;
+};
+
+export const analyzeRoundParticipantIntegrity = (round, players = []) => {
+  const byId = new Map(players.map((player) => [String(player.id), player]));
+  const seen = new Map();
+  const forbidden = [];
+  for (const [matchIndex, match] of (round?.matches ?? []).entries()) {
+    const table = match.table ?? matchIndex + 1;
+    const ids = match.p2 == null ? [match.p1] : [match.p1, match.p2];
+    if (match.p2 != null && String(match.p1) === String(match.p2)) {
+      forbidden.push({ table, code: 'self-match', players: [String(match.p1)] });
+    }
+    for (const rawId of ids) {
+      if (rawId == null) continue;
+      const id = String(rawId);
+      const player = byId.get(id);
+      if (!player) {
+        forbidden.push({ table, code: 'unknown-player', players: [id] });
+        continue;
+      }
+      if (seen.has(id)) {
+        forbidden.push({ table, code: 'duplicate-player', players: [id] });
+      } else {
+        seen.set(id, table);
+      }
+      if (player.status !== 'active' && !isResolvedMatch(match)) {
+        forbidden.push({ table, code: 'inactive-player', players: [id] });
+      }
+    }
+  }
+  for (const player of players) {
+    const id = String(player.id);
+    if (player.status === 'active' && !seen.has(id)) {
+      forbidden.push({ table: '—', code: 'missing-player', players: [id] });
+    }
+  }
+  return forbidden;
 };
 
 export const roundHasEnteredResults = (round) => (round?.matches ?? []).some((match) => {

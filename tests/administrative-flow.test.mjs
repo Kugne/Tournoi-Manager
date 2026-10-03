@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import { writeMatchOutcome } from '../src/results/match-outcome.mjs';
 import {
+  analyzeRoundParticipantIntegrity,
   findOpenRoundMatch,
   resolveAdministrativeMatch,
   roundHasEnteredResults,
@@ -60,4 +61,27 @@ test('retrouve seulement la ronde ouverte et détecte les données déjà saisie
   assert.equal(roundHasEnteredResults(open), false);
   open.matches[0].s1 = 1;
   assert.equal(roundHasEnteredResults(open), true);
+});
+
+test('cible la première ronde ouverte quand plusieurs rondes manuelles sont préparées', () => {
+  const rounds = [
+    { validated: false, matches: [pending('A', 'B')] },
+    { validated: false, matches: [pending('A', 'C')] },
+  ];
+  assert.equal(findOpenRoundMatch(rounds, 'A').roundIndex, 0);
+});
+
+test('bloque un joueur inactif non résolu dans tous les formats', () => {
+  const players = [
+    { id: 'A', status: 'active' },
+    { id: 'B', status: 'dropped' },
+  ];
+  const round = { matches: [pending()] };
+  assert.ok(analyzeRoundParticipantIntegrity(round, players)
+    .some((item) => item.code === 'inactive-player' && item.players.includes('B')));
+
+  round.matches[0] = resolveAdministrativeMatch(round.matches[0], {
+    unavailablePlayerId: 'B', reason: 'drop', started: false,
+  });
+  assert.equal(analyzeRoundParticipantIntegrity(round, players).length, 0);
 });

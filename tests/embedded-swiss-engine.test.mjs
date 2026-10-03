@@ -49,10 +49,15 @@ test('le script complet du HTML monofichier reste syntaxiquement valide', () => 
 
 test('le conteneur persistant versionne le nouveau modèle sans réécrire les anciens matchs', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  assert.match(html, /const STATE_SCHEMA_VERSION=1/);
+  assert.match(html, /const STATE_SCHEMA_VERSION=TMSwiss\.STATE_SCHEMA_VERSION/);
   assert.match(html, /let S=\{schemaVersion:STATE_SCHEMA_VERSION,/);
   assert.match(html, /if\(S\.schemaVersion===undefined\)S\.schemaVersion=STATE_SCHEMA_VERSION/);
-  assert.match(html, /version de données plus récente : import refusé/);
+  assert.match(html, /TMSwiss\.inspectPersistedState/);
+  assert.match(html, /Version générale de sauvegarde non prise en charge/);
+  assert.match(html, /if\(loadCompatibilityError\)\{[^}]+return false;\}/);
+  assert.match(html, /function save\(\)\{\s*if\(persistenceBlocked\)return;/);
+  assert.match(html, /function snapshotSave\(\)\{if\(persistenceBlocked\)return;/);
+  assert.match(html, /S = data; persistenceBlocked=false; save\(\); init\(\)/);
   assert.doesNotMatch(html, /forEach\([^)]*match[^)]*=>[^\n]*outcomeVersion/);
 });
 
@@ -191,4 +196,17 @@ test('le parcours administratif distingue absence, abandon commencé, drop et r�
   assert.match(html, /vroundKey==='main'&&vwinners\.length===0/);
   assert.match(html, /\.incident-btn\{align-self:flex-start;width:auto;\}/);
   assert.match(html, /\.match-player\.right \.incident-btn\{align-self:flex-end;\}/);
+  assert.match(html, /openAdministrativeFlow\('\$\{m\.p1\}',null,\$\{idx\},\$\{mi\}\)/);
+  assert.match(html, /openAdministrativeFlow\('\$\{m\.p2\}',null,\$\{idx\},\$\{mi\}\)/);
+});
+
+test('les formats manuels et les exports conservent les règles du lot 5D', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  assert.match(html, /function ensureRoundScoringMeta\(t,idx\)/);
+  assert.match(html, /TMSwiss\.analyzeRoundParticipantIntegrity/);
+  assert.match(html, /TMSwiss\.describePlayerOutcome/);
+  assert.match(html, /Points sportifs/);
+  assert.match(html, /Bonus\/Malus/);
+  assert.match(html, /Victoire sur abandon après début/);
+  assert.match(html, /Victoire forcée ancienne/);
 });
