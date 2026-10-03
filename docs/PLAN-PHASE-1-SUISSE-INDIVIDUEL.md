@@ -152,10 +152,10 @@ Critère de sortie : classement, historique, SOS, exports et restauration cohér
   - [x] Réinitialiser uniquement les résultats des tables effectivement modifiées lors de l'enregistrement final.
   - [x] Ajouter le bandeau fixe : échanges, tables modifiées, avertissements, annulation, remise à zéro et enregistrement.
   - [x] Isoler le mode de réorganisation des numéros de table sans modifier les paires ni leurs résultats.
-- [ ] Sous-lot 6D : partager l'éditeur avec la préparation manuelle et valider l'expérience complète.
-  - [ ] Réutiliser le même composant pour composer les rondes du mode manuel.
-  - [ ] Vérifier les parcours Suisse, hybride, bracket et manuel sans appeler le moteur Suisse hors de ses phases.
-  - [ ] Valider l'affichage et les interactions sur écrans larges et étroits.
+- [x] Sous-lot 6D : partager l'éditeur avec la préparation manuelle et valider l'expérience complète.
+  - [x] Réutiliser le même composant pour composer les rondes du mode manuel.
+  - [x] Vérifier les parcours Suisse, hybride, bracket et manuel sans appeler le moteur Suisse hors de ses phases.
+  - [x] Valider l'affichage et les interactions sur écrans larges et étroits.
 
 Critère de sortie : parcours bureau et petits écrans validés, contrôles identiques aux alertes du moteur.
 

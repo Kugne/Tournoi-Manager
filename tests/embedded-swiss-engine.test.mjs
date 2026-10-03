@@ -138,7 +138,7 @@ test('le routage exact exclut toujours le Top Cut et les formats non Suisses', (
 
 test('le lot 6B utilise un échange guidé analysé avant application', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  const start = html.indexOf('function openEditPairings(roundIdx)');
+  const start = html.indexOf('function initializePairingEditorDraft(roundIdx)');
   const end = html.indexOf('// PENALTIES', start);
   const editor = html.slice(start, end);
 
@@ -162,7 +162,7 @@ test('le lot 6B utilise un échange guidé analysé avant application', () => {
 
 test('le lot 6C protège les résultats et sépare la réorganisation physique', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  const start = html.indexOf('function openEditPairings(roundIdx)');
+  const start = html.indexOf('function initializePairingEditorDraft(roundIdx)');
   const end = html.indexOf('// PENALTIES', start);
   const editor = html.slice(start, end);
 
@@ -186,6 +186,60 @@ test('le lot 6C protège les résultats et sépare la réorganisation physique',
   assert.ok(saveBlock.indexOf('clearMatchRecordedData') < saveBlock.indexOf('getPairingAnalysisForMatches'));
   assert.ok(persistBlock.indexOf('clearMatchRecordedData') < persistBlock.indexOf('getPairingAnalysisForMatches'));
   assert.ok(persistBlock.indexOf('getPairingAnalysisForMatches') < persistBlock.indexOf('r.matches=newMatches'));
+});
+
+test('le lot 6D partage le même éditeur avec la préparation manuelle multi-rondes', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const prepStart = html.indexOf('function openManualPrepScreen(tId)');
+  const prepEnd = html.indexOf('function duplicateT', prepStart);
+  const editorStart = html.indexOf('function initializePairingEditorDraft(roundIdx)');
+  const editorEnd = html.indexOf('// PENALTIES', editorStart);
+  const prep = html.slice(prepStart, prepEnd);
+  const editor = html.slice(editorStart, editorEnd);
+
+  assert.ok(prepStart >= 0 && prepEnd > prepStart);
+  assert.match(prep, /pairingEditorManualPrepActive=true/);
+  assert.match(prep, /openEditPairings\(0,true\)/);
+  assert.match(prep, /saveCurrentManualPrepDraft/);
+  assert.match(editor, /pairing-editor-round-nav/);
+  assert.match(editor, /manualPrepGoTo/);
+  assert.match(editor, /Enregistrer cette ronde/);
+  assert.match(html, /Terminer la préparation/);
+  assert.doesNotMatch(html, /modal-manual-prep|manual-prep-content|pair-edit-select|highlightManualPrepDupes/);
+  assert.match(html, /const manual=t\.pairFormat==='manual'/);
+  assert.match(html, /criteria\.mirror===true/);
+  assert.match(html, /criteria\.allegiance===true/);
+  assert.match(html, /const mirror=\(!manual\|\|criteria\.mirror===true\)&&sameFaction/);
+  assert.match(html, /normalize\('NFD'\).*replace\(\/\[\\u0300-\\u036f\]\//s);
+  assert.match(html, /code:'compo-gap'/);
+  assert.match(html, /code:'free-note'/);
+});
+
+test('les alertes manuelles 6D normalisent les notes et respectent les critères actifs', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const start = html.indexOf('function getLegacyPairingAlerts(t,roundIdx)');
+  const end = html.indexOf('function getPairingAnalysis(t,roundIdx)', start);
+  const source = html.slice(start, end);
+  const getLegacyPairingAlerts = Function(
+    'getGS',
+    'getAllegiance',
+    `${source}; return getLegacyPairingAlerts;`,
+  )(() => ({}), () => 'Alliance commune');
+  const tournament = {
+    pairFormat: 'manual',
+    gameSystemId: 'test',
+    compoPairing: false,
+    noteMatchCriteria: 'separate',
+    secondaryCriteria: { mirror: false, allegiance: true, compo: false, free: 'separate' },
+    players: [
+      { id: 'a', name: 'Alpha', faction: 'Faction A', note: 'Équipe  A' },
+      { id: 'b', name: 'Bravo', faction: 'Faction A', note: 'Equipe A' },
+    ],
+    roundsData: [{ matches: [{ table: 1, p1: 'a', p2: 'b', bye: false }] }],
+  };
+
+  const alerts = getLegacyPairingAlerts(tournament, 0)[0];
+  assert.deepEqual(alerts.map(({ code }) => code), ['allegiance', 'free-note']);
 });
 
 test('le Top Cut crée puis relit une photographie Suisse avant toute mutation de statut', () => {

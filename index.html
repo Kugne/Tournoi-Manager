@@ -253,11 +253,10 @@
   .scenario-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
   .scenario-name{font-weight:700;font-size:0.9rem;}
   .scenario-desc{font-size:0.78rem;color:var(--text3);margin-top:3px;}
-  .pair-edit-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
-  .pair-edit-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;}
-  .pair-edit-select{width:100%;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.85rem;}
   .pairing-editor-scroll{max-height:min(66vh,640px);overflow-y:auto;padding-right:4px;}
   .pairing-editor-modes{display:flex;gap:6px;margin:0 0 12px;padding:4px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;}
+  .pairing-editor-round-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 10px;padding:9px 10px;background:rgba(82,139,255,.08);border:1px solid var(--accent);border-radius:10px;}
+  .pairing-editor-round-nav-label{font-size:.75rem;font-weight:800;color:var(--accent2);margin-right:3px;}
   .pairing-editor-mode{flex:1;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--text2);padding:8px 10px;font-weight:750;cursor:pointer;}
   .pairing-editor-mode.active{background:var(--card);border-color:var(--accent);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.12);}
   .pairing-editor-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.95fr);gap:14px;align-items:start;}
@@ -971,8 +970,9 @@
 </div>
 <div class="modal-overlay" id="modal-edit-pairings">
   <div class="modal" style="width:1040px;max-width:94vw">
-    <div class="modal-title">✏️ Éditer les appariements</div>
+    <div class="modal-title" id="pairing-editor-title">✏️ Éditer les appariements</div>
     <p id="pairing-editor-subtitle" style="font-size:0.82rem;color:var(--text3);margin-bottom:10px">Sélectionnez un joueur, comparez les candidats proposés, puis vérifiez les deux tables avant l’échange.</p>
+    <div id="pairing-editor-round-nav" class="pairing-editor-round-nav" style="display:none"></div>
     <div class="pairing-editor-modes">
       <button type="button" class="pairing-editor-mode active" id="pairing-mode-players" onclick="setPairingEditorMode('players')">👥 Échanger des joueurs</button>
       <button type="button" class="pairing-editor-mode" id="pairing-mode-tables" onclick="setPairingEditorMode('tables')">🪑 Réorganiser les tables</button>
@@ -984,21 +984,10 @@
         <button class="btn btn-secondary" id="pairing-edit-undo" onclick="undoPairingEditorExchange()">↶ Annuler la dernière action</button>
         <button class="btn btn-secondary" id="pairing-edit-reset" onclick="resetPairingEditorDraft()">Tout réinitialiser</button>
         <span style="flex:1"></span>
-        <button class="btn btn-secondary" onclick="cancelPairingEdits()">Annuler</button>
+        <button class="btn btn-secondary" id="pairing-edit-cancel" onclick="cancelPairingEdits()">Annuler</button>
+        <button class="btn btn-secondary" id="pairing-edit-finish-prep" style="display:none" onclick="finishManualPrep()">✅ Terminer la préparation</button>
         <button class="btn btn-primary" id="pairing-edit-save" onclick="savePairingEdits()">💾 Enregistrer</button>
       </div>
-    </div>
-  </div>
-</div>
-<div class="modal-overlay" id="modal-manual-prep">
-  <div class="modal" style="width:640px">
-    <div class="modal-title">✏️ Préparation des rondes</div>
-    <p style="font-size:0.82rem;color:var(--text3);margin-bottom:10px">Composez librement les tables de chaque ronde. Les appariements sont fixes, sans recalcul automatique.</p>
-    <div id="manual-prep-nav" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
-    <div id="manual-prep-content" style="max-height:380px;overflow-y:auto"></div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="saveManualPrepRound(true)">💾 Enregistrer cette ronde</button>
-      <button class="btn btn-primary" onclick="finishManualPrep()">✅ Terminer la préparation</button>
     </div>
   </div>
 </div>
@@ -3686,6 +3675,7 @@ let pendingRoundIdx=null,editPairingRoundIdx=null,pendingManualRound=false;
 let pairingEditorDraft=null,pairingEditorSelectedPlayerId=null,pairingEditorCandidateId=null,pairingEditorSearch='';
 let pairingEditorCandidateCache=new Map();
 let pairingEditorMode='players',pairingEditorUnlockedResultMatchIndexes=new Set();
+let pairingEditorManualPrepActive=false;
 let confirmCb=null,validateIdx=null,activeTab='joueurs',expandedPlayer=null;
 let timer={active:false,paused:false,total:0,remaining:0,interval:null,endsAt:null,alerts:{30:false,20:false,10:false,0:false}};
 let sharedAudioCtx=null;
@@ -4211,105 +4201,38 @@ function openManualPrepScreen(tId){
   var t=S.tournaments.find(function(x){return x.id===tId;});
   if(!t)return;
   manualPrepRoundIdx=0;
-  renderManualPrepScreen();
-  openModal('modal-manual-prep');
-}
-
-function renderManualPrepScreen(){
-  var t=getActiveT();if(!t)return;
-  var idx=manualPrepRoundIdx;
-  var r=t.roundsData[idx];if(!r)return;
-  var pm={};t.players.forEach(function(p){pm[p.id]=p;});
-  var active=t.players.filter(function(p){return p.status==='active';});
-  var navHtml='';
-  for(var i=0;i<t.roundsData.length;i++){
-    navHtml+='<button class="btn '+(i===idx?'btn-primary':'btn-secondary')+' btn-sm" onclick="manualPrepGoTo('+i+')">Ronde '+(i+1)+'</button>';
-  }
-  document.getElementById('manual-prep-nav').innerHTML=navHtml;
-  var html='';
-  r.matches.forEach(function(m,mi){
-    if(m.bye){
-      var optsBye='<option value="">-- Choisir --</option>';
-      active.forEach(function(p){
-        optsBye+='<option value="'+p.id+'"'+(p.id===m.p1?' selected':'')+'>'+p.name+' ('+p.faction+')</option>';
-      });
-      html+='<div class="pair-edit-card"><div style="font-size:0.78rem;color:var(--text3);margin-bottom:6px">Table #'+m.table+' — BYE</div><select class="pair-edit-select" id="mp-bye-'+mi+'">'+optsBye+'</select></div>';
-      return;
-    }
-    var optsP1='<option value="">-- Choisir --</option>',optsP2='<option value="">-- Choisir --</option>';
-    active.forEach(function(p){
-      optsP1+='<option value="'+p.id+'"'+(p.id===m.p1?' selected':'')+'>'+p.name+' ('+p.faction+')</option>';
-      optsP2+='<option value="'+p.id+'"'+(p.id===m.p2?' selected':'')+'>'+p.name+' ('+p.faction+')</option>';
-    });
-    html+='<div class="pair-edit-card"><div style="font-size:0.78rem;color:var(--text3);margin-bottom:6px">Table #'+m.table+'</div><div class="pair-edit-row"><select class="pair-edit-select" id="mp-p1-'+mi+'">'+optsP1+'</select><span style="font-weight:900;color:var(--text3)">VS</span><select class="pair-edit-select" id="mp-p2-'+mi+'">'+optsP2+'</select></div></div>';
-  });
-  document.getElementById('manual-prep-content').innerHTML=html;
-  document.querySelectorAll('#manual-prep-content .pair-edit-select').forEach(function(sel){
-    sel.addEventListener('change', highlightManualPrepDupes);
-  });
-  highlightManualPrepDupes();
-}
-
-function highlightManualPrepDupes(){
-  var selects=document.querySelectorAll('#manual-prep-content .pair-edit-select');
-  var count={};
-  selects.forEach(function(s){ if(s.value)count[s.value]=(count[s.value]||0)+1; });
-  selects.forEach(function(s){
-    s.style.borderColor=(count[s.value]&&count[s.value]>1)?'var(--danger)':'var(--border)';
-    s.style.color=(count[s.value]&&count[s.value]>1)?'var(--danger)':'var(--text)';
-  });
+  pairingEditorManualPrepActive=true;
+  openEditPairings(0,true);
 }
 
 function manualPrepGoTo(idx){
-  if(!saveManualPrepRound(false))return;
+  var t=getActiveT();if(!t||!pairingEditorManualPrepActive||idx===manualPrepRoundIdx)return;
+  if(!saveCurrentManualPrepDraft(false))return;
   manualPrepRoundIdx=idx;
-  renderManualPrepScreen();
+  initializePairingEditorDraft(idx);
+  renderPairingEditor();
 }
 
-function saveManualPrepRound(showToast){
-  var t=getActiveT();if(!t)return true;
-  var idx=manualPrepRoundIdx;
-  var r=t.roundsData[idx];if(!r)return true;
-  var pm={};t.players.forEach(function(p){pm[p.id]=p;});
-  var newMatches=r.matches.map(function(m,mi){
-    if(m.bye){
-      var byeEl=document.getElementById('mp-bye-'+mi);
-      return Object.assign({},m,{p1: byeEl ? byeEl.value : m.p1});
-    }
-    var p1El=document.getElementById('mp-p1-'+mi);
-    var p2El=document.getElementById('mp-p2-'+mi);
-    var newP1=p1El?p1El.value:m.p1, newP2=p2El?p2El.value:m.p2;
-    var changed = (newP1!==m.p1) || (newP2!==m.p2);
-    var next=Object.assign({},m,{p1:newP1,p2:newP2});
-    if(changed){next.s1=0;next.s2=0;next.f1=0;next.f2=0;next=TMSwiss.writeMatchOutcome(next,{kind:null,result:null,started:null});}
-    return next;
-  });
-  var incomplete=newMatches.some(function(m){return !m.p1 || (!m.bye && !m.p2);});
-  if(incomplete){toast('Ronde '+(idx+1)+' : toutes les tables doivent avoir leurs joueurs sélectionnés','warning');return false;}
-  var selfErr=null;
-  newMatches.forEach(function(m){if(!m.bye&&m.p1===m.p2)selfErr=m;});
-  if(selfErr){toast('Ronde '+(idx+1)+', table #'+selfErr.table+' : joueur contre lui-même','warning');return false;}
-  var byeIds={};
-  newMatches.forEach(function(m){ if(m.bye && m.p1) byeIds[m.p1]=true; });
-  var usage={};
-  newMatches.forEach(function(m){
-    if(m.bye) return;
-    if(byeIds[m.p1]||byeIds[m.p2]) return;
-    usage[m.p1]=(usage[m.p1]||0)+1;
-    usage[m.p2]=(usage[m.p2]||0)+1;
-  });
-  var dups=[];
-  Object.keys(usage).forEach(function(id){if(usage[id]>1)dups.push(pm[id]?pm[id].name:id);});
-  if(dups.length){toast('Ronde '+(idx+1)+' — appairé plusieurs fois : '+dups.join(', '),'warning');return false;}
+function saveCurrentManualPrepDraft(showToast){
+  var t=getActiveT();if(!t||!pairingEditorDraft)return false;
+  var r=t.roundsData[manualPrepRoundIdx];if(!r)return false;
+  var summary=TMSwiss.summarizePairingDraft(pairingEditorDraft);
+  if(summary.affectedResultMatchIndexes.length){toast('La préparation initiale ne peut pas modifier une ronde comportant déjà des résultats.','error',7000);return false;}
+  var newMatches=TMSwiss.pairingDraftMatches(pairingEditorDraft);
+  var analysis=getPairingAnalysisForMatches(t,manualPrepRoundIdx,newMatches);
+  if(!analysis.valid){toast('Ronde '+(manualPrepRoundIdx+1)+' non enregistrée : corrigez les appariements interdits.','error',7000);return false;}
   r.matches=newMatches;
   save();
-  if(showToast)toast('Ronde '+(idx+1)+' enregistrée ✅','success');
+  if(showToast)toast('Ronde '+(manualPrepRoundIdx+1)+' enregistrée ✅','success');
+  pairingEditorDraft=TMSwiss.createPairingDraft(r.matches);
+  pairingEditorSelectedPlayerId=null;pairingEditorCandidateId=null;pairingEditorSearch='';pairingEditorCandidateCache=new Map();
   return true;
 }
 
 function finishManualPrep(){
-  if(!saveManualPrepRound(false))return;
-  closeModal('modal-manual-prep');
+  if(!saveCurrentManualPrepDraft(false))return;
+  pairingEditorManualPrepActive=false;
+  cancelPairingEdits();
   renderRounds();
   toast('Préparation terminée, vous pouvez lancer le tournoi 🚀','success');
 }
@@ -6651,22 +6574,30 @@ function confirmDeleteScenario(id){
   renderScenariosList();save();toast('Supprimé','error');
 }
 
-function openEditPairings(roundIdx){
+function initializePairingEditorDraft(roundIdx){
   var t=getActiveT();if(!t)return;
   var r=t.roundsData[roundIdx];
-  if(!r||r.validated){toast('Une ronde validée ne peut plus être réappariée.','warning',6000);return;}
+  if(!r||r.validated)throw new Error('Une ronde validée ne peut plus être réappariée.');
+  editPairingRoundIdx=roundIdx;
+  pairingEditorDraft=TMSwiss.createPairingDraft(r.matches);
+  pairingEditorSelectedPlayerId=null;
+  pairingEditorCandidateId=null;
+  pairingEditorSearch='';
+  pairingEditorCandidateCache=new Map();
+  pairingEditorMode='players';
+  pairingEditorUnlockedResultMatchIndexes=new Set();
+}
+
+function openEditPairings(roundIdx,manualPrepSession){
+  var t=getActiveT();if(!t)return;
   try{
-    editPairingRoundIdx=roundIdx;
-    pairingEditorDraft=TMSwiss.createPairingDraft(r.matches);
-    pairingEditorSelectedPlayerId=null;
-    pairingEditorCandidateId=null;
-    pairingEditorSearch='';
-    pairingEditorCandidateCache=new Map();
-    pairingEditorMode='players';
-    pairingEditorUnlockedResultMatchIndexes=new Set();
+    pairingEditorManualPrepActive=manualPrepSession===true;
+    if(pairingEditorManualPrepActive)manualPrepRoundIdx=roundIdx;
+    initializePairingEditorDraft(roundIdx);
     renderPairingEditor();
     openModal('modal-edit-pairings');
   }catch(error){
+    pairingEditorManualPrepActive=false;
     toast('Impossible d’ouvrir l’éditeur : '+(error?.message||String(error)),'error',7000);
   }
 }
@@ -6718,6 +6649,7 @@ function setPairingEditorMode(mode){
 function renderPairingEditor(){
   var t=getActiveT(),container=document.getElementById('edit-pairings-content');
   if(!t||!container||!pairingEditorDraft)return;
+  renderPairingEditorChrome(t);
   var playerMode=pairingEditorMode==='players';
   var playerTab=document.getElementById('pairing-mode-players'),tableTab=document.getElementById('pairing-mode-tables'),subtitle=document.getElementById('pairing-editor-subtitle');
   if(playerTab)playerTab.classList.toggle('active',playerMode);
@@ -6749,6 +6681,19 @@ function renderPairingEditor(){
   }
   renderPairingEditorCandidatePane();
   renderPairingEditorFooter(t);
+}
+
+function renderPairingEditorChrome(t){
+  var title=document.getElementById('pairing-editor-title'),nav=document.getElementById('pairing-editor-round-nav');
+  var cancel=document.getElementById('pairing-edit-cancel'),finish=document.getElementById('pairing-edit-finish-prep'),saveButton=document.getElementById('pairing-edit-save');
+  if(title)title.textContent=pairingEditorManualPrepActive?'✏️ Préparer les appariements · Ronde '+(manualPrepRoundIdx+1):'✏️ Éditer les appariements';
+  if(nav){
+    nav.style.display=pairingEditorManualPrepActive?'flex':'none';
+    nav.innerHTML=pairingEditorManualPrepActive?'<span class="pairing-editor-round-nav-label">Rondes préparées</span>'+t.roundsData.map(function(round,index){return '<button type="button" class="btn '+(index===manualPrepRoundIdx?'btn-primary':'btn-secondary')+' btn-sm" onclick="manualPrepGoTo('+index+')">Ronde '+(index+1)+'</button>';}).join(''):'';
+  }
+  if(cancel)cancel.textContent=pairingEditorManualPrepActive?'Fermer sans enregistrer':'Annuler';
+  if(finish)finish.style.display=pairingEditorManualPrepActive?'inline-flex':'none';
+  if(saveButton)saveButton.textContent=pairingEditorManualPrepActive?'💾 Enregistrer cette ronde':'💾 Enregistrer';
 }
 
 function renderPairingEditorTableMode(t,container){
@@ -6927,11 +6872,15 @@ function resetPairingEditorDraft(){
 }
 
 function cancelPairingEdits(){
-  closeModal('modal-edit-pairings');pairingEditorDraft=null;pairingEditorSelectedPlayerId=null;pairingEditorCandidateId=null;pairingEditorCandidateCache=new Map();pairingEditorUnlockedResultMatchIndexes=new Set();
+  closeModal('modal-edit-pairings');pairingEditorDraft=null;pairingEditorSelectedPlayerId=null;pairingEditorCandidateId=null;pairingEditorCandidateCache=new Map();pairingEditorUnlockedResultMatchIndexes=new Set();pairingEditorManualPrepActive=false;
 }
 
 function savePairingEdits(){
   var t=getActiveT();if(!t||!pairingEditorDraft)return;
+  if(pairingEditorManualPrepActive){
+    if(saveCurrentManualPrepDraft(true))renderPairingEditor();
+    return;
+  }
   var r=t.roundsData[editPairingRoundIdx];
   var summary=TMSwiss.summarizePairingDraft(pairingEditorDraft);
   if(!summary.modifiedMatchIndexes.length&&!summary.reorderedMatchIndexes.length){toast('Aucune modification à enregistrer.','info');return;}
@@ -7072,6 +7021,9 @@ function deleteAward(index){
 // PAIRING ALERTS
 function getLegacyPairingAlerts(t,roundIdx){
   const r=t.roundsData[roundIdx];if(!r)return {};
+  const manual=t.pairFormat==='manual',criteria=t.secondaryCriteria||{};
+  const useCompo=t.compoPairing==null?criteria.compo===true:t.compoPairing===true;
+  const noteMode=t.noteMatchCriteria??criteria.free??'none';
   const pm={};t.players.forEach(p=>{pm[p.id]=p;});
   const hist={};t.players.forEach(p=>{hist[p.id]=new Set();});
   t.roundsData.forEach((rd,ri)=>{if(ri===roundIdx)return;rd.matches.forEach(m=>{if(m.p1&&m.p2){hist[m.p1]?.add(m.p2);hist[m.p2]?.add(m.p1);}});});
@@ -7081,17 +7033,25 @@ function getLegacyPairingAlerts(t,roundIdx){
   r.matches.forEach((m,mi)=>{
     const warnings=[];
     if(m.bye){
-      if(byeCount[m.p1]>=1)warnings.push({level:'red',msg:`${pm[m.p1]?.name} a déjà eu un BYE`});
+      if(byeCount[m.p1]>=1)warnings.push({level:manual?'orange':'red',code:'repeated-bye',msg:`${pm[m.p1]?.name} a déjà eu un BYE`});
       if(warnings.length)alerts[mi]=warnings;return;
     }
     if(!m.p1||!m.p2)return;
     const p1=pm[m.p1],p2=pm[m.p2];
-    if(hist[m.p1]?.has(m.p2))warnings.push({level:'red',msg:`${p1?.name} et ${p2?.name} se sont déjà affrontés`});
+    if(hist[m.p1]?.has(m.p2))warnings.push({level:manual?'orange':'red',code:'rematch',msg:`${p1?.name} et ${p2?.name} se sont déjà affrontés`});
     const gsAlert=getGS(t.gameSystemId);
     const alg1=p1?.faction?getAllegiance(gsAlert,p1.faction):null;
     const alg2=p2?.faction?getAllegiance(gsAlert,p2.faction):null;
-    if(alg1&&alg2&&alg1===alg2)warnings.push({level:'yellow',msg:`Même allégeance : ${alg1}`});
-    else if(p1?.faction&&p2?.faction&&p1.faction===p2.faction)warnings.push({level:'yellow',msg:`Même faction : ${p1.faction}`});
+    const sameFaction=p1?.faction&&p2?.faction&&p1.faction===p2.faction;
+    const mirror=(!manual||criteria.mirror===true)&&sameFaction;
+    if(mirror)warnings.push({level:'yellow',code:'mirror',msg:`Même faction : ${p1.faction}`});
+    if((!manual||criteria.allegiance===true)&&alg1&&alg2&&alg1===alg2&&!mirror)warnings.push({level:'yellow',code:'allegiance',msg:`Même allégeance : ${alg1}`});
+    if(manual&&useCompo&&p1?.compo!=null&&p2?.compo!=null&&Number(p1.compo)!==Number(p2.compo))warnings.push({level:'yellow',code:'compo-gap',msg:`Écart de compo : ${Math.abs(Number(p1.compo)-Number(p2.compo))}`});
+    const normalizeNote=function(value){return String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,' ').toLocaleLowerCase('fr');};
+    const note1=normalizeNote(p1?.note),note2=normalizeNote(p2?.note);
+    const bothNotes=note1!==''&&note2!=='';
+    const noteConflict=['separer','separate'].includes(noteMode)?bothNotes&&note1===note2:['regrouper','group'].includes(noteMode)?bothNotes&&note1!==note2:false;
+    if(manual&&noteConflict)warnings.push({level:'yellow',code:'free-note',msg:`Préférence de note libre « ${['separer','separate'].includes(noteMode)?'séparer':'regrouper'} » non respectée`});
     if(warnings.length)alerts[mi]=warnings;
   });
   return alerts;
