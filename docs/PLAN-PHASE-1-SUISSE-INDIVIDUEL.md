@@ -147,11 +147,11 @@ Critère de sortie : classement, historique, SOS, exports et restauration cohér
   - [x] Sélectionner un joueur puis afficher un panneau recherchable de candidats avec table et adversaire actuels.
   - [x] Évaluer les deux tables après échange avec la source commune d'alertes et classer les candidats par validité.
   - [x] Prévisualiser ensemble les deux tables avant d'appliquer l'échange au brouillon.
-- [ ] Sous-lot 6C : sécuriser l'enregistrement et séparer la réorganisation physique des tables.
-  - [ ] Verrouiller visuellement les résultats saisis et exiger une confirmation précise avant leur invalidation.
-  - [ ] Réinitialiser uniquement les résultats des tables effectivement modifiées lors de l'enregistrement final.
-  - [ ] Ajouter le bandeau fixe : échanges, tables modifiées, avertissements, annulation, remise à zéro et enregistrement.
-  - [ ] Isoler le mode de réorganisation des numéros de table sans modifier les paires ni leurs résultats.
+- [x] Sous-lot 6C : sécuriser l'enregistrement et séparer la réorganisation physique des tables.
+  - [x] Verrouiller visuellement les résultats saisis et exiger une confirmation précise avant leur invalidation.
+  - [x] Réinitialiser uniquement les résultats des tables effectivement modifiées lors de l'enregistrement final.
+  - [x] Ajouter le bandeau fixe : échanges, tables modifiées, avertissements, annulation, remise à zéro et enregistrement.
+  - [x] Isoler le mode de réorganisation des numéros de table sans modifier les paires ni leurs résultats.
 - [ ] Sous-lot 6D : partager l'éditeur avec la préparation manuelle et valider l'expérience complète.
   - [ ] Réutiliser le même composant pour composer les rondes du mode manuel.
   - [ ] Vérifier les parcours Suisse, hybride, bracket et manuel sans appeler le moteur Suisse hors de ses phases.

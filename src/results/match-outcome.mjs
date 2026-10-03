@@ -95,6 +95,34 @@ export const writeMatchOutcome = (match, outcome) => {
   return next;
 };
 
+export const clearMatchRecordedData = (match) => {
+  const current = readMatchOutcome(match);
+  if (current.kind === MATCH_OUTCOME_KINDS.LEGACY_FORCED_WIN_UNKNOWN) {
+    throw new TypeError('Cet ancien résultat ambigu doit être qualifié avant d’être effacé');
+  }
+  const outcome = current.kind === MATCH_OUTCOME_KINDS.BYE
+    ? { kind: MATCH_OUTCOME_KINDS.BYE, result: null, started: false }
+    : { kind: null, result: null, started: null };
+  const next = writeMatchOutcome({
+    ...match,
+    s1: 0,
+    s2: 0,
+    f1: 0,
+    f2: 0,
+  }, outcome);
+  delete next.secondaryScoresConfirmed;
+  delete next.neutralScenario;
+  delete next.neutralFree;
+  if (current.kind === MATCH_OUTCOME_KINDS.BYE) {
+    next.byeScenario = 0;
+    next.byeFree = 0;
+  } else {
+    delete next.byeScenario;
+    delete next.byeFree;
+  }
+  return next;
+};
+
 const legacyOutcome = (match) => {
   if (match?.bye === true || match?.result === 'bye') {
     return {

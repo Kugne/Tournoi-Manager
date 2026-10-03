@@ -31,6 +31,7 @@ import {
   MATCH_OUTCOME_KINDS,
   MATCH_OUTCOME_VERSION,
   readMatchOutcome,
+  clearMatchRecordedData,
   writeMatchOutcome,
 } from '../results/match-outcome.mjs';
 import {
@@ -59,6 +60,7 @@ import {
   PAIRING_DRAFT_VERSION,
   PairingDraftError,
   applyPairingExchange,
+  applyTableNumberExchange,
   createPairingDraft,
   getPairingDraftPosition,
   listPairingDraftPositions,
@@ -97,6 +99,7 @@ export {
   MATCH_OUTCOME_KINDS,
   MATCH_OUTCOME_VERSION,
   readMatchOutcome,
+  clearMatchRecordedData,
   writeMatchOutcome,
   calculatePlayedRoundAverages,
   calculateSwissStandings,
@@ -117,6 +120,7 @@ export {
   PAIRING_DRAFT_VERSION,
   PairingDraftError,
   applyPairingExchange,
+  applyTableNumberExchange,
   createPairingDraft,
   getPairingDraftPosition,
   listPairingDraftPositions,

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  clearMatchRecordedData,
   assertExplicitMatchOutcome,
   consumesSwissBye,
   hasRealOpponent,
@@ -136,4 +137,48 @@ test('supporte un aller-retour JSON sans perdre le type administratif', () => {
     administrativeReason: 'drop',
     source: 'explicit',
   });
+});
+
+test('efface complètement les données saisies sans modifier les participants ni la table', () => {
+  const source = {
+    ...writeMatchOutcome({ ...match(), table: 4, s1: 12, s2: 7, f1: 2, f2: 1 }, {
+      kind: 'forfeit_after_start', result: 'p1', started: true, administrativeReason: 'drop',
+    }),
+    secondaryScoresConfirmed: true,
+    neutralScenario: 9,
+    neutralFree: 1,
+  };
+  const cleared = clearMatchRecordedData(source);
+
+  assert.deepEqual([cleared.p1, cleared.p2, cleared.table], ['A', 'B', 4]);
+  assert.deepEqual([cleared.s1, cleared.s2, cleared.f1, cleared.f2], [0, 0, 0, 0]);
+  assert.deepEqual(readMatchOutcome(cleared), {
+    outcomeVersion: MATCH_OUTCOME_VERSION,
+    kind: null,
+    result: null,
+    started: null,
+    administrativeReason: null,
+    source: 'explicit',
+  });
+  assert.equal('secondaryScoresConfirmed' in cleared, false);
+  assert.equal('neutralScenario' in cleared, false);
+  assert.equal('neutralFree' in cleared, false);
+  assert.equal(source.result, 'p1');
+});
+
+test('réinitialise les scores compensatoires d’un bye en conservant son type', () => {
+  const bye = writeMatchOutcome({ p1: 'A', p2: null, table: 2, byeScenario: 8, byeFree: 3 }, {
+    kind: 'bye', result: null, started: false,
+  });
+  const cleared = clearMatchRecordedData(bye);
+  assert.equal(readMatchOutcome(cleared).kind, 'bye');
+  assert.deepEqual([cleared.byeScenario, cleared.byeFree], [0, 0]);
+  assert.equal(cleared.table, 2);
+});
+
+test('refuse d’effacer silencieusement une ancienne victoire forcée ambiguë', () => {
+  assert.throws(
+    () => clearMatchRecordedData({ ...match(), result: 'p1', bye_forced: true }),
+    /doit être qualifié/,
+  );
 });

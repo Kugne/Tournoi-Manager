@@ -70,7 +70,7 @@ test('la saisie et l’effacement d’un résultat conservent un tuple explicite
   const end = html.indexOf('function printTableSheets', start);
   const functions = html.slice(start, end);
   assert.match(functions, /writeMatchOutcome\(m,\{kind:'played',result:result,started:true\}\)/);
-  assert.match(functions, /writeMatchOutcome\(m,\{kind:null,result:null,started:null\}\)/);
+  assert.match(functions, /clearMatchRecordedData\(m\)/);
 });
 
 test('les notifications affichent les messages comme du texte non interprété', () => {
@@ -157,7 +157,35 @@ test('le lot 6B utilise un échange guidé analysé avant application', () => {
   assert.match(editor, /classification\.status==='warning'/);
   assert.match(editor, /Confirmer la revanche/);
   assert.match(html, /t\.pairFormat==='manual'\?TMSwiss\.analyzeManualRoundBlocks/);
-  assert.doesNotMatch(editor, /<select|pair-edit-select|highlightPairingDupes/);
+  assert.doesNotMatch(editor, /pair-edit-select|highlightPairingDupes/);
+});
+
+test('le lot 6C protège les résultats et sépare la réorganisation physique', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const start = html.indexOf('function openEditPairings(roundIdx)');
+  const end = html.indexOf('// PENALTIES', start);
+  const editor = html.slice(start, end);
+
+  assert.match(html, /Échanger des joueurs/);
+  assert.match(html, /Réorganiser les tables/);
+  assert.match(html, /class="pairing-editor-footer"/);
+  assert.match(editor, /function unlockPairingEditorResult/);
+  assert.match(editor, /Modification autorisée/);
+  assert.match(editor, /ne sera effacé que si cette table est réellement modifiée/);
+  assert.match(editor, /TMSwiss\.applyTableNumberExchange/);
+  assert.match(editor, /Résultat conservé/);
+  assert.match(editor, /Effacer les résultats modifiés \?/);
+  assert.match(editor, /summary\.affectedResultMatchIndexes\.forEach/);
+  assert.match(editor, /TMSwiss\.clearMatchRecordedData/);
+  assert.match(editor, /prospectiveSummary\.affectedResultMatchIndexes\.forEach/);
+  assert.match(editor, /getPairingAnalysisForMatches\(t,editPairingRoundIdx,analysisMatches\)/);
+  assert.match(editor, /var tablesChanged=summary\.reorderedMatchIndexes\.length>0/);
+  assert.match(editor, /isSwissPairingPhase\(t\)&&!r\.validated&&pairingChanged/);
+  const saveBlock = editor.slice(editor.indexOf('function savePairingEdits()'), editor.indexOf('function persistPairingEdits'));
+  const persistBlock = editor.slice(editor.indexOf('function persistPairingEdits'));
+  assert.ok(saveBlock.indexOf('clearMatchRecordedData') < saveBlock.indexOf('getPairingAnalysisForMatches'));
+  assert.ok(persistBlock.indexOf('clearMatchRecordedData') < persistBlock.indexOf('getPairingAnalysisForMatches'));
+  assert.ok(persistBlock.indexOf('getPairingAnalysisForMatches') < persistBlock.indexOf('r.matches=newMatches'));
 });
 
 test('le Top Cut crée puis relit une photographie Suisse avant toute mutation de statut', () => {

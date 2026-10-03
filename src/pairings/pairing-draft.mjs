@@ -88,11 +88,13 @@ const participantsChanged = (before, after) => (
   || Boolean(before?.bye) !== Boolean(after?.bye)
 );
 
+const tableNumber = (match, index) => match?.table ?? index + 1;
+
 export const matchHasRecordedData = (match) => {
   const outcome = readMatchOutcome(match);
   if (outcome.kind !== null && outcome.kind !== MATCH_OUTCOME_KINDS.BYE) return true;
   if (match?.secondaryScoresConfirmed === true) return true;
-  return ['s1', 's2', 'f1', 'f2'].some((field) => {
+  return ['s1', 's2', 'f1', 'f2', 'neutralScenario', 'neutralFree', 'byeScenario', 'byeFree'].some((field) => {
     const value = match?.[field];
     return value != null && (Number.isNaN(Number(value)) || Number(value) !== 0);
   });
@@ -153,10 +155,42 @@ export const applyPairingExchange = (draft, firstPlayerId, secondPlayerId) => {
     originalMatches: cloneMatches(draft.originalMatches),
     matches: preview.matches,
     history: draft.history.map(cloneValue).concat([{
+      operation: 'players',
       matches: cloneMatches(draft.matches),
       exchange: cloneValue(preview.exchange),
       affectedMatchIndexes: [...preview.affectedMatchIndexes],
       affectedResultMatchIndexes: [...preview.affectedResultMatchIndexes],
+    }]),
+  };
+};
+
+export const applyTableNumberExchange = (draft, firstMatchIndex, secondMatchIndex) => {
+  assertDraft(draft);
+  if (!Number.isInteger(firstMatchIndex) || !Number.isInteger(secondMatchIndex)
+    || firstMatchIndex < 0 || secondMatchIndex < 0
+    || firstMatchIndex >= draft.matches.length || secondMatchIndex >= draft.matches.length) {
+    fail('UNKNOWN_TABLE', 'Une table à réorganiser est introuvable', {
+      firstMatchIndex,
+      secondMatchIndex,
+    });
+  }
+  if (firstMatchIndex === secondMatchIndex) {
+    fail('SAME_TABLE', 'Une table ne peut pas être échangée avec elle-même', { firstMatchIndex });
+  }
+  const matches = cloneMatches(draft.matches);
+  const firstTable = tableNumber(matches[firstMatchIndex], firstMatchIndex);
+  const secondTable = tableNumber(matches[secondMatchIndex], secondMatchIndex);
+  matches[firstMatchIndex].table = secondTable;
+  matches[secondMatchIndex].table = firstTable;
+  return {
+    draftVersion: PAIRING_DRAFT_VERSION,
+    originalMatches: cloneMatches(draft.originalMatches),
+    matches,
+    history: draft.history.map(cloneValue).concat([{
+      operation: 'tables',
+      matches: cloneMatches(draft.matches),
+      affectedMatchIndexes: [firstMatchIndex, secondMatchIndex].sort((a, b) => a - b),
+      affectedResultMatchIndexes: [],
     }]),
   };
 };
@@ -195,10 +229,20 @@ export const summarizePairingDraft = (draft) => {
   const modifiedMatchIndexes = draft.matches
     .map((match, index) => (participantsChanged(draft.originalMatches[index], match) ? index : null))
     .filter((index) => index !== null);
+  const reorderedMatchIndexes = draft.matches
+    .map((match, index) => (tableNumber(draft.originalMatches[index], index) !== tableNumber(match, index) ? index : null))
+    .filter((index) => index !== null);
   return {
-    exchangeCount: draft.history.length,
+    exchangeCount: draft.history.filter((entry) => entry.operation !== 'tables').length,
+    tableReorderCount: draft.history.filter((entry) => entry.operation === 'tables').length,
     modifiedMatchIndexes,
     modifiedTables: modifiedMatchIndexes.map((index) => draft.matches[index].table ?? index + 1),
+    reorderedMatchIndexes,
+    reorderedTables: reorderedMatchIndexes.map((index) => ({
+      matchIndex: index,
+      from: tableNumber(draft.originalMatches[index], index),
+      to: tableNumber(draft.matches[index], index),
+    })),
     affectedResultMatchIndexes: modifiedMatchIndexes
       .filter((index) => matchHasRecordedData(draft.originalMatches[index])),
   };

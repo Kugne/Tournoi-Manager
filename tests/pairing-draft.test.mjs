@@ -5,8 +5,10 @@ import { writeMatchOutcome } from '../src/results/match-outcome.mjs';
 import {
   PairingDraftError,
   applyPairingExchange,
+  applyTableNumberExchange,
   createPairingDraft,
   getPairingDraftPosition,
+  matchHasRecordedData,
   pairingDraftMatches,
   previewPairingExchange,
   resetPairingDraft,
@@ -36,10 +38,42 @@ test('échange atomiquement deux joueurs sans muter la ronde ni créer de doublo
   ))).size, 5);
   assert.deepEqual(summarizePairingDraft(next), {
     exchangeCount: 1,
+    tableReorderCount: 0,
     modifiedMatchIndexes: [0, 1],
     modifiedTables: [1, 2],
+    reorderedMatchIndexes: [],
+    reorderedTables: [],
     affectedResultMatchIndexes: [],
   });
+});
+
+test('réorganise uniquement les numéros physiques sans toucher aux paires ni résultats', () => {
+  const matches = round();
+  matches[0] = writeMatchOutcome({ ...matches[0], s1: 12, s2: 8 }, {
+    kind: 'played', result: 'p1', started: true,
+  });
+  const original = createPairingDraft(matches);
+  const reordered = applyTableNumberExchange(original, 0, 2);
+  const result = pairingDraftMatches(reordered);
+
+  assert.deepEqual(result.map((match) => [match.p1, match.p2, match.result]), [
+    ['A', 'B', 'p1'], ['C', 'D', null], ['E', null, 'p1'],
+  ]);
+  assert.deepEqual(result.map((match) => match.table), [3, 2, 1]);
+  assert.equal(result[0].s1, 12);
+  assert.deepEqual(summarizePairingDraft(reordered), {
+    exchangeCount: 0,
+    tableReorderCount: 1,
+    modifiedMatchIndexes: [],
+    modifiedTables: [],
+    reorderedMatchIndexes: [0, 2],
+    reorderedTables: [
+      { matchIndex: 0, from: 1, to: 3 },
+      { matchIndex: 2, from: 3, to: 1 },
+    ],
+    affectedResultMatchIndexes: [],
+  });
+  assert.deepEqual(pairingDraftMatches(undoPairingExchange(reordered)), matches);
 });
 
 test('un échange avec le bye déplace uniquement son bénéficiaire', () => {
@@ -86,6 +120,7 @@ test('annule le dernier échange, puis remet tout le brouillon à zéro', () => 
   assert.deepEqual(pairingDraftMatches(reset), pairingDraftMatches(original));
   assert.deepEqual(summarizePairingDraft(reset).modifiedTables, []);
   assert.equal(summarizePairingDraft(reset).exchangeCount, 0);
+  assert.equal(summarizePairingDraft(reset).tableReorderCount, 0);
 });
 
 test('un échange inverse revient à un diff vide sans effacer son historique', () => {
@@ -113,6 +148,10 @@ test('refuse les joueurs absents, dupliqués ou une même position', () => {
     () => previewPairingExchange(createPairingDraft(round()), 'A', 'A'),
     (error) => error instanceof PairingDraftError && error.code === 'SAME_POSITION',
   );
+  assert.throws(
+    () => applyTableNumberExchange(createPairingDraft(round()), 0, 0),
+    (error) => error instanceof PairingDraftError && error.code === 'SAME_TABLE',
+  );
   const duplicate = round();
   duplicate[1].p1 = 'A';
   assert.throws(
@@ -127,4 +166,9 @@ test('refuse les joueurs absents, dupliqués ou une même position', () => {
     () => createPairingDraft(ambiguousIds),
     (error) => error instanceof PairingDraftError && error.code === 'DUPLICATE_PLAYER',
   );
+});
+
+test('détecte aussi les scores neutres et compensatoires du bye', () => {
+  assert.equal(matchHasRecordedData({ p1: 'A', p2: 'B', neutralScenario: 4 }), true);
+  assert.equal(matchHasRecordedData({ p1: 'A', p2: null, bye: true, byeScenario: 4 }), true);
 });
