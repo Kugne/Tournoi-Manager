@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import { writeMatchOutcome } from '../src/results/match-outcome.mjs';
 import {
+  analyzeManualRoundBlocks,
   analyzeRoundParticipantIntegrity,
   findOpenRoundMatch,
   resolveAdministrativeMatch,
@@ -84,4 +85,24 @@ test('bloque un joueur inactif non résolu dans tous les formats', () => {
     unavailablePlayerId: 'B', reason: 'drop', started: false,
   });
   assert.equal(analyzeRoundParticipantIntegrity(round, players).length, 0);
+});
+
+test('détecte les blocages d’une ronde composée manuellement sans affecter les byes', () => {
+  const players = [
+    { id: 'A', name: 'Alice' },
+    { id: 'B', name: 'Bob' },
+    { id: 'C', name: 'Chloé' },
+  ];
+  const round = { matches: [pending('A', 'B'), { table: 2, p1: 'C', p2: null, bye: true }] };
+  const violations = analyzeManualRoundBlocks(round, [
+    { p1: 'B', p2: 'A' },
+    { p1: 'C', p2: 'A' },
+  ], players);
+
+  assert.deepEqual(violations, [{
+    table: 1,
+    code: 'manual-block',
+    players: ['A', 'B'],
+    message: 'Alice et Bob sont bloqués : cette rencontre est interdite.',
+  }]);
 });

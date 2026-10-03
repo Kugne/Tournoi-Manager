@@ -136,6 +136,30 @@ test('le routage exact exclut toujours le Top Cut et les formats non Suisses', (
   assert.deepEqual(Array.from(sandbox.result), [true, true, false, false, false, false]);
 });
 
+test('le lot 6B utilise un échange guidé analysé avant application', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const start = html.indexOf('function openEditPairings(roundIdx)');
+  const end = html.indexOf('// PENALTIES', start);
+  const editor = html.slice(start, end);
+
+  assert.ok(start >= 0 && end > start);
+  assert.match(editor, /TMSwiss\.createPairingDraft\(r\.matches\)/);
+  assert.match(editor, /TMSwiss\.previewPairingExchange/);
+  assert.match(editor, /getPairingAnalysisForMatches/);
+  assert.match(editor, /TMSwiss\.classifyPairingCandidate/);
+  assert.match(editor, /affectedMatchIndexes\.map/);
+  assert.match(editor, /TMSwiss\.applyPairingExchange/);
+  assert.match(editor, /TMSwiss\.sortPairingCandidates/);
+  assert.match(editor, /pairing-editor-search/);
+  assert.match(editor, /Résultat verrouillé/);
+  assert.match(editor, /matchMedia\('\(max-width:768px\)'\)/);
+  assert.match(editor, /selectedCard\.insertAdjacentElement\('afterend',mobilePane\)/);
+  assert.match(editor, /classification\.status==='warning'/);
+  assert.match(editor, /Confirmer la revanche/);
+  assert.match(html, /t\.pairFormat==='manual'\?TMSwiss\.analyzeManualRoundBlocks/);
+  assert.doesNotMatch(editor, /<select|pair-edit-select|highlightPairingDupes/);
+});
+
 test('le Top Cut crée puis relit une photographie Suisse avant toute mutation de statut', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const standingsStart = html.indexOf('function getStandings(tournament)');

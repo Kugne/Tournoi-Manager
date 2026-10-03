@@ -48,6 +48,7 @@ import {
   resolveAdministrativeMatch,
   roundHasEnteredResults,
   analyzeRoundParticipantIntegrity,
+  analyzeManualRoundBlocks,
 } from '../results/administrative-flow.mjs';
 import { describePlayerOutcome } from '../results/result-presentation.mjs';
 import {
@@ -68,6 +69,10 @@ import {
   summarizePairingDraft,
   undoPairingExchange,
 } from '../pairings/pairing-draft.mjs';
+import {
+  classifyPairingCandidate,
+  sortPairingCandidates,
+} from '../pairings/pairing-candidate.mjs';
 
 export {
   analyzeApplicationSwissRound,
@@ -105,6 +110,7 @@ export {
   resolveAdministrativeMatch,
   roundHasEnteredResults,
   analyzeRoundParticipantIntegrity,
+  analyzeManualRoundBlocks,
   describePlayerOutcome,
   inspectPersistedState,
   STATE_SCHEMA_VERSION,
@@ -120,4 +126,6 @@ export {
   resetPairingDraft,
   summarizePairingDraft,
   undoPairingExchange,
+  classifyPairingCandidate,
+  sortPairingCandidates,
 };

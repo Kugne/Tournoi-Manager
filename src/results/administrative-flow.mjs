@@ -65,6 +65,28 @@ export const analyzeRoundParticipantIntegrity = (round, players = []) => {
   return forbidden;
 };
 
+export const analyzeManualRoundBlocks = (round, blocks = [], players = []) => {
+  const byId = new Map(players.map((player) => [String(player.id), player]));
+  const pairKey = (left, right) => [String(left), String(right)].sort().join('\u0000');
+  const blocked = new Set(blocks
+    .filter((entry) => (entry?.p1 ?? entry?.a) != null && (entry?.p2 ?? entry?.b) != null)
+    .map((entry) => pairKey(entry.p1 ?? entry.a, entry.p2 ?? entry.b)));
+  const violations = [];
+  for (const [matchIndex, match] of (round?.matches ?? []).entries()) {
+    if (match?.bye || match?.p1 == null || match?.p2 == null) continue;
+    if (!blocked.has(pairKey(match.p1, match.p2))) continue;
+    const leftId = String(match.p1);
+    const rightId = String(match.p2);
+    violations.push({
+      table: match.table ?? matchIndex + 1,
+      code: 'manual-block',
+      players: [leftId, rightId],
+      message: `${byId.get(leftId)?.name ?? leftId} et ${byId.get(rightId)?.name ?? rightId} sont bloqués : cette rencontre est interdite.`,
+    });
+  }
+  return violations;
+};
+
 export const roundHasEnteredResults = (round) => (round?.matches ?? []).some((match) => {
   const outcome = readMatchOutcome(match);
   if (outcome.kind !== null && outcome.kind !== MATCH_OUTCOME_KINDS.BYE) return true;

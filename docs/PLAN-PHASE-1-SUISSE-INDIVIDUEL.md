@@ -143,10 +143,10 @@ Critère de sortie : classement, historique, SOS, exports et restauration cohér
   - [x] Fournir prévisualisation, annulation du dernier échange, remise à zéro et résumé des tables réellement modifiées.
   - [x] Identifier les seules tables comportant déjà un résultat ou des scores saisis, sans encore les effacer.
   - [x] Embarquer cette API dans l'application tout en conservant l'éditeur actuel jusqu'à son remplacement complet au 6B.
-- [ ] Sous-lot 6B : remplacer les listes indépendantes par l'interface d'échange guidé.
-  - [ ] Sélectionner un joueur puis afficher un panneau recherchable de candidats avec table et adversaire actuels.
-  - [ ] Évaluer les deux tables après échange avec la source commune d'alertes et classer les candidats par validité.
-  - [ ] Prévisualiser ensemble les deux tables avant d'appliquer l'échange au brouillon.
+- [x] Sous-lot 6B : remplacer les listes indépendantes par l'interface d'échange guidé.
+  - [x] Sélectionner un joueur puis afficher un panneau recherchable de candidats avec table et adversaire actuels.
+  - [x] Évaluer les deux tables après échange avec la source commune d'alertes et classer les candidats par validité.
+  - [x] Prévisualiser ensemble les deux tables avant d'appliquer l'échange au brouillon.
 - [ ] Sous-lot 6C : sécuriser l'enregistrement et séparer la réorganisation physique des tables.
   - [ ] Verrouiller visuellement les résultats saisis et exiger une confirmation précise avant leur invalidation.
   - [ ] Réinitialiser uniquement les résultats des tables effectivement modifiées lors de l'enregistrement final.
