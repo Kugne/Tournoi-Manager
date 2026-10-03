@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "tournaments": [
+    {
+      "id": "invalid-7b",
+      "name": "Ne doit jamais remplacer l'état courant",
+      "pairFormat": "hybrid",
+      "hybridPhase": "cut",
+      "cutStartIndex": 1,
+      "players": [
+        { "id": "a", "name": "A", "status": "active" },
+        { "id": "b", "name": "B", "status": "eliminatedcut" }
+      ],
+      "roundsData": [],
+      "swissSnapshot": {
+        "schemaVersion": 2,
+        "cutStartIndex": 1,
+        "standings": [
+          { "playerId": "a", "swissRank": 1 }
+        ]
+      }
+    }
+  ],
+  "gameSystems": [
+    { "id": "default", "name": "Standard", "factions": [] }
+  ],
+  "scenarios": [],
+  "activeTId": "invalid-7b"
+}

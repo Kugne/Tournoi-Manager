@@ -1,0 +1,32 @@
+{
+  "tournaments": [
+    {
+      "id": "legacy-7b",
+      "name": "7B Sauvegarde V1.9.32",
+      "rounds": 1,
+      "pairFormat": "swiss",
+      "status": "active",
+      "currentRound": 1,
+      "scoring": { "win": 3, "draw": 1, "loss": 0 },
+      "players": [
+        { "id": "legacy-a", "name": "Legacy A", "faction": "Rouge", "status": "active" },
+        { "id": "legacy-b", "name": "Legacy B", "faction": "Bleu", "status": "active" }
+      ],
+      "roundsData": [
+        {
+          "validated": true,
+          "matches": [
+            { "table": 1, "p1": "legacy-a", "p2": "legacy-b", "result": "p1", "bye_forced": true, "s1": 4, "s2": 2 }
+          ]
+        }
+      ]
+    }
+  ],
+  "gameSystems": [
+    { "id": "default", "name": "Standard", "factions": [] }
+  ],
+  "scenarios": [],
+  "activeTId": "legacy-7b",
+  "view": "tournaments",
+  "_sig": "TM4-ORIG-2026"
+}

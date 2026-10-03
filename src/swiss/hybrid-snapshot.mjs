@@ -14,6 +14,8 @@ const integer = (value, label, minimum = 0) => {
 const SNAPSHOT_VERSION = 2;
 const LEGACY_SNAPSHOT_VERSION = 1;
 const SCORE_FIELDS = ['pts', 'scenario', 'free', 'sos', 'wins', 'draws', 'losses', 'bonusMalus'];
+const isFiniteStoredNumber = (value) => (typeof value === 'number' && Number.isFinite(value))
+  || (typeof value === 'string' && value.trim() !== '' && Number.isFinite(Number(value)));
 
 export const createHybridSwissSnapshot = ({
   standings,
@@ -84,8 +86,8 @@ export const isValidHybridSwissSnapshot = (snapshot, cutStartIndex = null, playe
     && typeof row.eligibleAtCut === 'boolean'
     && typeof row.qualifiedAtCut === 'boolean'
     && (!row.qualifiedAtCut ? row.seed == null : row.eligibleAtCut)
-    && SCORE_FIELDS.every((field) => Number.isFinite(Number(row[field])))
-    && (snapshot.schemaVersion === LEGACY_SNAPSHOT_VERSION || Number.isFinite(Number(row.sportsPts))));
+    && SCORE_FIELDS.every((field) => isFiniteStoredNumber(row[field]))
+    && (snapshot.schemaVersion === LEGACY_SNAPSHOT_VERSION || isFiniteStoredNumber(row.sportsPts)));
 };
 
 export const restoreHybridSwissStandings = ({ players, snapshot, normalizeStatus = (status) => status }) => {

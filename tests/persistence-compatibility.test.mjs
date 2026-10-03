@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { inspectPersistedState } from '../src/results/persistence-compatibility.mjs';
+import { createHybridSwissSnapshot } from '../src/swiss/hybrid-snapshot.mjs';
 import { writeMatchOutcome } from '../src/results/match-outcome.mjs';
 
 const state = (match, extraRound = {}) => ({
@@ -46,6 +47,48 @@ test('refuse les versions futures imbriquées avant import ou restauration', () 
   const futureSnapshot = state({ p1: 'A', p2: 'B', result: 'p1' });
   futureSnapshot.tournaments[0].swissSnapshot = { schemaVersion: 99 };
   assert.equal(inspectPersistedState(futureSnapshot).code, 'future-hybrid-schema');
+});
+
+test('refuse les photographies hybrides et métadonnées neutres corrompues malgré une version connue', () => {
+  const brokenSnapshot = state({ p1: 'A', p2: 'B', result: 'p1' });
+  brokenSnapshot.tournaments[0].cutStartIndex = 1;
+  brokenSnapshot.tournaments[0].swissSnapshot = {
+    schemaVersion: 2,
+    cutStartIndex: 1,
+    standings: [{ playerId: 'A', swissRank: 1 }],
+  };
+  assert.equal(inspectPersistedState(brokenSnapshot).code, 'invalid-hybrid-snapshot');
+
+  const validSnapshot = state({ p1: 'A', p2: 'B', result: 'p1' });
+  validSnapshot.tournaments[0].cutStartIndex = 1;
+  validSnapshot.tournaments[0].swissSnapshot = createHybridSwissSnapshot({
+    cutStartIndex: 1,
+    standings: [
+      { id: 'A', pts: 3, sportsPts: 3 },
+      { id: 'B', pts: 0, sportsPts: 0 },
+    ],
+    eligiblePlayerIds: ['A', 'B'],
+    qualifiedPlayerIds: ['A'],
+  });
+  assert.equal(inspectPersistedState(validSnapshot).valid, true);
+
+  const brokenScoring = state({ p1: 'A', p2: null, bye: true }, {
+    scoringMeta: {
+      scoringVersion: 1,
+      virtualOpponentPopulationIds: ['A', 'A'],
+      neutralScores: { status: 'manual', scenario: 'invalide', free: 0 },
+    },
+  });
+  assert.equal(inspectPersistedState(brokenScoring).code, 'invalid-scoring-meta');
+
+  validSnapshot.tournaments[0].swissSnapshot.standings[0].pts = null;
+  assert.equal(inspectPersistedState(validSnapshot).code, 'invalid-hybrid-snapshot');
+
+  brokenScoring.tournaments[0].roundsData[0].scoringMeta.virtualOpponentPopulationIds = ['A', 'B'];
+  brokenScoring.tournaments[0].roundsData[0].scoringMeta.neutralScores = {
+    status: 'manual', scenario: null, free: '   ',
+  };
+  assert.equal(inspectPersistedState(brokenScoring).code, 'invalid-scoring-meta');
 });
 
 test('refuse une structure incomplète au lieu de la charger partiellement', () => {

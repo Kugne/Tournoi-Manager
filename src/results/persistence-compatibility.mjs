@@ -1,10 +1,31 @@
 import { readMatchOutcome } from './match-outcome.mjs';
 import { ROUND_SCORING_VERSION } from './swiss-scoring.mjs';
-import { HYBRID_SWISS_SNAPSHOT_VERSION } from '../swiss/hybrid-snapshot.mjs';
+import {
+  HYBRID_SWISS_SNAPSHOT_VERSION,
+  isValidHybridSwissSnapshot,
+} from '../swiss/hybrid-snapshot.mjs';
 
 export const STATE_SCHEMA_VERSION = 1;
 
 const failure = (code, message) => ({ valid: false, code, message });
+const isFiniteStoredNumber = (value) => (typeof value === 'number' && Number.isFinite(value))
+  || (typeof value === 'string' && value.trim() !== '' && Number.isFinite(Number(value)));
+
+const isValidRoundScoringMeta = (meta) => {
+  if (!meta || typeof meta !== 'object'
+    || meta.scoringVersion !== ROUND_SCORING_VERSION
+    || !Array.isArray(meta.virtualOpponentPopulationIds)
+    || !meta.neutralScores || typeof meta.neutralScores !== 'object') return false;
+  const ids = meta.virtualOpponentPopulationIds.map(String);
+  if (new Set(ids).size !== ids.length) return false;
+  const { status, scenario, free } = meta.neutralScores;
+  if (!['pending', 'round_average', 'manual'].includes(status)) return false;
+  if (status === 'pending') {
+    return (scenario == null || isFiniteStoredNumber(scenario))
+      && (free == null || isFiniteStoredNumber(free));
+  }
+  return isFiniteStoredNumber(scenario) && isFiniteStoredNumber(free);
+};
 
 export const inspectPersistedState = (data) => {
   if (!data || typeof data !== 'object') {
@@ -28,13 +49,24 @@ export const inspectPersistedState = (data) => {
       && hybridSchema !== HYBRID_SWISS_SNAPSHOT_VERSION) {
       return failure('future-hybrid-schema', 'Version de photographie Suisse non prise en charge');
     }
+    if (tournament.swissSnapshot != null && !isValidHybridSwissSnapshot(
+      tournament.swissSnapshot,
+      tournament.cutStartIndex,
+      tournament.players.map((player) => player?.id),
+    )) {
+      return failure('invalid-hybrid-snapshot', 'Photographie Suisse invalide ou incomplète');
+    }
     for (const round of tournament.roundsData) {
       if (!round || !Array.isArray(round.matches)) {
         return failure('invalid-round', 'Structure de ronde incorrecte');
       }
-      if (round.scoringMeta != null
-        && round.scoringMeta.scoringVersion !== ROUND_SCORING_VERSION) {
-        return failure('future-scoring-schema', 'Version de calcul neutre non prise en charge');
+      if (round.scoringMeta != null) {
+        if (round.scoringMeta.scoringVersion !== ROUND_SCORING_VERSION) {
+          return failure('future-scoring-schema', 'Version de calcul neutre non prise en charge');
+        }
+        if (!isValidRoundScoringMeta(round.scoringMeta)) {
+          return failure('invalid-scoring-meta', 'Métadonnées de calcul neutre invalides');
+        }
       }
       for (const match of round.matches) {
         try {

@@ -58,9 +58,9 @@ test('le conteneur persistant versionne le nouveau modèle sans réécrire les a
   assert.match(html, /TMSwiss\.inspectPersistedState/);
   assert.match(html, /Version générale de sauvegarde non prise en charge/);
   assert.match(html, /if\(loadCompatibilityError\)\{[^}]+return false;\}/);
-  assert.match(html, /function save\(\)\{\s*if\(persistenceBlocked\)return;/);
+  assert.match(html, /function save\(\)\{\s*if\(persistenceBlocked\)return false;/);
   assert.match(html, /function snapshotSave\(\)\{if\(persistenceBlocked\)return;/);
-  assert.match(html, /S = data; persistenceBlocked=false; save\(\); init\(\)/);
+  assert.match(html, /if\(!replaceStateAndPersist\(data\)\)/);
   assert.doesNotMatch(html, /forEach\([^)]*match[^)]*=>[^\n]*outcomeVersion/);
 });
 
@@ -358,4 +358,155 @@ test('le lot 7A ouvre la première ronde manuelle préparée et rafraîchit les 
   assert.match(importCsv, /renderPlayers\(\);renderSidebar\(\);renderTopbar\(\)/);
   assert.match(checkin, /renderPlayers\(\);renderTopbar\(\)/);
   assert.match(administrativeFinish, /renderPlayers\(\);renderTopbar\(\);renderRounds\(\)/);
+});
+
+test('le lot 7B remplace les données de façon transactionnelle et conserve les vrais numéros de ronde', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const saveStart = html.indexOf('function save()');
+  const saveEnd = html.indexOf('function load()', saveStart);
+  const persistence = html.slice(saveStart, saveEnd);
+  const restoreStart = html.indexOf('function snapshotRestore(');
+  const restoreEnd = html.indexOf('function snapshotExport(', restoreStart);
+  const restore = html.slice(restoreStart, restoreEnd);
+  const importStart = html.indexOf('function importJSON()');
+  const importEnd = html.indexOf('function exportJSON()', importStart);
+  const jsonImport = html.slice(importStart, importEnd);
+  const detailStart = html.indexOf('function buildPlayerDetailData(');
+  const detailEnd = html.indexOf('function exportPlayerCSV(', detailStart);
+  const detail = html.slice(detailStart, detailEnd);
+  const playerImportStart = html.indexOf('function importCSV()');
+  const playerImportEnd = html.indexOf('// STANDINGS', playerImportStart);
+  const playerImport = html.slice(playerImportStart, playerImportEnd);
+  const snapshotsStart = html.indexOf("const SNAP_KEY='tm4_snapshots'");
+  const snapshotsEnd = html.indexOf('function toggleTheme()', snapshotsStart);
+  const snapshots = html.slice(snapshotsStart, snapshotsEnd);
+
+  assert.match(persistence, /if\(persistenceBlocked\)return false/);
+  assert.match(persistence, /function replaceStateAndPersist\(candidate\)/);
+  assert.match(persistence, /previousState=S.*previousUndo=undoStack\.slice\(\)/s);
+  assert.match(persistence, /if\(save\(\)\)return true/);
+  assert.match(persistence, /S=previousState.*undoStack=previousUndo/s);
+  assert.match(restore, /if\(!replaceStateAndPersist\(snap\.data\)\)/);
+  assert.match(jsonImport, /if\(!replaceStateAndPersist\(data\)\)/);
+  assert.match(detail, /t\.roundsData\.forEach\(\(r,ri\)=>\{\s*if\(!r\.validated\)return;/);
+  assert.doesNotMatch(detail, /roundsData\.filter\(r=>r\.validated\)/);
+  assert.match(playerImport, /replace\(\/\^\\uFEFF\/,'\'\)/);
+  assert.match(playerImport, /Number\.isInteger\(compoValue\)/);
+  assert.match(playerImport, /replaceStateAndPersist\(candidate\)/);
+  assert.match(snapshots, /function readSnapshots\(notifyError\)/);
+  assert.match(snapshots, /if\(!Array\.isArray\(snaps\)\)throw/);
+  assert.match(snapshots, /if\(snaps===null\)/);
+
+  const messages=[];
+  const readSnapshots = Function('localStorage', 'toast', `${snapshots}; return readSnapshots;`)(
+    {getItem:()=>'{cassé'},
+    (message)=>messages.push(message),
+  );
+  assert.equal(readSnapshots(true), null);
+  assert.equal(messages.length, 1);
+
+  const invalidEntryMessages=[];
+  const readInvalidEntry = Function('localStorage', 'toast', 'escapeHtml', `${snapshots}; return readSnapshots;`)(
+    {getItem:()=>'[null]'},
+    (message)=>invalidEntryMessages.push(message),
+    (value)=>String(value),
+  );
+  assert.equal(readInvalidEntry(true), null);
+  assert.equal(invalidEntryMessages.length, 1);
+});
+
+test('le remplacement 7B revient réellement à l’état précédent si localStorage refuse l’écriture', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const source = html.slice(html.indexOf('function save()'), html.indexOf('function load()'));
+  const makeHarness = (setItem) => Function('document', 'localStorage', 'toast', `
+    let S={value:'avant'},persistenceBlocked=false,lastSnapshot=JSON.stringify(S),undoStack=[],saveFailureActive=false,suppressPositiveSaveToast=false;
+    const UNDO_LIMIT=20;
+    function updateUndoButton(){}
+    ${source}
+    return {replaceStateAndPersist,getState:()=>S,getUndo:()=>undoStack.slice(),getLast:()=>lastSnapshot};
+  `)({getElementById:()=>null},{setItem},()=>{});
+
+  const failing = makeHarness(() => { throw new Error('quota'); });
+  assert.equal(failing.replaceStateAndPersist({value:'après'}), false);
+  assert.deepEqual(failing.getState(), {value:'avant'});
+  assert.deepEqual(failing.getUndo(), []);
+  assert.equal(failing.getLast(), JSON.stringify({value:'avant'}));
+
+  const saved=[];
+  const working = makeHarness((key,value) => saved.push([key,value]));
+  assert.equal(working.replaceStateAndPersist({value:'après'}), true);
+  assert.deepEqual(working.getState(), {value:'après'});
+  assert.equal(JSON.parse(saved.at(-1)[1]).value, 'après');
+});
+
+test('l’annulation 7B ne dépile rien si sa réécriture locale échoue', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const source = html.slice(html.indexOf('function undoLastAction()'), html.indexOf('setInterval(save', html.indexOf('function undoLastAction()')));
+  const makeHarness = (setItem) => Function('document', 'localStorage', 'toast', `
+    let S={value:'après'},lastSnapshot=JSON.stringify(S),undoStack=[JSON.stringify({value:'avant'})],saveFailureActive=false;
+    function updateUndoButton(){} function renderSidebar(){} function renderTopbar(){} function switchTab(){} function showView(){}
+    let activeTab='rounds';
+    ${source}
+    return {undoLastAction,getState:()=>S,getUndo:()=>undoStack.slice(),getLast:()=>lastSnapshot};
+  `)({getElementById:()=>null},{setItem},()=>{});
+
+  const failing=makeHarness(()=>{throw new Error('quota');});
+  failing.undoLastAction();
+  assert.deepEqual(failing.getState(),{value:'après'});
+  assert.equal(failing.getUndo().length,1);
+  assert.equal(JSON.parse(failing.getLast()).value,'après');
+
+  const working=makeHarness(()=>{});
+  working.undoLastAction();
+  assert.deepEqual(working.getState(),{value:'avant'});
+  assert.equal(working.getUndo().length,0);
+  assert.equal(JSON.parse(working.getLast()).value,'avant');
+});
+
+test('les CSV détaillés du lot 7B protègent tous les champs textuels dynamiques', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const playerStart = html.indexOf('function exportPlayerCSV(');
+  const playerEnd = html.indexOf('function buildPlayerSectionHTML(', playerStart);
+  const playerCsv = html.slice(playerStart, playerEnd);
+  const sectionStart = html.indexOf('function buildPlayerSectionCSV(');
+  const sectionEnd = html.indexOf('function exportPlayerPDF(', sectionStart);
+  const sectionCsv = html.slice(sectionStart, sectionEnd);
+  const statsStart = html.indexOf('function exportStatsCSV()');
+  const statsEnd = html.indexOf('function exportStatsPDF()', statsStart);
+  const statsCsv = html.slice(statsStart, statsEnd);
+
+  assert.match(playerCsv, /csvEscape\(`FICHE JOUEUR/);
+  assert.match(playerCsv, /\.map\(csvEscape\)\.join\('; '\)|\.map\(csvEscape\)\.join\(';\'\)/);
+  assert.match(sectionCsv, /csvEscape\(awards\.join/);
+  assert.match(sectionCsv, /\.map\(csvEscape\)\.join\(';\'\)/);
+  assert.match(statsCsv, /\[f\.name,f\.players/);
+  assert.match(statsCsv, /\[i\+1,p\.name,p\.faction/);
+  assert.equal((statsCsv.match(/\.map\(csvEscape\)\.join\(';\'\)/g)||[]).length >= 2, true);
+
+  const escapeStart = html.indexOf('function csvEscape(');
+  const escapeEnd = html.indexOf('function sanitizeFilename(', escapeStart);
+  const csvEscape = Function(`${html.slice(escapeStart, escapeEnd)}; return csvEscape;`)();
+  assert.equal(csvEscape('Nom;Club'), '"Nom;Club"');
+  assert.equal(csvEscape('Nom "A"'), '"Nom ""A"""');
+  assert.equal(csvEscape('Deux\nlignes'), '"Deux\nlignes"');
+});
+
+test('les impressions PDF du lot 7B échappent les libellés organisateur', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const classement = html.slice(html.indexOf('function exportPDF()'), html.indexOf('function exportStatsCSV()'));
+  const playerSection = html.slice(html.indexOf('function buildPlayerSectionHTML('), html.indexOf('function buildPlayerSectionCSV('));
+  const playerPdf = html.slice(html.indexOf('function exportPlayerPDF('), html.indexOf('function renderPlayerProgressionChartForPrint('));
+  const statsPdf = html.slice(html.indexOf('function exportStatsPDF()'), html.indexOf('function init()'));
+  const recapPdf = html.slice(html.indexOf('function printAllRoundsRecap()'), html.indexOf('function resetTournamentToWaiting()'));
+  assert.match(classement, /escapeHtml\(p\.name\)/);
+  assert.match(classement, /safeName=escapeHtml\(t\.name\)/);
+  assert.match(playerSection, /escapeHtml\(r\.adversaire\)/);
+  assert.match(playerSection, /escapeHtml\(awards\.join/);
+  assert.match(playerPdf, /escapeHtml\(d\.p\.name\)/);
+  assert.match(statsPdf, /escapeHtml\(f\.name\)/);
+  assert.match(statsPdf, /escapeHtml\(awards\|\|'—'\)/);
+  assert.match(recapPdf, /escapeHtml\(p1\?\.name\)/);
+  assert.match(recapPdf, /escapeHtml\(p2\?\.faction\)/);
+  assert.match(recapPdf, /escapeHtml\(r\.scenarioName\)/);
+  assert.match(recapPdf, /escapeHtml\(t\.name\)/);
 });
