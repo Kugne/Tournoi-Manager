@@ -28,8 +28,12 @@ export const findOpenRoundMatch = (rounds, playerId) => {
   return null;
 };
 
-export const analyzeRoundParticipantIntegrity = (round, players = []) => {
+export const analyzeRoundParticipantIntegrity = (round, players = [], {
+  requireAllActive = true,
+  allowedInactivePlayerIds = [],
+} = {}) => {
   const byId = new Map(players.map((player) => [String(player.id), player]));
+  const allowedInactive = new Set(allowedInactivePlayerIds.map(String));
   const seen = new Map();
   const forbidden = [];
   for (const [matchIndex, match] of (round?.matches ?? []).entries()) {
@@ -51,15 +55,17 @@ export const analyzeRoundParticipantIntegrity = (round, players = []) => {
       } else {
         seen.set(id, table);
       }
-      if (player.status !== 'active' && !isResolvedMatch(match)) {
+      if (player.status !== 'active' && !allowedInactive.has(id) && !isResolvedMatch(match)) {
         forbidden.push({ table, code: 'inactive-player', players: [id] });
       }
     }
   }
-  for (const player of players) {
-    const id = String(player.id);
-    if (player.status === 'active' && !seen.has(id)) {
-      forbidden.push({ table: '—', code: 'missing-player', players: [id] });
+  if (requireAllActive) {
+    for (const player of players) {
+      const id = String(player.id);
+      if (player.status === 'active' && !seen.has(id)) {
+        forbidden.push({ table: '—', code: 'missing-player', players: [id] });
+      }
     }
   }
   return forbidden;

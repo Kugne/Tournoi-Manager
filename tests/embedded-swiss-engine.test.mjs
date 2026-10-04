@@ -318,6 +318,68 @@ test('le Top Cut crée puis relit une photographie Suisse avant toute mutation d
   assert.match(html, /Points et départages suisses figés au lancement du Top Cut/);
 });
 
+test('la finale et la petite finale parallèles conservent leurs joueurs et retardent la clôture', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  assert.match(html, /loser\.played&&player&&player\.status==='eliminatedcut'/);
+  assert.match(html, /restorePendingThirdPlaceParticipants\(t\)/);
+  assert.match(html, /function tryCompleteBracketTournament\(t\)/);
+  assert.match(html, /pendingThirdPlace=.*bracketKey==='3rd-place'&&round\.validated!==true/);
+  assert.match(html, /requireAllActive:!bracketRound,allowedInactivePlayerIds:allowedInactivePlayerIds/);
+});
+
+test('une sauvegarde hybride touchée réactive les joueurs de petite finale encore en attente', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const start = html.indexOf('function restorePendingThirdPlaceParticipants(t)');
+  const end = html.indexOf('function bracketRoundColTitle', start);
+  const source = html.slice(start, end);
+  const tournament = {
+    pairFormat: 'hybrid', hybridPhase: 'cut', status: 'active',
+    players: [
+      { id: 'A', status: 'eliminatedcut' }, { id: 'B', status: 'eliminatedcut' },
+      { id: 'C', status: 'active' }, { id: 'D', status: 'active' },
+    ],
+    roundsData: [
+      { bracketKey: 'main', validated: true, matches: [
+        { p1: 'C', p2: 'A', result: 'p1' }, { p1: 'D', p2: 'B', result: 'p1' },
+      ] },
+      { bracketKey: '3rd-place', validated: false, matches: [{ p1: 'A', p2: 'B' }] },
+      { bracketKey: 'main', validated: false, matches: [{ p1: 'C', p2: 'D' }] },
+    ],
+  };
+  const context = {
+    tournament,
+    isBracketFormat: () => true,
+    TMSwiss: { readMatchOutcome: () => ({ kind: 'played' }) },
+  };
+  vm.runInNewContext(`${source}; restored = restorePendingThirdPlaceParticipants(tournament);`, context);
+  assert.equal(context.restored, true);
+  assert.deepEqual(tournament.players.map((player) => player.status), ['active', 'active', 'active', 'active']);
+});
+
+test('la victoire finale ne clôt le tableau qu’après validation de la petite finale', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const start = html.indexOf('function tryCompleteBracketTournament(t)');
+  const end = html.indexOf('// CLASSEMENT', start);
+  const source = html.slice(start, end);
+  const tournament = {
+    status: 'active',
+    players: ['A', 'B', 'C', 'D'].map((id) => ({ id, status: 'active' })),
+    roundsData: [
+      { bracketKey: '3rd-place', validated: false, matches: [{ p1: 'A', p2: 'B' }] },
+      { bracketKey: 'main', validated: true, matches: [{ p1: 'C', p2: 'D', result: 'p1' }] },
+    ],
+  };
+  const context = { tournament };
+  vm.runInNewContext(`${source}; first = tryCompleteBracketTournament(tournament);`, context);
+  assert.equal(context.first.completed, false);
+  assert.deepEqual(tournament.players.map((player) => player.status), ['active', 'active', 'active', 'active']);
+  tournament.roundsData[0].validated = true;
+  vm.runInNewContext('second = tryCompleteBracketTournament(tournament);', context);
+  assert.equal(context.second.completed, true);
+  assert.equal(context.second.winnerId, 'C');
+  assert.deepEqual(tournament.players.map((player) => player.status), ['eliminatedcut', 'eliminatedcut', 'active', 'eliminatedcut']);
+});
+
 test('les nouvelles rondes figent leur population et finalisent leurs valeurs neutres à la validation', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /newRound\.scoringMeta=TMSwiss\.createRoundScoringMeta/);

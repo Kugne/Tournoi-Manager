@@ -87,6 +87,20 @@ test('bloque un joueur inactif non résolu dans tous les formats', () => {
   assert.equal(analyzeRoundParticipantIntegrity(round, players).length, 0);
 });
 
+test('une ronde de classement parallèle peut limiter son contrôle à ses participants', () => {
+  const players = [
+    { id: 'A', status: 'active' },
+    { id: 'B', status: 'active' },
+    { id: 'C', status: 'active' },
+    { id: 'D', status: 'eliminatedcut' },
+  ];
+  const round = { matches: [pending('A', 'D')] };
+  assert.equal(analyzeRoundParticipantIntegrity(round, players, {
+    requireAllActive: false,
+    allowedInactivePlayerIds: ['D'],
+  }).length, 0);
+});
+
 test('détecte les blocages d’une ronde composée manuellement sans affecter les byes', () => {
   const players = [
     { id: 'A', name: 'Alice' },
