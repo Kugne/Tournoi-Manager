@@ -5,6 +5,7 @@ import {
   buildApplicationMatches,
   buildSwissEngineInput,
   selectSwissBye,
+  swissPairingCriteriaSnapshot,
 } from '../src/swiss/application-adapter.mjs';
 import { solveSwissPairing } from '../src/swiss/solve-swiss.mjs';
 import { writeMatchOutcome } from '../src/results/match-outcome.mjs';
@@ -138,6 +139,19 @@ test('les options désactivées sont absentes du calcul applicatif', () => {
     noteMode: 'none',
   });
   assert.equal(input.participants[0].compo, 'valeur historique invalide mais inactive');
+});
+
+test('fige les critères optionnels normalisés utilisés par une génération', () => {
+  const source = tournament();
+  source.compoPairing = null;
+  source.noteMatchCriteria = null;
+  source.secondaryCriteria = { mirror: true, allegiance: false, compo: true, free: 'group' };
+  assert.deepEqual(swissPairingCriteriaSnapshot(source), {
+    avoidMirrors: true,
+    avoidAlliances: false,
+    useCompo: true,
+    noteMode: 'group',
+  });
 });
 
 test('ignore les rondes non validées dans l’historique et le compte des byes', () => {

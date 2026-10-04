@@ -38,6 +38,12 @@ test('applique atomiquement un résultat complet au format historique', async ()
   assert.equal(result.matches.length, 2);
   assert.equal(result.engineSignature, engineSignatureFromMatches(result.matches));
   assert.match(result.signature, /"byePlayerId":null/);
+  assert.deepEqual(result.criteria, {
+    avoidMirrors: false,
+    avoidAlliances: false,
+    useCompo: false,
+    noteMode: 'none',
+  });
   assert.equal(result.matches.some((match) => new Set([match.p1, match.p2]).has('A')
     && new Set([match.p1, match.p2]).has('B')), false);
   assert.deepEqual(tournament, before);
@@ -134,6 +140,12 @@ test('le reroll propose chaque optimum une seule fois puis prouve l’épuisemen
   assert.equal(first.matches.length, 2);
   assert.notEqual(first.engineSignature, engineSignatureFromMatches(tournament.roundsData[0].matches));
   assert.equal(first.seenSignatures.length, 2);
+  assert.deepEqual(first.criteria, {
+    avoidMirrors: false,
+    avoidAlliances: false,
+    useCompo: false,
+    noteMode: 'none',
+  });
 
   tournament.roundsData[0].matches = first.matches;
   tournament.roundsData[0].swissPairingSignatures = first.seenSignatures;

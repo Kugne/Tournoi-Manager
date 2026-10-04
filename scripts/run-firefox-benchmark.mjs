@@ -12,6 +12,8 @@ const port = 9800 + (process.pid % 100);
 const profile = mkdtempSync(join(tmpdir(), 'tm-firefox-7c-'));
 const child = spawn(browserPath, [
   '--headless',
+  '--no-remote',
+  '--new-instance',
   '--remote-debugging-port', String(port),
   '--profile', profile,
   targetUrl,
@@ -120,5 +122,9 @@ try {
   if (child.exitCode === null && child.signalCode === null) child.kill();
   const exited = await waitForChildExit(5_000);
   if (!exited) throw new Error('Firefox de test ne s’est pas arrêté ; profil temporaire conservé');
-  rmSync(profile, { recursive: true, force: true });
+  try {
+    rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+  } catch (error) {
+    process.stderr.write(`Profil Firefox temporaire non supprimé (${error.code ?? 'erreur inconnue'}) : ${profile}\n`);
+  }
 }

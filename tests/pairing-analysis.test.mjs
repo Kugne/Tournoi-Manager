@@ -85,6 +85,51 @@ test('un critère désactivé ne produit ni alerte ni explication active', () =>
   assert.match(result.summary, /sans alerte/);
 });
 
+test('une ronde conserve les critères de sa génération après changement des options', () => {
+  const tournament = {
+    pairFormat: 'swiss',
+    players: makePlayers(),
+    blocks: [],
+    compoPairing: true,
+    noteMatchCriteria: 'separate',
+    secondaryCriteria: { mirror: true, allegiance: true },
+    roundsData: [{
+      validated: false,
+      pairingMeta: {
+        manuallyEdited: false,
+        criteria: {
+          avoidMirrors: false,
+          avoidAlliances: false,
+          useCompo: false,
+          noteMode: 'none',
+        },
+      },
+      matches: [{ p1: 'P0', p2: 'P1', table: 1 }, { p1: 'P2', p2: 'P3', table: 2 }],
+    }],
+  };
+
+  const result = analyze(tournament, 0);
+  assert.equal(result.exactEngineResult, true);
+  assert.equal(result.criteriaChangedSinceGeneration, true);
+  assert.deepEqual(result.criteria, tournament.roundsData[0].pairingMeta.criteria);
+  assert.deepEqual(result.alerts, []);
+  assert.doesNotMatch(result.tables[0].explanation.join(' '), /miroir|allégeance|compo|note libre/i);
+});
+
+test('une ronde modifiée manuellement sans alerte n’est pas qualifiée d’optimale', () => {
+  const tournament = {
+    pairFormat: 'swiss', players: makePlayers(), blocks: [], compoPairing: false,
+    noteMatchCriteria: 'none', secondaryCriteria: {},
+    roundsData: [{
+      validated: false,
+      pairingMeta: { manuallyEdited: true },
+      matches: [{ p1: 'P0', p2: 'P2', table: 1 }, { p1: 'P1', p2: 'P3', table: 2 }],
+    }],
+  };
+  const result = analyze(tournament, 0);
+  assert.equal(result.summary, 'Appariement sans alerte');
+});
+
 test('un blocage manuel est une interdiction et non une simple alerte', () => {
   const tournament = {
     pairFormat: 'swiss',

@@ -36,6 +36,16 @@ const currentBye = (tournament, roundIndex, eligibleIds) => {
   return id != null && eligibleIds.has(id) ? id : null;
 };
 
+/** Captures the normalized optional criteria that define one Swiss optimum. */
+export const swissPairingCriteriaSnapshot = (tournament) => ({
+  avoidMirrors: tournament?.secondaryCriteria?.mirror === true,
+  avoidAlliances: tournament?.secondaryCriteria?.allegiance === true,
+  useCompo: tournament?.compoPairing == null
+    ? tournament?.secondaryCriteria?.compo === true
+    : tournament.compoPairing === true,
+  noteMode: tournament?.noteMatchCriteria ?? tournament?.secondaryCriteria?.free ?? 'none',
+});
+
 /**
  * Selects the bye before the exact matching is built.
  * A reroll keeps its eligible beneficiary. Otherwise the fewest prior byes
@@ -80,10 +90,7 @@ export const buildSwissEngineInput = ({
   }
   const standingById = standingsIndex(standings);
   const byePlayerId = selectSwissBye({ tournament, roundIndex, standings });
-  const useCompo = tournament.compoPairing == null
-    ? tournament.secondaryCriteria?.compo === true
-    : tournament.compoPairing === true;
-  const avoidAlliances = tournament.secondaryCriteria?.allegiance === true;
+  const options = swissPairingCriteriaSnapshot(tournament);
 
   const participants = active
     .filter((player) => String(player.id) !== byePlayerId)
@@ -95,7 +102,7 @@ export const buildSwissEngineInput = ({
         id,
         points: finiteNumber(standing.pts, `Points de ${id}`),
         faction: player.faction ?? '',
-        allegiance: avoidAlliances ? allegianceForFaction(player.faction) ?? '' : '',
+        allegiance: options.avoidAlliances ? allegianceForFaction(player.faction) ?? '' : '',
         compo: player.compo ?? null,
         note: player.note ?? '',
       };
@@ -108,19 +115,12 @@ export const buildSwissEngineInput = ({
   const blockedPairs = (tournament.blocks ?? [])
     .filter((block) => block.p1 != null && block.p2 != null)
     .map((block) => ({ a: String(block.p1), b: String(block.p2) }));
-  const noteMode = tournament.noteMatchCriteria ?? tournament.secondaryCriteria?.free ?? 'none';
-
   return {
     participants,
     context: {
       history,
       blockedPairs,
-      options: {
-        avoidMirrors: tournament.secondaryCriteria?.mirror === true,
-        avoidAlliances,
-        useCompo,
-        noteMode,
-      },
+      options,
     },
     byePlayerId,
     excludedSignatures: [...(tournament.roundsData?.[roundIndex]?.swissPairingSignatures ?? [])],

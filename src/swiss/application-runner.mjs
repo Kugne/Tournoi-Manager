@@ -100,6 +100,7 @@ export const runInitialSwissPairing = async ({
     engineSignature,
     signature: applicationPairingSignature(engineSignature, input.byePlayerId),
     byePlayerId: input.byePlayerId,
+    criteria: { ...input.context.options },
     fingerprint,
   };
 };
@@ -179,6 +180,7 @@ export const runNextSwissPairingVariant = async ({
     engineSignature,
     signature: applicationPairingSignature(engineSignature, input.byePlayerId),
     byePlayerId: input.byePlayerId,
+    criteria: { ...input.context.options },
     seenSignatures: [...excludedSignatures, engineSignature],
     fingerprint,
   };

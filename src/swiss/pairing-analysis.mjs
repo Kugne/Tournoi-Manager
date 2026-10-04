@@ -136,6 +136,21 @@ const activeCriteriaText = (options) => {
   return criteria.join(', ');
 };
 
+const normalizedStoredCriteria = (criteria) => {
+  if (!criteria || typeof criteria !== 'object') return null;
+  return {
+    avoidMirrors: criteria.avoidMirrors === true,
+    avoidAlliances: criteria.avoidAlliances === true,
+    useCompo: criteria.useCompo === true,
+    noteMode: typeof criteria.noteMode === 'string' ? criteria.noteMode : 'none',
+  };
+};
+
+const sameCriteria = (left, right) => left.avoidMirrors === right.avoidMirrors
+  && left.avoidAlliances === right.avoidAlliances
+  && left.useCompo === right.useCompo
+  && left.noteMode === right.noteMode;
+
 /**
  * Analyzes one persisted Swiss round from the same normalized input consumed by
  * the exact engine. No UI field or legacy alert cache participates in the result.
@@ -155,6 +170,10 @@ export const analyzeApplicationSwissRound = ({
     allegianceForFaction,
     allowInsufficientActive: true,
   });
+  const currentOptions = input.context.options;
+  const storedOptions = normalizedStoredCriteria(round.pairingMeta?.criteria);
+  const options = storedOptions ?? currentOptions;
+  const criteriaChangedSinceGeneration = storedOptions != null && !sameCriteria(storedOptions, currentOptions);
   const standingsById = new Map(standings.map((entry) => [String(entry.id), entry]));
   const playersById = new Map((tournament.players ?? []).map((player) => {
     const id = String(player.id);
@@ -164,7 +183,7 @@ export const analyzeApplicationSwissRound = ({
       id,
       name: player.name || id,
       points: finiteNumber(standing?.pts),
-      allegiance: input.context.options.avoidAlliances
+      allegiance: options.avoidAlliances
         ? allegianceForFaction(player.faction) ?? ''
         : '',
     }];
@@ -178,7 +197,6 @@ export const analyzeApplicationSwissRound = ({
     .map((player) => byeCounts.get(player.id) ?? 0);
   const minimumByeCount = eligibleByeCounts.length ? Math.min(...eligibleByeCounts) : 0;
   const exactEngineResult = round.pairingMeta?.manuallyEdited === false;
-  const options = input.context.options;
   const activePlayerIds = new Set([...playersById.values()]
     .filter((player) => player.status === 'active')
     .map((player) => player.id));
@@ -405,12 +423,14 @@ export const analyzeApplicationSwissRound = ({
   const summary = forbidden.length > 0
     ? `${forbidden.length} appariement${forbidden.length > 1 ? 's' : ''} interdit${forbidden.length > 1 ? 's' : ''}`
     : alerts.length === 0
-      ? 'Appariement optimal sans alerte'
+      ? exactEngineResult ? 'Appariement optimal sans alerte' : 'Appariement sans alerte'
       : `Alertes : ${alertSummary}`;
 
   return {
     valid: forbidden.length === 0,
     exactEngineResult,
+    criteriaChangedSinceGeneration,
+    criteria: { ...options },
     tables,
     alerts,
     forbidden,

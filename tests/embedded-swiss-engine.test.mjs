@@ -242,6 +242,43 @@ test('les alertes manuelles 6D normalisent les notes et respectent les critères
   assert.deepEqual(alerts.map(({ code }) => code), ['allegiance', 'free-note']);
 });
 
+test('les alertes manuelles ignorent les rondes futures et non validées', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const start = html.indexOf('function getLegacyPairingAlerts(t,roundIdx)');
+  const end = html.indexOf('function getPairingAnalysis(t,roundIdx)', start);
+  const getLegacyPairingAlerts = Function(
+    'getGS',
+    'getAllegiance',
+    `${html.slice(start, end)}; return getLegacyPairingAlerts;`,
+  )(() => ({}), () => null);
+  const tournament = {
+    pairFormat: 'manual', secondaryCriteria: {}, noteMatchCriteria: 'none',
+    players: [
+      { id: 'a', name: 'Alpha', faction: 'A' },
+      { id: 'b', name: 'Bravo', faction: 'B' },
+      { id: 'c', name: 'Charlie', faction: 'C' },
+    ],
+    roundsData: [
+      { validated: false, matches: [{ table: 1, p1: 'a', p2: 'b' }, { table: 2, p1: 'c', bye: true }] },
+      { validated: false, matches: [{ table: 1, p1: 'a', p2: 'b' }, { table: 2, p1: 'c', bye: true }] },
+    ],
+  };
+
+  assert.deepEqual(getLegacyPairingAlerts(tournament, 0), {});
+  tournament.roundsData[0].validated = true;
+  const historical = getLegacyPairingAlerts(tournament, 1);
+  assert.deepEqual(historical[0].map(({ code }) => code), ['rematch']);
+  assert.deepEqual(historical[1].map(({ code }) => code), ['repeated-bye']);
+});
+
+test('le libellé du score libre est échappé dans tous les rendus interactifs', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  assert.doesNotMatch(html, /\$\{t\.freeScoreName\}/);
+  assert.doesNotMatch(html, /\$\{t\.freeScoreName\.toUpperCase\(\)\}/);
+  assert.match(html, /value="\$\{escapeHtml\(t\.freeScoreName\|\|''\)\}"/);
+  assert.equal((html.match(/escapeHtml\(t\.freeScoreName/g) ?? []).length >= 10, true);
+});
+
 test('le Top Cut crée puis relit une photographie Suisse avant toute mutation de statut', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const standingsStart = html.indexOf('function getStandings(tournament)');
