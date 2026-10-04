@@ -1,4 +1,4 @@
-# Tournoi-Manager
+# Tournoi Manager V2
 🏆 Tournoi Manager
 
 Licence GPLv3
@@ -36,7 +36,7 @@ Idéal pour :
 
 Aucune installation. Aucune dépendance.
 
-    Téléchargez tournoi-manager.html depuis la dernière release
+    Téléchargez tournoi-manager-V2.html depuis la dernière release
     Double-cliquez dessus → il s'ouvre dans votre navigateur
     Créez votre premier tournoi. C'est tout.
 
@@ -64,16 +64,18 @@ Les retours sont bienvenus ! Ouvrez une issue pour un bug ou une suggestion d'am
 
 Pour contribuer au code : forkez, créez une branche, proposez une pull request.
 
-## Développement en cours
+## Tournoi Manager V2
 
-Le cadrage de la phase 1 de fiabilisation du Suisse individuel est conservé dans :
+La V2 intègre le moteur Suisse individuel exact, les variantes optimales, les explications d'appariement, la gestion explicite des résultats administratifs et le nouvel éditeur guidé d'appariements. Sa validation finale couvre les quatre formats, les imports et exports, les grands effectifs ainsi que Chromium, Edge et Firefox.
+
+La documentation du chantier est conservée dans :
 
 - [la spécification fonctionnelle et technique](docs/SPECIFICATIONS-SUISSE-INDIVIDUEL-2026-09-26.md) ;
 - [le plan de réalisation par lots reprenables](docs/PLAN-PHASE-1-SUISSE-INDIVIDUEL.md) ;
 - [l'architecture du solveur exact](docs/ARCHITECTURE-SOLVEUR-SUISSE.md) ;
 - [le carnet des idées et décisions](IDEES.md).
 
-La phase 2 consacrée au Suisse par équipes reste hors périmètre de l'implémentation actuelle.
+La phase 2 consacrée au Suisse par équipes reste hors périmètre de la V2.
 
 Le socle de validation du moteur Suisse s'exécute sans dépendance externe avec Node.js :
 
@@ -81,7 +83,7 @@ Le socle de validation du moteur Suisse s'exécute sans dépendance externe avec
 node --test tests/oracle-suisse.test.mjs
 ```
 
-L'oracle est volontairement exhaustif et réservé aux petits effectifs. Il sert de référence mathématique au futur moteur optimisé ; il n'est pas utilisé directement par l'application.
+L'oracle est volontairement exhaustif et réservé aux petits effectifs. Il sert de référence mathématique au moteur optimisé ; il n'est pas utilisé directement par l'application.
 ☕ Soutenir
 
 Tournoi Manager est et restera gratuit. Si l'outil vous a servi lors de vos tournois, un café est toujours apprécié 
