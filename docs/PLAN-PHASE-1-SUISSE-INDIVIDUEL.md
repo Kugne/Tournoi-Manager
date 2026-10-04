@@ -165,7 +165,7 @@ Critère de sortie : parcours bureau et petits écrans validés, contrôles iden
 - [x] Sous-lot 7B — Vérifier imports, exports, sauvegardes et restauration sur les formats concernés. Les remplacements JSON/snapshot sont transactionnels, les schémas imbriqués connus sont validés en profondeur, les historiques conservent les vrais numéros de ronde et les sorties CSV/PDF protègent les champs libres.
 - [x] Sous-lot 7C — Rejouer les navigateurs ciblés, les grands effectifs et les cas de performance/annulation. Le Worker réellement embarqué passe dans Chrome/Chromium 154, Edge 154 et Firefox 157 à 64 joueurs sous le seuil d'une seconde ; le cas impair à 63 joueurs, la réactivité, l'annulation, le timeout et l'ouverture autonome sont contrôlés.
 - [ ] Sous-lot 7D — Examiner les modifications finales, corriger les régressions et rejouer toutes les validations.
-- [ ] Sous-lot 7E — Incrémenter la version selon le système existant et préparer la livraison, sans push ni release implicite.
+- [ ] Sous-lot 7E — Passer la livraison finale en **V2** et mettre à jour toutes les mentions nécessaires dans l'application, les métadonnées, la documentation, le fichier distribué, le tag et la release, sans push ni publication implicite.
 - Tester Suisse, hybride, bracket et manuel.
 - Vérifier imports, exports, sauvegardes, restauration et navigateurs ciblés.
 - Examiner les modifications finales et corriger les régressions.
