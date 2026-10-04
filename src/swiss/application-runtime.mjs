@@ -54,6 +54,7 @@ import {
 } from '../results/administrative-flow.mjs';
 import { describePlayerOutcome } from '../results/result-presentation.mjs';
 import {
+  BRACKET_PLACEMENTS_VERSION,
   inspectPersistedState,
   STATE_SCHEMA_VERSION,
 } from '../results/persistence-compatibility.mjs';
@@ -117,6 +118,7 @@ export {
   analyzeRoundParticipantIntegrity,
   analyzeManualRoundBlocks,
   describePlayerOutcome,
+  BRACKET_PLACEMENTS_VERSION,
   inspectPersistedState,
   STATE_SCHEMA_VERSION,
   PAIRING_DRAFT_VERSION,

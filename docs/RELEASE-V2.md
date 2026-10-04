@@ -15,6 +15,8 @@ Fichier distribué : `tournoi-manager-V2.html`
 - SOS fondé sur les points sportifs, compensations neutres calculées sur la ronde et bonus/malus séparés ;
 - photographie du classement Suisse avant le Top Cut hybride ;
 - finale et petite finale hybrides gérées comme deux rondes parallèles, sans faux statut inactif ni clôture anticipée ;
+- drops et absences en petite finale traités explicitement, podium automatique et troisièmes ex æquo en cas de double forfait, avec les mêmes rangs dans les fiches, statistiques et exports ;
+- placements exceptionnels du tableau validés dans les sauvegardes avant import ou restauration ;
 - imports, restaurations et historiques transactionnels, avec validation renforcée des données ;
 - fonctionnement monofichier hors ligne conservé.
 
@@ -26,7 +28,7 @@ La V2 couvre toujours les quatre formats existants : Suisse, élimination direct
 
 ## Validation
 
-- 178 tests automatisés réussis ;
+- 181 tests automatisés réussis ;
 - moteur embarqué déterministe et HTML monofichier syntaxiquement valide ;
 - parcours Suisse, hybride, bracket, manuel et manuel préparé contrôlés ;
 - imports, exports, sauvegardes et restaurations contrôlés ;

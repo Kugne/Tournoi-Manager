@@ -91,6 +91,43 @@ test('refuse les photographies hybrides et métadonnées neutres corrompues malg
   assert.equal(inspectPersistedState(brokenScoring).code, 'invalid-scoring-meta');
 });
 
+test('valide strictement les placements persistés du tableau', () => {
+  const valid = state({ p1: 'A', p2: 'B', result: 'p1' });
+  valid.tournaments[0].bracketPlacements = {
+    schemaVersion: 1,
+    thirdIds: ['A'],
+    fourthIds: ['B'],
+    runnerUpIds: [],
+    noPodium: false,
+    noThirdPlace: false,
+    reason: 'opponent_unavailable',
+  };
+  assert.equal(inspectPersistedState(valid).valid, true);
+
+  const future = structuredClone(valid);
+  future.tournaments[0].bracketPlacements.schemaVersion = 2;
+  assert.equal(inspectPersistedState(future).code, 'future-bracket-placements-schema');
+
+  const malformed = structuredClone(valid);
+  malformed.tournaments[0].bracketPlacements.thirdIds = 'A';
+  assert.equal(inspectPersistedState(malformed).code, 'invalid-bracket-placements');
+
+  const unknownPlayer = structuredClone(valid);
+  unknownPlayer.tournaments[0].bracketPlacements.thirdIds = ['C'];
+  assert.equal(inspectPersistedState(unknownPlayer).code, 'invalid-bracket-placements');
+
+  const overlapping = structuredClone(valid);
+  overlapping.tournaments[0].bracketPlacements.runnerUpIds = ['A'];
+  assert.equal(inspectPersistedState(overlapping).code, 'invalid-bracket-placements');
+
+  const invalidFlags = structuredClone(valid);
+  invalidFlags.tournaments[0].bracketPlacements.noPodium = 'false';
+  assert.equal(inspectPersistedState(invalidFlags).code, 'invalid-bracket-placements');
+
+  const invalidReason = structuredClone(valid);
+  invalidReason.tournaments[0].bracketPlacements.reason = 3;
+  assert.equal(inspectPersistedState(invalidReason).code, 'invalid-bracket-placements');
+});
 test('refuse une structure incomplète au lieu de la charger partiellement', () => {
   assert.equal(inspectPersistedState({ schemaVersion: 1 }).code, 'invalid-state');
   assert.equal(inspectPersistedState({ schemaVersion: 2, tournaments: [], gameSystems: [] }).code, 'future-state-schema');

@@ -6,6 +6,7 @@ import {
 } from '../swiss/hybrid-snapshot.mjs';
 
 export const STATE_SCHEMA_VERSION = 1;
+export const BRACKET_PLACEMENTS_VERSION = 1;
 
 const failure = (code, message) => ({ valid: false, code, message });
 const isFiniteStoredNumber = (value) => (typeof value === 'number' && Number.isFinite(value))
@@ -27,6 +28,21 @@ const isValidRoundScoringMeta = (meta) => {
   return isFiniteStoredNumber(scenario) && isFiniteStoredNumber(free);
 };
 
+const isValidBracketPlacements = (placements, playerIds) => {
+  if (!placements || typeof placements !== 'object'
+    || placements.schemaVersion !== BRACKET_PLACEMENTS_VERSION) return false;
+  const placementLists = [placements.thirdIds, placements.fourthIds, placements.runnerUpIds];
+  if (placementLists.some((ids) => !Array.isArray(ids))) return false;
+  const knownPlayerIds = new Set(playerIds.map(String));
+  const allIds = placementLists.flat().map(String);
+  if (new Set(allIds).size !== allIds.length
+    || allIds.some((id) => !knownPlayerIds.has(id))) return false;
+  if (placements.noPodium !== undefined && typeof placements.noPodium !== 'boolean') return false;
+  if (placements.noThirdPlace !== undefined && typeof placements.noThirdPlace !== 'boolean') return false;
+  if (placements.reason !== undefined && typeof placements.reason !== 'string') return false;
+  return true;
+};
+
 export const inspectPersistedState = (data) => {
   if (!data || typeof data !== 'object') {
     return failure('invalid-state', 'Structure de sauvegarde incorrecte');
@@ -42,6 +58,17 @@ export const inspectPersistedState = (data) => {
     if (!tournament || tournament.id === undefined
       || !Array.isArray(tournament.players) || !Array.isArray(tournament.roundsData)) {
       return failure('invalid-tournament', 'Structure de tournoi incorrecte');
+    }
+    const bracketPlacementsSchema = tournament.bracketPlacements?.schemaVersion;
+    if (bracketPlacementsSchema !== undefined
+      && bracketPlacementsSchema !== BRACKET_PLACEMENTS_VERSION) {
+      return failure('future-bracket-placements-schema', 'Version des placements du tableau non prise en charge');
+    }
+    if (tournament.bracketPlacements != null && !isValidBracketPlacements(
+      tournament.bracketPlacements,
+      tournament.players.map((player) => player?.id),
+    )) {
+      return failure('invalid-bracket-placements', 'Placements du tableau invalides');
     }
     const hybridSchema = tournament.swissSnapshot?.schemaVersion;
     if (hybridSchema !== undefined

@@ -320,7 +320,7 @@ test('le Top Cut crée puis relit une photographie Suisse avant toute mutation d
 
 test('la finale et la petite finale parallèles conservent leurs joueurs et retardent la clôture', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  assert.match(html, /loser\.played&&player&&player\.status==='eliminatedcut'/);
+  assert.match(html, /prepareThirdPlaceAfterSemifinals\(t\)/);
   assert.match(html, /restorePendingThirdPlaceParticipants\(t\)/);
   assert.match(html, /function tryCompleteBracketTournament\(t\)/);
   assert.match(html, /pendingThirdPlace=.*bracketKey==='3rd-place'&&round\.validated!==true/);
@@ -585,7 +585,7 @@ test('les CSV détaillés du lot 7B protègent tous les champs textuels dynamiqu
   assert.match(sectionCsv, /csvEscape\(awards\.join/);
   assert.match(sectionCsv, /\.map\(csvEscape\)\.join\(';\'\)/);
   assert.match(statsCsv, /\[f\.name,f\.players/);
-  assert.match(statsCsv, /\[i\+1,p\.name,p\.faction/);
+  assert.match(statsCsv, /\[getStandingRankInfo\(t,p,i\)\.rankLabel,p\.name,p\.faction/);
   assert.equal((statsCsv.match(/\.map\(csvEscape\)\.join\(';\'\)/g)||[]).length >= 2, true);
 
   const escapeStart = html.indexOf('function csvEscape(');
@@ -614,4 +614,170 @@ test('les impressions PDF du lot 7B échappent les libellés organisateur', () =
   assert.match(recapPdf, /escapeHtml\(p2\?\.faction\)/);
   assert.match(recapPdf, /escapeHtml\(r\.scenarioName\)/);
   assert.match(recapPdf, /escapeHtml\(t\.name\)/);
+});
+
+test('les transitions exceptionnelles de petite finale suivent les arbitrages', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const start = html.indexOf('function getBracketSemifinalState(t)');
+  const end = html.indexOf('function bracketRoundColTitle', start);
+  const source = html.slice(start, end);
+  const makeTournament = (players, matches) => ({
+    pairFormat: 'hybrid', hybridPhase: 'cut', thirdPlaceMatch: true,
+    players, roundsData: [{ bracketKey: 'main', validated: true, matches }],
+  });
+  const context = {
+    isBracketFormat: () => true,
+    TMSwiss: { readMatchOutcome: (match) => ({ kind: match.outcomeKind ?? (match.result ? 'played' : null) }) },
+  };
+  vm.runInNewContext(source, context);
+
+  const drop = makeTournament([
+    { id: 'A', status: 'active' }, { id: 'B', status: 'dropped' },
+    { id: 'C', status: 'active' }, { id: 'D', status: 'eliminatedcut' },
+  ], [
+    { p1: 'A', p2: 'B', result: 'p1', outcomeKind: 'administrative_no_show' },
+    { p1: 'C', p2: 'D', result: 'p1', outcomeKind: 'played' },
+  ]);
+  context.drop = drop;
+  vm.runInNewContext('dropResult = prepareThirdPlaceAfterSemifinals(drop)', context);
+  assert.equal(context.dropResult.kind, 'automatic');
+  assert.deepEqual(Array.from(drop.bracketPlacements.thirdIds), ['D']);
+  assert.deepEqual(Array.from(drop.bracketPlacements.fourthIds), ['B']);
+  assert.equal(drop.bracketPlacements.reason, 'opponent_dropped');
+  assert.equal(drop.players.find((player) => player.id === 'D').status, 'active');
+  assert.equal(drop.roundsData.length, 1);
+
+  const absent = makeTournament([
+    { id: 'A', status: 'active' }, { id: 'B', status: 'absent' },
+    { id: 'C', status: 'active' }, { id: 'D', status: 'eliminatedcut' },
+  ], [
+    { p1: 'A', p2: 'B', result: 'p1', outcomeKind: 'administrative_no_show' },
+    { p1: 'C', p2: 'D', result: 'p1', outcomeKind: 'played' },
+  ]);
+  context.absent = absent;
+  vm.runInNewContext('absentees = getPendingThirdPlaceAbsentPlayers(absent)', context);
+  assert.deepEqual(Array.from(context.absentees, (player) => player.id), ['B']);
+  absent.players.find((player) => player.id === 'B').status = 'active';
+  vm.runInNewContext('absentResult = prepareThirdPlaceAfterSemifinals(absent)', context);
+  assert.equal(context.absentResult.kind, 'match');
+  assert.deepEqual(
+    Array.from([context.absentResult.round.matches[0].p1, context.absentResult.round.matches[0].p2]),
+    ['B', 'D'],
+  );
+
+  const none = makeTournament([
+    { id: 'A', status: 'active' }, { id: 'B', status: 'dropped' },
+    { id: 'C', status: 'active' }, { id: 'D', status: 'absent' },
+  ], [
+    { p1: 'A', p2: 'B', result: 'p1', outcomeKind: 'administrative_no_show' },
+    { p1: 'C', p2: 'D', result: 'p1', outcomeKind: 'administrative_no_show' },
+  ]);
+  context.none = none;
+  vm.runInNewContext('noneResult = prepareThirdPlaceAfterSemifinals(none)', context);
+  assert.equal(context.noneResult.kind, 'unassigned');
+  assert.equal(none.bracketPlacements.noThirdPlace, true);
+  assert.deepEqual(Array.from(none.bracketPlacements.thirdIds), []);
+
+  const sole = makeTournament([
+    { id: 'A', status: 'active' }, { id: 'B', status: 'eliminatedcut' },
+    { id: 'C', status: 'eliminatedcut' }, { id: 'D', status: 'eliminatedcut' },
+  ], [
+    { p1: 'A', p2: 'B', result: 'p1', outcomeKind: 'played' },
+    { p1: 'C', p2: 'D', result: null, outcomeKind: 'double_forfeit' },
+  ]);
+  context.sole = sole;
+  vm.runInNewContext("solePrepared = prepareSoleSemifinalWinnerPlacements(sole, 'A')", context);
+  assert.equal(context.solePrepared, true);
+  assert.deepEqual(Array.from(sole.bracketPlacements.runnerUpIds), ['B']);
+  assert.deepEqual(Array.from(sole.bracketPlacements.thirdIds), ['C', 'D']);
+  assert.equal(sole.bracketPlacements.reason, 'semifinal_double_forfeit');
+});
+
+test('le classement du Top Cut expose le podium automatique et les troisièmes ex æquo', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const start = html.indexOf('function getBracketDepth(t)');
+  const end = html.indexOf('function getStandings(', start);
+  const source = html.slice(start, end);
+  const tournament = {
+    pairFormat: 'hybrid', hybridPhase: 'cut', cutStartIndex: 0,
+    players: ['A', 'B', 'C', 'D'].map((id) => ({ id, status: id === 'A' ? 'active' : 'eliminatedcut' })),
+    roundsData: [{ bracketKey: 'main', validated: true, matches: [
+      { p1: 'A', p2: 'B', result: 'p1' },
+      { p1: 'C', p2: 'D', result: null, outcomeKind: 'double_forfeit' },
+    ] }],
+    bracketPlacements: { schemaVersion: 1, runnerUpIds: ['B'], thirdIds: ['C', 'D'], fourthIds: [], reason: 'semifinal_double_forfeit' },
+  };
+  const context = {
+    tournament,
+    isBracketFormat: () => true,
+    TMSwiss: { readMatchOutcome: (match) => ({ kind: match.outcomeKind ?? (match.result ? 'played' : null) }) },
+  };
+  vm.runInNewContext(`${source}; depth = getBracketDepth(tournament);`, context);
+  assert.equal(context.depth.A.champion, true);
+  assert.equal(context.depth.B.runnerUp, true);
+  assert.equal(context.depth.C.thirdPlaceWin, true);
+  assert.equal(context.depth.C.thirdPlaceTie, true);
+  assert.equal(context.depth.D.thirdPlaceWin, true);
+  assert.equal(context.depth.D.thirdPlaceTie, true);
+
+  const standingsSource = html.slice(start, html.indexOf('function getSortedForPairing(', start));
+  tournament.players.find((player) => player.id === 'B').status = 'absent';
+  const standingsContext = {
+    tournament,
+    isBracketFormat: () => true,
+    hasValidSwissSnapshot: () => false,
+    normalizePlayerStatus: (status) => status,
+    TMSwiss: context.TMSwiss,
+  };
+  vm.runInNewContext(`${standingsSource}; standings = getStandings(tournament);`, standingsContext);
+  assert.deepEqual(Array.from(standingsContext.standings, (player) => player.id), ['A', 'B', 'C', 'D']);
+
+  assert.match(html, /id="modal-third-place-availability"/);
+  assert.match(html, /Réactiver et jouer/);
+  assert.match(html, /Confirmer l’indisponibilité/);
+  assert.match(html, /if\(pl&&pl\.status==='active'\)pl\.status='eliminatedcut'/);
+  assert.match(html, /3ᵉ ex æquo/);
+  assert.match(html, /canCompleteSoleSemifinalWinner/);
+  assert.match(html, /prepareSoleSemifinalWinnerPlacements\(t,vwinners\[0\]\)/);
+
+  const rankStart = html.indexOf('function getStandingRankInfo(');
+  const rankEnd = html.indexOf('function getSortedForPairing(', rankStart);
+  const rankContext = {
+    isBracketFormat: () => true,
+    getBracketDepth: () => ({}),
+    normalizePlayerStatus: (status) => status,
+  };
+  vm.runInNewContext(html.slice(rankStart, rankEnd), rankContext);
+  const player = (id, status = 'eliminatedcut') => ({ id, status });
+  const depth = {
+    A: { champion: true },
+    B: { runnerUp: true },
+    C: { thirdPlaceWin: true, thirdPlaceTie: true },
+    D: { thirdPlaceWin: true, thirdPlaceTie: true },
+  };
+  tournament.bracketPlacements = {
+    schemaVersion: 1, runnerUpIds: ['B'], thirdIds: ['C', 'D'], fourthIds: [], reason: 'semifinal_double_forfeit',
+  };
+  assert.equal(rankContext.getStandingRankInfo(tournament, player('A'), 0, depth).rankLabel, '1');
+  assert.equal(rankContext.getStandingRankInfo(tournament, player('B', 'absent'), 1, depth).rankLabel, '2');
+  assert.equal(rankContext.getStandingRankInfo(tournament, player('C'), 2, depth).rankLabel, '3 ex æquo');
+  assert.equal(rankContext.getStandingRankInfo(tournament, player('D'), 3, depth).rankLabel, '3 ex æquo');
+
+  tournament.bracketPlacements = {
+    schemaVersion: 1, runnerUpIds: [], thirdIds: [], fourthIds: ['C', 'D'], noThirdPlace: true, reason: 'third_place_unavailable',
+  };
+  const noThirdDepth = { A: { champion: true }, B: { runnerUp: true }, C: {}, D: {} };
+  assert.equal(rankContext.getStandingRankInfo(tournament, player('A'), 0, noThirdDepth).rankLabel, '1');
+  assert.equal(rankContext.getStandingRankInfo(tournament, player('B'), 1, noThirdDepth).rankLabel, '2');
+  assert.equal(rankContext.getStandingRankInfo(tournament, player('C', 'absent'), 2, noThirdDepth).rankLabel, '—');
+  assert.equal(rankContext.getStandingRankInfo(tournament, player('D', 'dropped'), 3, noThirdDepth).rankLabel, '—');
+
+  tournament.bracketPlacements = {
+    schemaVersion: 1, runnerUpIds: [], thirdIds: [], fourthIds: [], noPodium: true, reason: 'semifinals_double_forfeit',
+  };
+  assert.equal(rankContext.getStandingRankInfo(tournament, player('A'), 0, depth).rankLabel, '—');
+  assert.equal(rankContext.getStandingRankInfo(tournament, player('B'), 1, depth).rankLabel, '—');
+
+  const rankingConsumers = html.match(/getStandingRankInfo\(/g) || [];
+  assert.equal(rankingConsumers.length >= 7, true);
 });

@@ -68,6 +68,10 @@ Pour contribuer au code : forkez, créez une branche, proposez une pull request.
 
 La V2 intègre le moteur Suisse individuel exact, les variantes optimales, les explications d'appariement, la gestion explicite des résultats administratifs et le nouvel éditeur guidé d'appariements. Sa validation finale couvre les quatre formats, les imports et exports, les grands effectifs ainsi que Chromium, Edge et Firefox.
 
+Le Top Cut prend en charge les finales parallèles, les absences, les drops et les doubles forfaits. Les rangs particuliers, notamment les troisièmes ex æquo, sont partagés par le classement, les fiches joueurs, les statistiques et les exports CSV/PDF.
+
+Les nouveautés et validations de cette livraison sont détaillées dans [les notes V2](docs/RELEASE-V2.md).
+
 La documentation du chantier est conservée dans :
 
 - [la spécification fonctionnelle et technique](docs/SPECIFICATIONS-SUISSE-INDIVIDUEL-2026-09-26.md) ;
@@ -77,10 +81,10 @@ La documentation du chantier est conservée dans :
 
 La phase 2 consacrée au Suisse par équipes reste hors périmètre de la V2.
 
-Le socle de validation du moteur Suisse s'exécute sans dépendance externe avec Node.js :
+La suite complète de validation (181 tests) s'exécute sans dépendance externe avec Node.js :
 
 ```bash
-node --test tests/oracle-suisse.test.mjs
+node --test tests/*.test.mjs
 ```
 
 L'oracle est volontairement exhaustif et réservé aux petits effectifs. Il sert de référence mathématique au moteur optimisé ; il n'est pas utilisé directement par l'application.
