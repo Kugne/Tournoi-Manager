@@ -41,6 +41,8 @@ Les idées sont conservées pour en discuter à la prochaine séance de travail.
 
 ## Décisions et suivi
 
+- 2026-10-04 — V2 publiee sur GitHub avec autorisation utilisateur : main et le tag v2 pointent sur le commit final 1d0560b. Release : https://github.com/Kugne/Tournoi-Manager/releases/tag/v2. Fichier joint tournoi-manager-V2.html (525802 octets), SHA-256 aacb38d520659e0ad6dbef4e86774eede4313349f38b2d33a4c1f0cd97c0e54a, identique au fichier local valide. Les 181 tests passent. Le prochain chantier fonctionnel reste reporte : tableau principal des joueurs et Suisse par equipes.
+
 - 2026-10-04 — Préparation finale de livraison V2 : README et notes de version actualisés, correctifs exceptionnels de petite finale inclus, suite complète de 181 tests validée. Un fichier autonome identique à index.html est préparé avec une empreinte SHA-256. Le tag local v2 est repositionné sur le commit final avant sa première publication ; son ancien état est conservé localement. Le tableau principal des joueurs et le Suisse par équipes restent reportés. La publication GitHub attend une instruction explicite.
 
 - 2026-10-04 — Amélioration du tableau principal des joueurs reportée : conserver pour une version ultérieure la recherche, le tri, les filtres par faction, compo, statut et autres colonnes pertinentes, ainsi que l’étude d’une sélection multiple avec actions groupées. Piste privilégiée : reprendre ce lot lors du chantier d’une future version orientée tournois par équipes. Aucune mise en œuvre dans la V2 actuelle.
