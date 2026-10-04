@@ -163,7 +163,7 @@ Critère de sortie : parcours bureau et petits écrans validés, contrôles iden
 
 - [x] Sous-lot 7A — Tester dans l'application les parcours Suisse, hybride, bracket, manuel et manuel préparé : création, activation des joueurs, lancement, saisie, validation, progression et résultat final. Corriger l'ouverture d'une préparation manuelle sur la dernière ronde et les compteurs joueurs non rafraîchis après import.
 - [x] Sous-lot 7B — Vérifier imports, exports, sauvegardes et restauration sur les formats concernés. Les remplacements JSON/snapshot sont transactionnels, les schémas imbriqués connus sont validés en profondeur, les historiques conservent les vrais numéros de ronde et les sorties CSV/PDF protègent les champs libres.
-- [ ] Sous-lot 7C — Rejouer les navigateurs ciblés, les grands effectifs et les cas de performance/annulation.
+- [x] Sous-lot 7C — Rejouer les navigateurs ciblés, les grands effectifs et les cas de performance/annulation. Le Worker réellement embarqué passe dans Chrome/Chromium 154, Edge 154 et Firefox 157 à 64 joueurs sous le seuil d'une seconde ; le cas impair à 63 joueurs, la réactivité, l'annulation, le timeout et l'ouverture autonome sont contrôlés.
 - [ ] Sous-lot 7D — Examiner les modifications finales, corriger les régressions et rejouer toutes les validations.
 - [ ] Sous-lot 7E — Incrémenter la version selon le système existant et préparer la livraison, sans push ni release implicite.
 - Tester Suisse, hybride, bracket et manuel.

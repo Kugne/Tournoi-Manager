@@ -1,95 +1,190 @@
 <!doctype html>
 <html lang="fr">
 <meta charset="utf-8">
-<title>Benchmark navigateur — moteur Suisse</title>
+<title>Validation navigateur — moteur Suisse embarqué</title>
 <style>
   body { font: 16px/1.45 system-ui; max-width: 900px; margin: 40px auto; padding: 0 20px; }
   pre { white-space: pre-wrap; background: #111827; color: #e5e7eb; padding: 20px; border-radius: 10px; }
 </style>
-<h1>Benchmark navigateur — moteur Suisse</h1>
+<h1>Validation navigateur — moteur Suisse embarqué</h1>
 <p id="status">Calcul en cours…</p>
 <pre id="result"></pre>
 <script type="module">
-  import {
-    createBrowserWorkerFactory,
-    SwissWorkerExecutor,
-  } from '../src/swiss/worker-executor.mjs?benchmark';
+  import { runInitialSwissPairing } from '../src/swiss/application-runner.mjs?benchmark';
+  import { SwissWorkerExecutor } from '../src/swiss/worker-executor.mjs?benchmark';
 
-  const participants = Array.from({ length: 64 }, (_, index) => ({
+  const assert = (condition, message) => { if (!condition) throw new Error(message); };
+  const summarize = (values) => {
+    assert(values.length > 0, 'Aucune mesure disponible');
+    const sorted = [...values].sort((a, b) => a - b);
+    return {
+      min: sorted[0],
+      median: sorted[Math.floor(sorted.length / 2)],
+      p95: sorted[Math.ceil(sorted.length * 0.95) - 1],
+      max: sorted.at(-1),
+    };
+  };
+  const decodeWorker = (base64) => {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+    return bytes;
+  };
+  const readEmbeddedWorker = async () => {
+    const html = await fetch('../index.html', { cache: 'no-store' }).then((response) => {
+      if (!response.ok) throw new Error(`index.html indisponible : HTTP ${response.status}`);
+      return response.text();
+    });
+    const hash = html.match(/const SWISS_ENGINE_SOURCE_HASH = "([a-f0-9]+)";/)?.[1];
+    const base64 = html.match(/const SWISS_WORKER_BUNDLE_BASE64 = "([A-Za-z0-9+/=]+)";/)?.[1];
+    assert(hash && base64, 'Bundle Worker embarqué introuvable dans index.html');
+    return { hash, bytes: decodeWorker(base64) };
+  };
+  const makeParticipants = (count) => Array.from({ length: count }, (_, index) => ({
     id: `P${index}`,
+    name: `Joueur ${index + 1}`,
+    status: 'active',
     points: (index % 13) / 2,
     faction: `F${index % 9}`,
     allegiance: `A${index % 4}`,
     compo: index % 3,
     note: index % 5 ? `G${index % 7}` : '',
   }));
-  const history = [];
-  for (let round = 1; round <= 8; round += 1) {
-    for (let index = 0; index < 64; index += 2) {
-      history.push({
-        a: `P${(index + round * 3) % 64}`,
-        b: `P${(index + round * 3 + 1) % 64}`,
-        round,
-      });
+  const makeHistory = (count) => {
+    const history = [];
+    for (let round = 1; round <= 8; round += 1) {
+      for (let index = 0; index + 1 < count; index += 2) {
+        history.push({
+          a: `P${(index + round * 3) % count}`,
+          b: `P${(index + round * 3 + 1) % count}`,
+          round,
+        });
+      }
     }
-  }
-  const context = {
-    history,
-    options: {
-      avoidMirrors: true,
-      avoidAlliances: true,
-      useCompo: true,
-      noteMode: 'separer',
-    },
+    return history;
   };
-  const workerFactory = createBrowserWorkerFactory({
-    workerModuleUrl: new URL('../src/swiss/swiss-worker.mjs?benchmark', import.meta.url),
-  });
-  const executor = new SwissWorkerExecutor({ workerFactory });
-  const summarize = (values) => {
-    const sorted = [...values].sort((a, b) => a - b);
-    return {
-      min: sorted[0],
-      median: sorted[Math.floor(sorted.length / 2)],
-      p95: sorted[Math.floor((sorted.length - 1) * 0.95)],
-      max: sorted.at(-1),
-    };
+  const options = {
+    avoidMirrors: true,
+    avoidAlliances: true,
+    useCompo: true,
+    noteMode: 'separer',
   };
+  const participants = makeParticipants(64);
+  const context = { history: makeHistory(64), options };
+  let workerUrl = null;
+  let silentWorkerUrl = null;
+  let heartbeat = 0;
+  const heartbeatTimer = setInterval(() => { heartbeat += 1; }, 5);
+
   try {
+    const embedded = await readEmbeddedWorker();
+    workerUrl = URL.createObjectURL(new Blob([embedded.bytes], { type: 'text/javascript' }));
+    const executor = new SwissWorkerExecutor({
+      workerFactory: () => new Worker(workerUrl, { type: 'module' }),
+    });
+
     const initialTimes = [];
+    const heartbeatBeforeCalculations = heartbeat;
     let first;
     for (let run = 0; run < 30; run += 1) {
-      const result = await executor.run({ participants, context });
-      if (!['success', 'alerted'].includes(result.status)) throw new Error(`Échec initial : ${result.status}`);
-      if (!first) first = result.result;
-      initialTimes.push(result.durationMs);
+      const outcome = await executor.run({ participants, context });
+      assert(outcome.status === 'success', `Échec initial : ${outcome.status}`);
+      if (!first) first = outcome.result;
+      initialTimes.push(outcome.durationMs);
     }
+    assert(first.pairs.length === 32, 'Le résultat 64 joueurs doit contenir 32 tables');
+    assert(new Set(first.pairs.flatMap(({ a, b }) => [a, b])).size === 64, 'Le résultat 64 joueurs doit être complet et unique');
+
     const variantTimes = [];
     const signatures = [];
     for (let run = 0; run < 10; run += 1) {
-      const result = await executor.run({
+      const outcome = await executor.run({
         operation: 'next-variant',
         participants,
         context,
         excludedSignatures: signatures,
       });
-      if (!['success', 'alerted'].includes(result.status)) throw new Error(`Échec variante : ${result.status}`);
-      const variant = result.result.variants[0];
-      if (!variant) break;
+      assert(outcome.status === 'success', `Échec variante : ${outcome.status}`);
+      const variant = outcome.result.variants[0];
+      if (!variant) {
+        assert(outcome.result.exhausted, 'Absence de variante sans preuve d’épuisement');
+        break;
+      }
       signatures.push(variant.signature);
-      variantTimes.push(result.durationMs);
+      variantTimes.push(outcome.durationMs);
     }
+    const initialMs = summarize(initialTimes);
+    const variantMs = summarize(variantTimes);
+    const heartbeatDuringCalculations = heartbeat - heartbeatBeforeCalculations;
+    assert(initialMs.p95 < 1000, `Calcul initial trop lent au p95 : ${initialMs.p95} ms`);
+    assert(variantMs.p95 < 1000, `Recherche de variante trop lente au p95 : ${variantMs.p95} ms`);
+    assert(heartbeatDuringCalculations > 0, 'L’interface doit rester réactive pendant les calculs réels du Worker');
+
+    const oddPlayers = makeParticipants(63);
+    const oddTournament = {
+      id: 'browser-odd-63',
+      pairFormat: 'swiss',
+      players: oddPlayers,
+      roundsData: [],
+      blocks: [],
+      compoPairing: true,
+      noteMatchCriteria: 'separate',
+      secondaryCriteria: { mirror: true, allegiance: true, compo: true, free: 'separate' },
+    };
+    const oddOutcome = await runInitialSwissPairing({
+      tournament: oddTournament,
+      roundIndex: 0,
+      standings: oddPlayers.map((player, index) => ({ id: player.id, pts: Math.floor((62 - index) / 4) })),
+      allegianceForFaction: (faction) => `A${Number(faction.slice(1)) % 4}`,
+      executor,
+    });
+    assert(oddOutcome.status === 'success', `Échec du cas impair : ${oddOutcome.status}`);
+    assert(oddOutcome.matches.length === 32, 'Le cas 63 joueurs doit produire 31 tables et un bye');
+    assert(oddOutcome.matches.filter((match) => match.bye).length === 1, 'Le cas 63 joueurs doit produire exactement un bye');
+    assert(new Set(oddOutcome.matches.flatMap((match) => match.bye ? [match.p1] : [match.p1, match.p2])).size === 63, 'Le cas impair doit placer chaque joueur une fois');
+
+    silentWorkerUrl = URL.createObjectURL(new Blob(['self.onmessage = () => {};'], { type: 'text/javascript' }));
+    const silentFactory = () => new Worker(silentWorkerUrl, { type: 'module' });
+    const cancelExecutor = new SwissWorkerExecutor({ workerFactory: silentFactory, alertMs: 40, timeoutMs: 500 });
+    let cancelAlerts = 0;
+    let cancelTask;
+    cancelTask = cancelExecutor.start({
+      participants: participants.slice(0, 2),
+      onAlert: () => { cancelAlerts += 1; cancelTask.cancel(); },
+    });
+    const cancelled = await cancelTask.promise;
+    assert(cancelAlerts === 1 && cancelled.status === 'cancelled', 'L’annulation après alerte doit terminer en cancelled');
+    assert(cancelExecutor.pendingCount === 0, 'L’annulation ne doit laisser aucun Worker en attente');
+
+    const heartbeatBeforePendingWorker = heartbeat;
+    const timeoutExecutor = new SwissWorkerExecutor({ workerFactory: silentFactory, alertMs: 30, timeoutMs: 80 });
+    let timeoutAlerts = 0;
+    const timedOut = await timeoutExecutor.run({
+      participants: participants.slice(0, 2),
+      onAlert: () => { timeoutAlerts += 1; },
+    });
+    assert(timeoutAlerts === 1 && timedOut.status === 'timeout', 'Le délai doit alerter puis terminer en timeout');
+    assert(timeoutExecutor.pendingCount === 0, 'Le timeout ne doit laisser aucun Worker en attente');
+    const heartbeatDuringPendingWorker = heartbeat - heartbeatBeforePendingWorker;
+    assert(heartbeatDuringPendingWorker > 0, 'L’interface doit rester réactive pendant une requête Worker en attente');
+
     const report = {
       ok: true,
       userAgent: navigator.userAgent,
+      embeddedSourceHash: embedded.hash,
       participants: participants.length,
+      oddParticipants: oddPlayers.length,
       edgesMaximum: 2016,
       initialRuns: initialTimes.length,
-      initialMs: summarize(initialTimes),
+      initialMs,
       variantRuns: variantTimes.length,
-      variantMs: summarize(variantTimes),
-      pairs: first.pairs.length,
-      pendingWorkers: executor.pendingCount,
+      variantMs,
+      heartbeat,
+      heartbeatDuringCalculations,
+      heartbeatDuringPendingWorker,
+      cancelStatus: cancelled.status,
+      timeoutStatus: timedOut.status,
+      pendingWorkers: executor.pendingCount + cancelExecutor.pendingCount + timeoutExecutor.pendingCount,
     };
     document.querySelector('#status').textContent = 'Terminé — succès';
     document.querySelector('#result').textContent = JSON.stringify(report, null, 2);
@@ -98,6 +193,10 @@
     document.querySelector('#status').textContent = 'Échec';
     document.querySelector('#result').textContent = error.stack ?? String(error);
     document.body.dataset.status = 'error';
+  } finally {
+    clearInterval(heartbeatTimer);
+    if (workerUrl) URL.revokeObjectURL(workerUrl);
+    if (silentWorkerUrl) URL.revokeObjectURL(silentWorkerUrl);
   }
 </script>
 </html>
