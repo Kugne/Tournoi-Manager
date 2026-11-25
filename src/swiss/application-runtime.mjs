@@ -101,6 +101,7 @@ import {
   TEAM_RANKING_ORDERS,
 } from '../teams/team-encounter.mjs';
 import { calculateTeamStandings } from '../teams/team-standings.mjs';
+import { teamStandingsExportTable } from '../teams/team-export.mjs';
 import {
   activeTeamRoster,
   assignEncounterBoards,
@@ -117,6 +118,7 @@ export {
   normalizeTeamSettings,
   TEAM_RANKING_ORDERS,
   calculateTeamStandings,
+  teamStandingsExportTable,
   activeTeamRoster,
   assignEncounterBoards,
   pairTeamRound,
