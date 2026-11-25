@@ -139,8 +139,12 @@ export const assignEncounterBoards = (tournament, round, encounterId, pairs) => 
     table: tables[board] ?? firstTable + board,
     encounterId: String(encounterId), board: board + 1,
   }));
-  const matches = (round.matches ?? []).filter((match) => String(match.encounterId) !== String(encounterId));
-  return { ...round, matches: [...matches, ...games] };
+  const all = round.matches ?? [];
+  const insertAt = all.findIndex((match) => String(match.encounterId) === String(encounterId));
+  const others = all.filter((match) => String(match.encounterId) !== String(encounterId));
+  const position = insertAt < 0 ? others.length
+    : all.slice(0, insertAt).filter((match) => String(match.encounterId) !== String(encounterId)).length;
+  return { ...round, matches: [...others.slice(0, position), ...games, ...others.slice(position)] };
 };
 
 /**
