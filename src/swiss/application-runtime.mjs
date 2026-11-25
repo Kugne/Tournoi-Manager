@@ -68,7 +68,10 @@ import {
 import {
   BRACKET_PLACEMENTS_VERSION,
   inspectPersistedState,
+  PARTICIPANT_MODES,
+  requiredStateSchemaVersion,
   STATE_SCHEMA_VERSION,
+  TEAM_STATE_SCHEMA_VERSION,
 } from '../results/persistence-compatibility.mjs';
 import {
   PAIRING_DRAFT_VERSION,
@@ -143,7 +146,10 @@ export {
   STANDING_STATUS_PRIORITY,
   BRACKET_PLACEMENTS_VERSION,
   inspectPersistedState,
+  PARTICIPANT_MODES,
+  requiredStateSchemaVersion,
   STATE_SCHEMA_VERSION,
+  TEAM_STATE_SCHEMA_VERSION,
   PAIRING_DRAFT_VERSION,
   PairingDraftError,
   applyPairingExchange,
