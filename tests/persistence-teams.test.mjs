@@ -51,7 +51,10 @@ test('un tournoi par équipes exige la version 2 et une structure cohérente', (
   const round = (encounters, matches = []) => ({ roundsData: [{ encounters, matches }] });
   assert.equal(inspect(teamTournament(round([{ id: 'e', teamA: 'rouge', teamB: 'rouge' }]))), 'invalid-encounters');
   assert.equal(inspect(teamTournament(round([{ id: 'e', teamA: 'rouge', teamB: 'verte' }]))), 'invalid-encounters');
+  assert.equal(inspect(teamTournament(round([{ id: 'e', teamA: 'rouge', teamB: 'bleue', teamForfeit: 'personne' }]))), 'invalid-encounters');
+  assert.equal(inspect(teamTournament(round([{ id: 'e', teamA: 'rouge', teamB: null, teamForfeit: 'teamA' }]))), 'invalid-encounters');
   assert.equal(inspect(teamTournament(round([{ id: 'e', teamA: 'rouge', teamB: null }]))), null);
+  assert.equal(inspect(teamTournament(round([{ id: 'e', teamA: 'rouge', teamB: 'bleue', teamForfeit: 'teamB' }]))), null);
   assert.equal(inspect(teamTournament(round(
     [{ id: 'e', teamA: 'rouge', teamB: 'bleue' }],
     [{ p1: 'r1', p2: 'b1', encounterId: 'autre' }],
