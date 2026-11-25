@@ -1,6 +1,8 @@
 import {
   buildApplicationMatches,
   buildSwissEngineInput,
+  individualSwissView,
+  priorSwissByeCounts,
   swissPairingCriteriaSnapshot,
 } from './application-adapter.mjs';
 import {
@@ -93,6 +95,8 @@ export {
   applicationPairingSignature,
   buildApplicationMatches,
   buildSwissEngineInput,
+  individualSwissView,
+  priorSwissByeCounts,
   swissPairingCriteriaSnapshot,
   createBrowserWorkerFactory,
   engineSignatureFromMatches,

@@ -61,11 +61,12 @@ export const runInitialSwissPairing = async ({
   isCurrent = () => true,
   byeScenario = 0,
   byeFree = 0,
+  view = null,
 }) => {
   if (!executor || (typeof executor.run !== 'function' && typeof executor.start !== 'function')) {
     throw new TypeError('Exécuteur Worker requis');
   }
-  const input = buildSwissEngineInput({ tournament, roundIndex, standings, allegianceForFaction });
+  const input = buildSwissEngineInput({ tournament, roundIndex, standings, allegianceForFaction, view });
   const fingerprint = swissInputFingerprint(input);
   const request = {
     operation: 'initial',
@@ -117,13 +118,14 @@ export const runNextSwissPairingVariant = async ({
   isCurrent = () => true,
   byeScenario = 0,
   byeFree = 0,
+  view = null,
 }) => {
   if (!executor || (typeof executor.run !== 'function' && typeof executor.start !== 'function')) {
     throw new TypeError('Exécuteur Worker requis');
   }
-  const round = tournament?.roundsData?.[roundIndex];
+  const round = (view?.rounds ?? tournament?.roundsData)?.[roundIndex];
   if (!round || round.validated === true) throw new Error('Ronde Suisse ouverte requise');
-  const input = buildSwissEngineInput({ tournament, roundIndex, standings, allegianceForFaction });
+  const input = buildSwissEngineInput({ tournament, roundIndex, standings, allegianceForFaction, view });
   const currentEngineSignature = engineSignatureFromMatches(round.matches);
   const excludedSignatures = [...new Set([
     ...(input.excludedSignatures ?? []),

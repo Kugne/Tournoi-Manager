@@ -1,4 +1,8 @@
-import { buildSwissEngineInput } from './application-adapter.mjs';
+import {
+  buildSwissEngineInput,
+  individualSwissView,
+  priorSwissByeCounts,
+} from './application-adapter.mjs';
 import { normalizeNote, pairKey } from './lexicographic-cost.mjs';
 import {
   isResolvedMatch,
@@ -98,19 +102,6 @@ const populateFactionExposures = (indexes, history, playersById) => {
   }
 };
 
-const priorByeCounts = (tournament, roundIndex) => {
-  const counts = new Map();
-  for (const [index, round] of (tournament.roundsData ?? []).entries()) {
-    if (index === roundIndex || round.validated !== true) continue;
-    for (const match of round.matches ?? []) {
-      if (!match.bye || match.p1 == null) continue;
-      const id = String(match.p1);
-      counts.set(id, (counts.get(id) ?? 0) + 1);
-    }
-  }
-  return counts;
-};
-
 const alert = (level, code, message, players, unavoidable) => ({
   level, code, message, players, unavoidable,
 });
@@ -160,8 +151,10 @@ export const analyzeApplicationSwissRound = ({
   roundIndex,
   standings,
   allegianceForFaction = () => null,
+  view = null,
 }) => {
-  const round = tournament?.roundsData?.[roundIndex];
+  const source = view ?? individualSwissView(tournament);
+  const round = source.rounds[roundIndex];
   if (!round || !Array.isArray(round.matches)) throw new Error('Ronde Suisse à analyser introuvable');
   const input = buildSwissEngineInput({
     tournament,
@@ -169,13 +162,14 @@ export const analyzeApplicationSwissRound = ({
     standings,
     allegianceForFaction,
     allowInsufficientActive: true,
+    view: source,
   });
   const currentOptions = input.context.options;
   const storedOptions = normalizedStoredCriteria(round.pairingMeta?.criteria);
   const options = storedOptions ?? currentOptions;
   const criteriaChangedSinceGeneration = storedOptions != null && !sameCriteria(storedOptions, currentOptions);
   const standingsById = new Map(standings.map((entry) => [String(entry.id), entry]));
-  const playersById = new Map((tournament.players ?? []).map((player) => {
+  const playersById = new Map(source.participants.map((player) => {
     const id = String(player.id);
     const standing = standingsById.get(id);
     return [id, {
@@ -191,7 +185,7 @@ export const analyzeApplicationSwissRound = ({
   const indexes = historyIndexes(input.context.history);
   populateFactionExposures(indexes, input.context.history, playersById);
   const blocked = new Set(input.context.blockedPairs.map((entry) => pairKey(entry.a, entry.b)));
-  const byeCounts = priorByeCounts(tournament, roundIndex);
+  const byeCounts = priorSwissByeCounts(source, roundIndex);
   const eligibleByeCounts = [...playersById.values()]
     .filter((player) => player.status === 'active')
     .map((player) => byeCounts.get(player.id) ?? 0);
