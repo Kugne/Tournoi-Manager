@@ -1,0 +1,698 @@
+{
+  "suisse-complet": [
+    {
+      "id": "d",
+      "name": "Joueur d",
+      "faction": "Fd",
+      "status": "active",
+      "compo": null,
+      "pts": 4,
+      "sportsPts": 4,
+      "scenario": 16,
+      "free": 2,
+      "sos": 4,
+      "wins": 1,
+      "draws": 1,
+      "losses": 0,
+      "opponents": [
+        "c",
+        "h"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "g",
+      "name": "Joueur g",
+      "faction": "Fg",
+      "status": "active",
+      "compo": null,
+      "pts": 3,
+      "sportsPts": 3,
+      "scenario": 24,
+      "free": 0,
+      "sos": 5.38,
+      "wins": 1,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [
+        "b"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "a",
+      "name": "Joueur a",
+      "faction": "Fa",
+      "status": "active",
+      "compo": null,
+      "pts": 3,
+      "sportsPts": 3,
+      "scenario": 22,
+      "free": 3,
+      "sos": 7,
+      "wins": 1,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [
+        "b",
+        "c"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "b",
+      "name": "Joueur b",
+      "faction": "Fb",
+      "status": "active",
+      "compo": null,
+      "pts": 3,
+      "sportsPts": 3,
+      "scenario": 22,
+      "free": 3,
+      "sos": 6,
+      "wins": 1,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [
+        "a",
+        "g"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "c",
+      "name": "Joueur c",
+      "faction": "Fc",
+      "status": "active",
+      "compo": null,
+      "pts": 2,
+      "sportsPts": 4,
+      "scenario": 22,
+      "free": 2,
+      "sos": 7,
+      "wins": 1,
+      "draws": 1,
+      "losses": 0,
+      "opponents": [
+        "d",
+        "a"
+      ],
+      "bonusMalus": -2
+    },
+    {
+      "id": "i",
+      "name": "Joueur i",
+      "faction": "Fi",
+      "status": "active",
+      "compo": null,
+      "pts": 1,
+      "sportsPts": 1,
+      "scenario": 9,
+      "free": 0,
+      "sos": 4,
+      "wins": 0,
+      "draws": 1,
+      "losses": 1,
+      "opponents": [
+        "f"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "h",
+      "name": "Joueur h",
+      "faction": "Fh",
+      "status": "active",
+      "compo": null,
+      "pts": 1,
+      "sportsPts": 0,
+      "scenario": 4,
+      "free": 0,
+      "sos": 4,
+      "wins": 0,
+      "draws": 0,
+      "losses": 2,
+      "opponents": [
+        "d"
+      ],
+      "bonusMalus": 1
+    },
+    {
+      "id": "e",
+      "name": "Joueur e",
+      "faction": "Fe",
+      "status": "dropped",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 0,
+      "free": 0,
+      "sos": 0,
+      "wins": 0,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [],
+      "bonusMalus": 0
+    },
+    {
+      "id": "f",
+      "name": "Joueur f",
+      "faction": "Ff",
+      "status": "inscrit",
+      "compo": null,
+      "pts": 4,
+      "sportsPts": 4,
+      "scenario": 18.5,
+      "free": 1,
+      "sos": 3.25,
+      "wins": 1,
+      "draws": 1,
+      "losses": 0,
+      "opponents": [
+        "i"
+      ],
+      "bonusMalus": 0
+    }
+  ],
+  "suisse-egalites": [
+    {
+      "id": "z",
+      "name": "Joueur z",
+      "faction": "Fz",
+      "status": "active",
+      "compo": null,
+      "pts": 3,
+      "sportsPts": 3,
+      "scenario": 10,
+      "free": 2,
+      "sos": 0,
+      "wins": 1,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [
+        "w"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "x",
+      "name": "Joueur x",
+      "faction": "Fx",
+      "status": "active",
+      "compo": null,
+      "pts": 3,
+      "sportsPts": 3,
+      "scenario": 10,
+      "free": 1,
+      "sos": 0,
+      "wins": 1,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [
+        "y"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "y",
+      "name": "Joueur y",
+      "faction": "Fy",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 5,
+      "free": 0,
+      "sos": 3,
+      "wins": 0,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [
+        "x"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "w",
+      "name": "Joueur w",
+      "faction": "Fw",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 5,
+      "free": 0,
+      "sos": 3,
+      "wins": 0,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [
+        "z"
+      ],
+      "bonusMalus": 0
+    }
+  ],
+  "suisse-scoring-2-1-0": [
+    {
+      "id": "w",
+      "name": "Joueur w",
+      "faction": "Fw",
+      "status": "active",
+      "compo": null,
+      "pts": 2,
+      "sportsPts": 2,
+      "scenario": 4,
+      "free": 0,
+      "sos": 0,
+      "wins": 1,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [
+        "z"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "x",
+      "name": "Joueur x",
+      "faction": "Fx",
+      "status": "active",
+      "compo": null,
+      "pts": 1,
+      "sportsPts": 1,
+      "scenario": 3,
+      "free": 0,
+      "sos": 1,
+      "wins": 0,
+      "draws": 1,
+      "losses": 0,
+      "opponents": [
+        "y"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "y",
+      "name": "Joueur y",
+      "faction": "Fy",
+      "status": "active",
+      "compo": null,
+      "pts": 1,
+      "sportsPts": 1,
+      "scenario": 3,
+      "free": 0,
+      "sos": 1,
+      "wins": 0,
+      "draws": 1,
+      "losses": 0,
+      "opponents": [
+        "x"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "z",
+      "name": "Joueur z",
+      "faction": "Fz",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 3,
+      "free": 0,
+      "sos": 2,
+      "wins": 0,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [
+        "w"
+      ],
+      "bonusMalus": 0
+    }
+  ],
+  "suisse-sans-ronde": [
+    {
+      "id": "n",
+      "name": "Joueur n",
+      "faction": "Fn",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 0,
+      "free": 0,
+      "sos": 0,
+      "wins": 0,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [],
+      "bonusMalus": 0
+    },
+    {
+      "id": "m",
+      "name": "Joueur m",
+      "faction": "Fm",
+      "status": "preinscrit",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 0,
+      "free": 0,
+      "sos": 0,
+      "wins": 0,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [],
+      "bonusMalus": 0
+    }
+  ],
+  "elimination-directe": [
+    {
+      "id": "s",
+      "name": "Joueur s",
+      "faction": "Fs",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 20,
+      "free": 0,
+      "sos": 0,
+      "wins": 0,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [],
+      "bonusMalus": 0
+    },
+    {
+      "id": "p",
+      "name": "Joueur p",
+      "faction": "Fp",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 7,
+      "free": 1,
+      "sos": 0,
+      "wins": 0,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [],
+      "bonusMalus": 0
+    },
+    {
+      "id": "r",
+      "name": "Joueur r",
+      "faction": "Fr",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 9,
+      "free": 0,
+      "sos": 0,
+      "wins": 0,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [],
+      "bonusMalus": 0
+    },
+    {
+      "id": "q",
+      "name": "Joueur q",
+      "faction": "Fq",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 4,
+      "free": 1,
+      "sos": 0,
+      "wins": 0,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [],
+      "bonusMalus": 0
+    },
+    {
+      "id": "t",
+      "name": "Joueur t",
+      "faction": "Ft",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 3,
+      "free": 2,
+      "sos": 0,
+      "wins": 0,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [],
+      "bonusMalus": 0
+    }
+  ],
+  "hybride-suisse-sans-instantane": [
+    {
+      "id": "h4",
+      "name": "Joueur h4",
+      "faction": "Fh4",
+      "status": "active",
+      "compo": null,
+      "pts": 3,
+      "sportsPts": 3,
+      "scenario": 11,
+      "free": 0,
+      "sos": 0,
+      "wins": 1,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [
+        "h3"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "h1",
+      "name": "Joueur h1",
+      "faction": "Fh1",
+      "status": "active",
+      "compo": null,
+      "pts": 3,
+      "sportsPts": 3,
+      "scenario": 10,
+      "free": 0,
+      "sos": 0,
+      "wins": 1,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [
+        "h2"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "h2",
+      "name": "Joueur h2",
+      "faction": "Fh2",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 2,
+      "free": 0,
+      "sos": 3,
+      "wins": 0,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [
+        "h1"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "h3",
+      "name": "Joueur h3",
+      "faction": "Fh3",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 1,
+      "free": 0,
+      "sos": 3,
+      "wins": 0,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [
+        "h4"
+      ],
+      "bonusMalus": 0
+    }
+  ],
+  "hybride-top-cut-sans-instantane": [
+    {
+      "id": "h4",
+      "name": "Joueur h4",
+      "faction": "Fh4",
+      "status": "active",
+      "compo": null,
+      "pts": 3,
+      "sportsPts": 3,
+      "scenario": 11,
+      "free": 0,
+      "sos": 0,
+      "wins": 1,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [
+        "h3"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "h1",
+      "name": "Joueur h1",
+      "faction": "Fh1",
+      "status": "active",
+      "compo": null,
+      "pts": 3,
+      "sportsPts": 3,
+      "scenario": 10,
+      "free": 0,
+      "sos": 0,
+      "wins": 1,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [
+        "h2"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "h2",
+      "name": "Joueur h2",
+      "faction": "Fh2",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 2,
+      "free": 0,
+      "sos": 3,
+      "wins": 0,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [
+        "h1"
+      ],
+      "bonusMalus": 0
+    },
+    {
+      "id": "h3",
+      "name": "Joueur h3",
+      "faction": "Fh3",
+      "status": "active",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 1,
+      "free": 0,
+      "sos": 3,
+      "wins": 0,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [
+        "h4"
+      ],
+      "bonusMalus": 0
+    }
+  ],
+  "hybride-top-cut-avec-instantane": [
+    {
+      "id": "h4",
+      "name": "Joueur h4",
+      "faction": "Fh4",
+      "status": "active",
+      "compo": null,
+      "pts": 3,
+      "sportsPts": 3,
+      "scenario": 11,
+      "free": 0,
+      "sos": 0,
+      "wins": 1,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [],
+      "bonusMalus": 0,
+      "swissRank": 2,
+      "eligibleAtCut": true,
+      "qualifiedAtCut": true,
+      "cutSeed": 2
+    },
+    {
+      "id": "h1",
+      "name": "Joueur h1",
+      "faction": "Fh1",
+      "status": "active",
+      "compo": null,
+      "pts": 3,
+      "sportsPts": 3,
+      "scenario": 10,
+      "free": 0,
+      "sos": 0,
+      "wins": 1,
+      "draws": 0,
+      "losses": 0,
+      "opponents": [],
+      "bonusMalus": 0,
+      "swissRank": 1,
+      "eligibleAtCut": true,
+      "qualifiedAtCut": true,
+      "cutSeed": 1
+    },
+    {
+      "id": "h2",
+      "name": "Joueur h2",
+      "faction": "Fh2",
+      "status": "eliminatedcut",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 2,
+      "free": 0,
+      "sos": 3,
+      "wins": 0,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [],
+      "bonusMalus": 0,
+      "swissRank": 4,
+      "eligibleAtCut": true,
+      "qualifiedAtCut": false,
+      "cutSeed": null
+    },
+    {
+      "id": "h3",
+      "name": "Joueur h3",
+      "faction": "Fh3",
+      "status": "eliminatedcut",
+      "compo": null,
+      "pts": 0,
+      "sportsPts": 0,
+      "scenario": 1,
+      "free": 0,
+      "sos": 3,
+      "wins": 0,
+      "draws": 0,
+      "losses": 1,
+      "opponents": [],
+      "bonusMalus": 0,
+      "swissRank": 3,
+      "eligibleAtCut": true,
+      "qualifiedAtCut": false,
+      "cutSeed": null
+    }
+  ]
+}

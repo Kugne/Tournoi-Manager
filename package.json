@@ -1,0 +1,10 @@
+{
+  "name": "tournoi-manager",
+  "private": true,
+  "description": "Gestionnaire de tournois de jeux de figurines, fichier HTML autonome.",
+  "license": "GPL-3.0-only",
+  "scripts": {
+    "test": "node scripts/embed-swiss-engine.mjs && node --test tests/*.test.mjs",
+    "embed": "node scripts/embed-swiss-engine.mjs --write"
+  }
+}

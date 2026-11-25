@@ -6,21 +6,42 @@ const finiteNumber = (value, label) => {
   return Object.is(number, -0) ? 0 : number;
 };
 
-const activePlayers = (tournament) => (tournament.players ?? [])
-  .filter((player) => player.status === 'active');
+/**
+ * Vue Suisse d'un tournoi : les participants appariés, les rondes qui forment
+ * l'historique et les blocages. Le moteur ne lit le tournoi qu'à travers elle,
+ * si bien qu'une vue par équipes (participants = équipes, rondes = rencontres)
+ * pourra réutiliser le même adaptateur sans le modifier.
+ *
+ * - participants : [{ id, status, faction?, compo?, note? }]
+ * - rounds : [{ validated, matches: [{ p1, p2, bye?, ... }], swissPairingSignatures? }]
+ * - blocks : [{ p1, p2 }]
+ * - options : critères optionnels imposés (sinon lus sur le tournoi)
+ */
+export const individualSwissView = (tournament) => ({
+  participants: tournament?.players ?? [],
+  rounds: tournament?.roundsData ?? [],
+  blocks: tournament?.blocks ?? [],
+  options: null,
+});
+
+const resolveView = (tournament, view) => view ?? individualSwissView(tournament);
+
+const activeParticipants = (view) => view.participants
+  .filter((participant) => participant.status === 'active');
 
 const standingsIndex = (standings) => new Map(
   standings.map((standing, index) => [String(standing.id), { ...standing, rank: index }]),
 );
 
-const roundMatches = (tournament, roundIndex) => (tournament.roundsData ?? [])
+const roundMatches = (view, roundIndex) => view.rounds
   .flatMap((round, index) => index === roundIndex || round.validated !== true
     ? []
     : (round.matches ?? []).map((match) => ({ match, round: index + 1 })));
 
-const byeCounts = (tournament, roundIndex) => {
+/** Nombre de byes déjà reçus dans les rondes validées, hors ronde en cours. */
+export const priorSwissByeCounts = (view, roundIndex) => {
   const counts = new Map();
-  for (const { match } of roundMatches(tournament, roundIndex)) {
+  for (const { match } of roundMatches(view, roundIndex)) {
     if (match.bye && match.p1 != null) {
       const id = String(match.p1);
       counts.set(id, (counts.get(id) ?? 0) + 1);
@@ -29,8 +50,8 @@ const byeCounts = (tournament, roundIndex) => {
   return counts;
 };
 
-const currentBye = (tournament, roundIndex, eligibleIds) => {
-  const round = tournament.roundsData?.[roundIndex];
+const currentBye = (view, roundIndex, eligibleIds) => {
+  const round = view.rounds[roundIndex];
   const match = round?.matches?.find((candidate) => candidate.bye && candidate.p1 != null);
   const id = match == null ? null : String(match.p1);
   return id != null && eligibleIds.has(id) ? id : null;
@@ -51,15 +72,16 @@ export const swissPairingCriteriaSnapshot = (tournament) => ({
  * A reroll keeps its eligible beneficiary. Otherwise the fewest prior byes
  * wins, with the lowest-ranked eligible player as the tiebreaker.
  */
-export const selectSwissBye = ({ tournament, roundIndex, standings }) => {
-  const active = activePlayers(tournament);
+export const selectSwissBye = ({ tournament, roundIndex, standings, view = null }) => {
+  const source = resolveView(tournament, view);
+  const active = activeParticipants(source);
   if (active.length % 2 === 0) return null;
   const eligibleIds = new Set(active.map((player) => String(player.id)));
-  const preserved = currentBye(tournament, roundIndex, eligibleIds);
+  const preserved = currentBye(source, roundIndex, eligibleIds);
   if (preserved != null) return preserved;
 
   const byId = standingsIndex(standings);
-  const counts = byeCounts(tournament, roundIndex);
+  const counts = priorSwissByeCounts(source, roundIndex);
   const ranked = active.map((player) => {
     const id = String(player.id);
     const standing = byId.get(id);
@@ -72,25 +94,30 @@ export const selectSwissBye = ({ tournament, roundIndex, standings }) => {
     .sort((left, right) => right.rank - left.rank || left.id.localeCompare(right.id))[0].id;
 };
 
-/** Maps the monolithic application's persisted tournament to the pure engine. */
+/**
+ * Maps the monolithic application's persisted tournament to the pure engine.
+ * `view` (par défaut la vue individuelle) choisit les participants appariés.
+ */
 export const buildSwissEngineInput = ({
   tournament,
   roundIndex,
   standings,
   allegianceForFaction = () => null,
   allowInsufficientActive = false,
+  view = null,
 }) => {
   if (!tournament || !Number.isInteger(roundIndex) || roundIndex < 0) {
     throw new TypeError('Tournoi et index de ronde valides requis');
   }
   if (!Array.isArray(standings)) throw new TypeError('Le classement courant est requis');
-  const active = activePlayers(tournament);
+  const source = resolveView(tournament, view);
+  const active = activeParticipants(source);
   if (!allowInsufficientActive && active.length < 2) {
     throw new Error('Une ronde Suisse exige au moins deux joueurs actifs');
   }
   const standingById = standingsIndex(standings);
-  const byePlayerId = selectSwissBye({ tournament, roundIndex, standings });
-  const options = swissPairingCriteriaSnapshot(tournament);
+  const byePlayerId = selectSwissBye({ tournament, roundIndex, standings, view: source });
+  const options = source.options ?? swissPairingCriteriaSnapshot(tournament);
 
   const participants = active
     .filter((player) => String(player.id) !== byePlayerId)
@@ -108,11 +135,11 @@ export const buildSwissEngineInput = ({
       };
     });
 
-  const history = roundMatches(tournament, roundIndex)
+  const history = roundMatches(source, roundIndex)
     .filter(({ match }) => (match.outcomeVersion == null ? !match.bye : hasRealOpponent(match))
       && match.p1 != null && match.p2 != null)
     .map(({ match, round }) => ({ a: String(match.p1), b: String(match.p2), round }));
-  const blockedPairs = (tournament.blocks ?? [])
+  const blockedPairs = source.blocks
     .filter((block) => block.p1 != null && block.p2 != null)
     .map((block) => ({ a: String(block.p1), b: String(block.p2) }));
   return {
@@ -123,7 +150,7 @@ export const buildSwissEngineInput = ({
       options,
     },
     byePlayerId,
-    excludedSignatures: [...(tournament.roundsData?.[roundIndex]?.swissPairingSignatures ?? [])],
+    excludedSignatures: [...(source.rounds[roundIndex]?.swissPairingSignatures ?? [])],
   };
 };
 
