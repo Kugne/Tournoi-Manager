@@ -8,6 +8,8 @@ import {
   bundleModuleGraph,
   replaceEmbeddedBlock,
 } from '../scripts/embed-swiss-engine.mjs';
+import { calculateBracketPhaseStandings } from '../src/results/bracket-scoring.mjs';
+import { individualTiebreakOrder, rankStandings } from '../src/results/standings-ranking.mjs';
 
 test('le bundle hôte expose l’adaptateur et l’exécuteur sans import résiduel', () => {
   const { code } = bundleModuleGraph('src/swiss/application-runtime.mjs', { globalName: 'TMSwiss' });
@@ -294,9 +296,9 @@ test('le Top Cut crée puis relit une photographie Suisse avant toute mutation d
   assert.match(standingsFunction, /restoreHybridSwissStandings/);
   assert.match(standingsFunction, /calculateSwissStandings/);
   assert.match(standingsFunction, /rounds:tournament\.roundsData\.slice\(0,swissCutoff\)/);
-  assert.match(standingsFunction, /if\(!snapshotActive&&swissCutoff===0\)tournament\.roundsData\.forEach/);
-  assert.match(standingsFunction, /includeSecondary=isSwissRound\|\|tournament\.pairFormat==='bracket'/);
-  assert.match(standingsFunction, /if\(!snapshotActive&&swissCutoff===0\)\{/);
+  assert.match(standingsFunction, /calculateBracketPhaseStandings\(\{players:tournament\.players,rounds:tournament\.roundsData/);
+  assert.match(standingsFunction, /includeSecondaryScores:tournament\.pairFormat==='bracket'/);
+  assert.match(standingsFunction, /fallbackField:snapshotActive\?'swissRank':null/);
 
   const confirmStart = html.indexOf('function confirmTopCut()');
   const confirmEnd = html.indexOf('function renderRounds()', confirmStart);
@@ -727,7 +729,12 @@ test('le classement du Top Cut expose le podium automatique et les troisièmes e
     isBracketFormat: () => true,
     hasValidSwissSnapshot: () => false,
     normalizePlayerStatus: (status) => status,
-    TMSwiss: context.TMSwiss,
+    TMSwiss: {
+      ...context.TMSwiss,
+      calculateBracketPhaseStandings,
+      individualTiebreakOrder,
+      rankStandings,
+    },
   };
   vm.runInNewContext(`${standingsSource}; standings = getStandings(tournament);`, standingsContext);
   assert.deepEqual(Array.from(standingsContext.standings, (player) => player.id), ['A', 'B', 'C', 'D']);

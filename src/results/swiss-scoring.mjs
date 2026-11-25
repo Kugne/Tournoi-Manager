@@ -3,6 +3,7 @@ import {
   MATCH_OUTCOME_KINDS,
   readMatchOutcome,
 } from './match-outcome.mjs';
+import { calculateBuchholz } from './buchholz.mjs';
 
 export const ROUND_SCORING_VERSION = 1;
 
@@ -173,16 +174,11 @@ export const calculateSwissStandings = ({
     }
   }
 
-  for (const player of standings) {
-    player.sos = player.opponents.reduce((sum, opponentId) => sum + (byId[String(opponentId)]?.sportsPts ?? 0), 0);
-  }
-  for (const virtual of virtualOpponents) {
-    const population = [...new Set(virtual.populationIds)]
-      .filter((id) => id !== virtual.beneficiaryId && byId[id]);
-    if (!population.length || !byId[virtual.beneficiaryId]) continue;
-    const average = population.reduce((sum, id) => sum + byId[id].sportsPts, 0) / population.length;
-    byId[virtual.beneficiaryId].sos += roundToHundredth(average);
-  }
+  const buchholz = calculateBuchholz({
+    entries: standings.map((player) => ({ id: player.id, points: player.sportsPts, opponents: player.opponents })),
+    virtualOpponents,
+  });
+  for (const player of standings) player.sos = buchholz.get(String(player.id));
   for (const player of standings) {
     const source = players.find((candidate) => String(candidate.id) === String(player.id));
     const adjustment = (source?.penalties ?? []).reduce((sum, item) => sum + numberOrZero(item.points), 0);

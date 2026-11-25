@@ -36,7 +36,7 @@ test('getStandings ne modifie pas le tournoi reçu', () => {
 });
 
 test('ordre Suisse lisible : points, scénario, score libre puis SOS', () => {
-  const ids = app.getStandings(structuredClone(scenarios['suisse-egalites'])).map((p) => p.id);
+  const ids = Array.from(app.getStandings(structuredClone(scenarios['suisse-egalites'])), (p) => p.id);
   // x et z : même points et scénario, z a plus de score libre ; y et w idem, à égalité stricte.
   assert.deepEqual(ids, ['z', 'x', 'y', 'w']);
 });

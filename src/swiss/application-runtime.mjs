@@ -53,6 +53,16 @@ import {
   analyzeManualRoundBlocks,
 } from '../results/administrative-flow.mjs';
 import { describePlayerOutcome } from '../results/result-presentation.mjs';
+import { calculateBuchholz } from '../results/buchholz.mjs';
+import { calculateBracketPhaseStandings, emptyStandingRow } from '../results/bracket-scoring.mjs';
+import {
+  compareBracketDepth,
+  compareByTiebreaks,
+  individualTiebreakOrder,
+  INDIVIDUAL_TIEBREAKS,
+  rankStandings,
+  STANDING_STATUS_PRIORITY,
+} from '../results/standings-ranking.mjs';
 import {
   BRACKET_PLACEMENTS_VERSION,
   inspectPersistedState,
@@ -118,6 +128,15 @@ export {
   analyzeRoundParticipantIntegrity,
   analyzeManualRoundBlocks,
   describePlayerOutcome,
+  calculateBuchholz,
+  calculateBracketPhaseStandings,
+  emptyStandingRow,
+  compareBracketDepth,
+  compareByTiebreaks,
+  individualTiebreakOrder,
+  INDIVIDUAL_TIEBREAKS,
+  rankStandings,
+  STANDING_STATUS_PRIORITY,
   BRACKET_PLACEMENTS_VERSION,
   inspectPersistedState,
   STATE_SCHEMA_VERSION,
