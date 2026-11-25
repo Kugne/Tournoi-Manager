@@ -65,7 +65,8 @@ const hasId = (value) => value !== null && value !== undefined && String(value) 
  * - teams : [{ id, name, status }] aux identifiants uniques ;
  * - player.teamId : équipe existante (ou absent pour un joueur non affecté) ;
  * - round.encounters (facultatif) : [{ id, teamA, teamB, table }] où teamB est
- *   null pour un bye ; chaque match individuel peut porter encounterId.
+ *   null pour un bye ; teamForfeit facultatif ('teamA' | 'teamB' | 'both') ;
+ *   chaque match individuel peut porter encounterId.
  */
 const inspectTeamTournament = (tournament) => {
   if (!Array.isArray(tournament.teams)) return failure('invalid-teams', 'Liste des équipes manquante');
@@ -85,7 +86,9 @@ const inspectTeamTournament = (tournament) => {
       if (!hasId(encounter?.id) || encounterIds.has(String(encounter.id))
         || !knownTeams.has(String(encounter.teamA))
         || (encounter.teamB != null && !knownTeams.has(String(encounter.teamB)))
-        || String(encounter.teamA) === String(encounter.teamB)) {
+        || String(encounter.teamA) === String(encounter.teamB)
+        || (encounter.teamForfeit != null
+          && (encounter.teamB == null || !['teamA', 'teamB', 'both'].includes(encounter.teamForfeit)))) {
         return failure('invalid-encounters', 'Rencontre d’équipes incohérente');
       }
       encounterIds.add(String(encounter.id));

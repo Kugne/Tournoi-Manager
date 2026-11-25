@@ -92,8 +92,36 @@ import {
   classifyPairingCandidate,
   sortPairingCandidates,
 } from '../pairings/pairing-candidate.mjs';
+import {
+  computeEncounterResult,
+  DEFAULT_TEAM_SETTINGS,
+  ENCOUNTER_KINDS,
+  encounterGames,
+  normalizeTeamSettings,
+  TEAM_RANKING_ORDERS,
+} from '../teams/team-encounter.mjs';
+import { calculateTeamStandings } from '../teams/team-standings.mjs';
+import {
+  activeTeamRoster,
+  assignEncounterBoards,
+  pairTeamRound,
+  setEncounterTeamForfeit,
+  teamSwissView,
+} from '../teams/team-swiss.mjs';
 
 export {
+  computeEncounterResult,
+  DEFAULT_TEAM_SETTINGS,
+  ENCOUNTER_KINDS,
+  encounterGames,
+  normalizeTeamSettings,
+  TEAM_RANKING_ORDERS,
+  calculateTeamStandings,
+  activeTeamRoster,
+  assignEncounterBoards,
+  pairTeamRound,
+  setEncounterTeamForfeit,
+  teamSwissView,
   analyzeApplicationSwissRound,
   applicationPairingSignature,
   buildApplicationMatches,
