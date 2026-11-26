@@ -7131,7 +7131,7 @@ function openTopCutConfirm(){
     } else {
       statusCell = qualified ? '✅ Qualifié' : '❌ Non qualifié';
     }
-    html+='<tr style="'+rowStyle+'"><td>'+(i+1)+'</td><td>'+escapeHtml(s.name)+'</td><td>'+s.pts+'</td><td>'+s.scenario+'</td>'+(t.freeScoreName?'<td>'+s.free+'</td>':'')+'<td>'+s.sos+'</td><td>'+statusCell+'</td></tr>';
+    html+='<tr style="'+rowStyle+'"><td>'+(i+1)+'</td><td>'+escapeHtml(s.name)+'</td><td>'+s.pts+'</td><td>'+fmtTotal(s.scenario)+'</td>'+(t.freeScoreName?'<td>'+fmtTotal(s.free)+'</td>':'')+'<td>'+fmtTotal(s.sos)+'</td><td>'+statusCell+'</td></tr>';
   });
   html+='</tbody></table>';
   if(manualNeeded){
@@ -7821,7 +7821,7 @@ function renderClassement(){
   const bracketHtml = isBracketFormat(t) ? `<div class="bracket-wrap" style="margin-bottom:24px">${renderBracketTree(t)}</div>` : '';
   const frozenNotice=hasValidSwissSnapshot(t)?'<div style="margin-bottom:12px;padding:9px 12px;border-radius:8px;background:rgba(79,142,247,0.12);color:var(--accent2);font-size:0.82rem">🔒 Points et départages suisses figés au lancement du Top Cut.</div>':'';
   const extraTh=`<th>Scénario</th>${hasFree?`<th>${escapeHtml(t.freeScoreName)}</th>`:''}`;
-  wrap.innerHTML=`${isTeamT(t)?renderTeamStandingsHtml(t):''}${bracketHtml}${frozenNotice}<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="data-table" style="min-width:420px"><thead><tr><th>Rang</th><th>Joueur</th><th>Faction</th><th>Pts</th>${extraTh}<th>SOS</th><th>Compo</th><th>Statut</th></tr></thead><tbody>${standings.map((p,i)=>{const dropped=normalizePlayerStatus(p.status)==='dropped';const depth=bracketDepth[p.id]||{};const rankInfo=getStandingRankInfo(t,p,i,bracketDepth);const extraTd=`<td><strong>${p.scenario}</strong></td>${hasFree?`<td>${p.free}</td>`:''}`;const rowStyle=dropped?'opacity:0.5;':'';return `<tr class="${rankInfo.cssClass}" style="${rowStyle}"><td>${rankInfo.medalLabel}${depth.champion?' 👑':''}</td><td><strong>${dropped?`<s>${escapeHtml(p.name)}</s>`:escapeHtml(p.name)}</strong>${(t.awards||[]).filter(a=>a.playerId===p.id).map(a=>`<span title="${a.name}" style="cursor:default;margin-left:4px">⭐</span>`).join('')}${(()=>{const pl=t.players.find(x=>x.id===p.id);return pl&&pl.penalties&&pl.penalties.length?`<span title="Bonus/Malus appliqué" style="cursor:default;margin-left:4px">⚖️</span>`:'';})()}</td><td style="color:var(--accent2)">${p.faction}</td><td><strong>${p.pts}</strong></td>${extraTd}<td>${p.sos}</td><td>${p.compo!=null?p.compo:'—'}</td><td>${(()=>{const st=normalizePlayerStatus(p.status);if(st==='dropped')return '<span class=\"badge badge-drop\">❌ Drop</span>';if(st==='absent')return '<span class=\"badge badge-danger\">Forfait</span>';if(st==='eliminatedcut')return '<span class=\"badge badge-neutral\">🚫 Éliminé</span>';if(st==='preinscrit')return '<span class=\"badge badge-neutral\">Préinscrit</span>';if(st==='inscrit')return '<span class=\"badge badge-neutral\">Inscrit</span>';return '<span class=\"badge badge-success\">Actif</span>';})()}</td></tr>`;}).join('')}</tbody></table></div>`;
+  wrap.innerHTML=`${isTeamT(t)?renderTeamStandingsHtml(t):''}${bracketHtml}${frozenNotice}<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="data-table" style="min-width:420px"><thead><tr><th>Rang</th><th>Joueur</th><th>Faction</th><th>Pts</th>${extraTh}<th>SOS</th><th>Compo</th><th>Statut</th></tr></thead><tbody>${standings.map((p,i)=>{const dropped=normalizePlayerStatus(p.status)==='dropped';const depth=bracketDepth[p.id]||{};const rankInfo=getStandingRankInfo(t,p,i,bracketDepth);const extraTd=`<td><strong>${fmtTotal(p.scenario)}</strong></td>${hasFree?`<td>${fmtTotal(p.free)}</td>`:''}`;const rowStyle=dropped?'opacity:0.5;':'';return `<tr class="${rankInfo.cssClass}" style="${rowStyle}"><td>${rankInfo.medalLabel}${depth.champion?' 👑':''}</td><td><strong>${dropped?`<s>${escapeHtml(p.name)}</s>`:escapeHtml(p.name)}</strong>${(t.awards||[]).filter(a=>a.playerId===p.id).map(a=>`<span title="${a.name}" style="cursor:default;margin-left:4px">⭐</span>`).join('')}${(()=>{const pl=t.players.find(x=>x.id===p.id);return pl&&pl.penalties&&pl.penalties.length?`<span title="Bonus/Malus appliqué" style="cursor:default;margin-left:4px">⚖️</span>`:'';})()}</td><td style="color:var(--accent2)">${p.faction}</td><td><strong>${p.pts}</strong></td>${extraTd}<td>${fmtTotal(p.sos)}</td><td>${p.compo!=null?p.compo:'—'}</td><td>${(()=>{const st=normalizePlayerStatus(p.status);if(st==='dropped')return '<span class=\"badge badge-drop\">❌ Drop</span>';if(st==='absent')return '<span class=\"badge badge-danger\">Forfait</span>';if(st==='eliminatedcut')return '<span class=\"badge badge-neutral\">🚫 Éliminé</span>';if(st==='preinscrit')return '<span class=\"badge badge-neutral\">Préinscrit</span>';if(st==='inscrit')return '<span class=\"badge badge-neutral\">Inscrit</span>';return '<span class=\"badge badge-success\">Actif</span>';})()}</td></tr>`;}).join('')}</tbody></table></div>`;
 }
 
 // STATS
@@ -7944,9 +7944,9 @@ function renderStats(){
             <div><div style="font-size:0.7rem;color:var(--text3)">VICTOIRES</div><div style="font-size:1.4rem;font-weight:900;color:var(--success)">${ps.wins}</div></div>
             <div><div style="font-size:0.7rem;color:var(--text3)">NULS</div><div style="font-size:1.4rem;font-weight:900;color:var(--warning)">${ps.draws}</div></div>
             <div><div style="font-size:0.7rem;color:var(--text3)">DÉFAITES</div><div style="font-size:1.4rem;font-weight:900;color:var(--danger)">${ps.losses}</div></div>
-            <div><div style="font-size:0.7rem;color:var(--text3)">SCÉNARIO TOTAL</div><div style="font-size:1.4rem;font-weight:900">${ps.scenario}</div></div>
-            ${hasFree?`<div><div style="font-size:0.7rem;color:var(--text3)">${escapeHtml(t.freeScoreName.toUpperCase())} TOTAL</div><div style="font-size:1.4rem;font-weight:900">${ps.free}</div></div>`:''}
-            <div><div style="font-size:0.7rem;color:var(--text3)">SOS</div><div style="font-size:1.4rem;font-weight:900;color:var(--text2)">${ps.sos}</div></div>
+            <div><div style="font-size:0.7rem;color:var(--text3)">SCÉNARIO TOTAL</div><div style="font-size:1.4rem;font-weight:900">${fmtTotal(ps.scenario)}</div></div>
+            ${hasFree?`<div><div style="font-size:0.7rem;color:var(--text3)">${escapeHtml(t.freeScoreName.toUpperCase())} TOTAL</div><div style="font-size:1.4rem;font-weight:900">${fmtTotal(ps.free)}</div></div>`:''}
+            <div><div style="font-size:0.7rem;color:var(--text3)">SOS</div><div style="font-size:1.4rem;font-weight:900;color:var(--text2)">${fmtTotal(ps.sos)}</div></div>
             ${ps.bonusMalus?`<div><div style="font-size:0.7rem;color:var(--text3)">BONUS/MALUS</div><div style="font-size:1.4rem;font-weight:900;color:${ps.bonusMalus>=0?'var(--success)':'var(--danger)'}">${ps.bonusMalus>0?'+':''}${ps.bonusMalus}</div></div>`:''}
           </div>
           <div style="margin-bottom:12px"><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();exportPlayerCSV('${ps.id}')">Export CSV joueur</button> <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();exportPlayerPDF('${ps.id}')">Export PDF joueur</button></div>
@@ -7957,7 +7957,7 @@ function renderStats(){
             <tbody>${hist.rounds.map(r=>{
               const badgeClass=r.result==='win'?'badge-success':r.result==='draw'?'badge-warning':r.result==='bye'?'badge-info':r.result===null?'badge-neutral':'badge-danger';
               const rc='<span class="badge '+badgeClass+'">'+escapeHtml(r.resultLabel||'En attente')+'</span>';
-              return `<tr><td>R${r.ronde}</td><td>${r.adversaire}</td><td style="color:var(--accent2)">${r.adversaireFaction||'—'}</td><td>${rc}</td><td>${r.scenario}</td>${hasFree?`<td>${r.free}</td>`:''}</tr>`;
+              return `<tr><td>R${r.ronde}</td><td>${r.adversaire}</td><td style="color:var(--accent2)">${r.adversaireFaction||'—'}</td><td>${rc}</td><td>${fmtTotal(r.scenario)}</td>${hasFree?`<td>${fmtTotal(r.free)}</td>`:''}</tr>`;
             }).join('')}</tbody>
           </table>`:'<div style="font-size:0.85rem;color:var(--text3);padding:8px 0">Aucune ronde jouée</div>'}
         </div>`:'';
@@ -7970,8 +7970,8 @@ function renderStats(){
               <span class="badge badge-success">${ps.wins}V</span>
               <span class="badge badge-warning">${ps.draws}N</span>
               <span class="badge badge-danger">${ps.losses}D</span>
-              <span class="badge badge-neutral">Scén: ${ps.scenario}</span>
-              ${hasFree?`<span class="badge badge-neutral">${escapeHtml(t.freeScoreName)}: ${ps.free}</span>`:''}
+              <span class="badge badge-neutral">Scén: ${fmtTotal(ps.scenario)}</span>
+              ${hasFree?`<span class="badge badge-neutral">${escapeHtml(t.freeScoreName)}: ${fmtTotal(ps.free)}</span>`:''}
             </div>
             <span style="color:var(--text3);font-size:0.8rem;margin-left:8px">${isExp?'▲':'▼'}</span>
           </div>
@@ -8109,16 +8109,16 @@ function exportPlayerCSV(playerId){
   out.push(`Victoires;${ps.wins}`);
   out.push(`Nuls;${ps.draws}`);
   out.push(`Défaites;${ps.losses}`);
-  out.push(`Scénario total;${ps.scenario}`);
-  if(hasFree) out.push(`${csvEscape(t.freeScoreName+' total')};${ps.free}`);
-  out.push(`SOS;${ps.sos}`);
+  out.push(`Scénario total;${fmtTotal(ps.scenario)}`);
+  if(hasFree) out.push(`${csvEscape(t.freeScoreName+' total')};${fmtTotal(ps.free)}`);
+  out.push(`SOS;${fmtTotal(ps.sos)}`);
   if(awards.length) out.push(`Prix spéciaux;${csvEscape(awards.join(', '))}`);
   out.push('');
   out.push('HISTORIQUE DES RONDES');
   out.push(`Ronde;Phase;Adversaire;Faction adv.;Résultat;Scénario${hasFree?';'+csvEscape(t.freeScoreName):''}`);
   rounds.forEach(r=>{
     const rl=r.resultLabel||'En attente';
-    out.push([`R${r.ronde}`,r.phase,r.adversaire,r.adversaireFaction||'—',rl,r.scenario,...(hasFree?[r.free]:[])].map(csvEscape).join(';'));
+    out.push([`R${r.ronde}`,r.phase,r.adversaire,r.adversaireFaction||'—',rl,fmtTotal(r.scenario),...(hasFree?[fmtTotal(r.free)]:[])].map(csvEscape).join(';'));
   });
   dlFile(`${sanitizeFilename('fiche-'+p.name+'-'+t.name)}.csv`, out.join('\n'), 'text/csv');
   toast('Export CSV joueur OK ✅','success');
@@ -8129,7 +8129,7 @@ function buildPlayerSectionHTML(t, d, prog){
   const chartSvg=(prog && prog.roundCount>=2)?renderPlayerProgressionChartForPrint(t,p.id,prog):'';
   const roundRows=rounds.map(r=>{
     const rl=r.resultLabel||'En attente';
-    return `<tr><td>R${r.ronde}</td><td>${escapeHtml(r.phase)}</td><td>${escapeHtml(r.adversaire)}</td><td>${escapeHtml(r.adversaireFaction||'—')}</td><td>${escapeHtml(rl)}</td><td>${r.scenario}</td>${hasFree?`<td>${r.free}</td>`:''}</tr>`;
+    return `<tr><td>R${r.ronde}</td><td>${escapeHtml(r.phase)}</td><td>${escapeHtml(r.adversaire)}</td><td>${escapeHtml(r.adversaireFaction||'—')}</td><td>${escapeHtml(rl)}</td><td>${fmtTotal(r.scenario)}</td>${hasFree?`<td>${fmtTotal(r.free)}</td>`:''}</tr>`;
   }).join('');
   return `
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid #e5e7eb;page-break-inside:avoid;">
@@ -8142,9 +8142,9 @@ function buildPlayerSectionHTML(t, d, prog){
         <div class="stat-card"><div class="stat-value">${ps.wins}</div><div class="stat-label">Victoires</div></div>
         <div class="stat-card"><div class="stat-value">${ps.draws}</div><div class="stat-label">Nuls</div></div>
         <div class="stat-card"><div class="stat-value">${ps.losses}</div><div class="stat-label">Défaites</div></div>
-        <div class="stat-card"><div class="stat-value">${ps.scenario}</div><div class="stat-label">Scénario</div></div>
-        ${hasFree?`<div class="stat-card"><div class="stat-value">${ps.free}</div><div class="stat-label">${escapeHtml(t.freeScoreName)}</div></div>`:''}
-        <div class="stat-card"><div class="stat-value">${ps.sos}</div><div class="stat-label">SOS</div></div>
+        <div class="stat-card"><div class="stat-value">${fmtTotal(ps.scenario)}</div><div class="stat-label">Scénario</div></div>
+        ${hasFree?`<div class="stat-card"><div class="stat-value">${fmtTotal(ps.free)}</div><div class="stat-label">${escapeHtml(t.freeScoreName)}</div></div>`:''}
+        <div class="stat-card"><div class="stat-value">${fmtTotal(ps.sos)}</div><div class="stat-label">SOS</div></div>
       </div>
       ${chartSvg}
       <table><thead><tr><th>Ronde</th><th>Phase</th><th>Adversaire</th><th>Faction adv.</th><th>Résultat</th><th>Scénario</th>${hasFree?`<th>${escapeHtml(t.freeScoreName)}</th>`:''}</tr></thead><tbody>${roundRows}</tbody></table>
@@ -8157,12 +8157,12 @@ function buildPlayerSectionCSV(t, d){
   out.push('');
   out.push(csvEscape(`FICHE JOUEUR — ${p.name} (Rang ${rank}/${total})`));
   out.push(`Faction;${csvEscape(p.faction||'')}`);
-  out.push(`Points sportifs;${ps.sportsPts};Bonus/Malus;${ps.bonusMalus||0};Total;${ps.pts};Victoires;${ps.wins};Nuls;${ps.draws};Défaites;${ps.losses};Scénario;${ps.scenario}${hasFree?';'+csvEscape(t.freeScoreName)+';'+ps.free:''};SOS;${ps.sos}`);
+  out.push(`Points sportifs;${ps.sportsPts};Bonus/Malus;${ps.bonusMalus||0};Total;${ps.pts};Victoires;${ps.wins};Nuls;${ps.draws};Défaites;${ps.losses};Scénario;${fmtTotal(ps.scenario)}${hasFree?';'+csvEscape(t.freeScoreName)+';'+fmtTotal(ps.free):''};SOS;${fmtTotal(ps.sos)}`);
   if(awards.length) out.push(`Prix spéciaux;${csvEscape(awards.join(', '))}`);
   out.push(`Ronde;Phase;Adversaire;Faction adv.;Résultat;Scénario${hasFree?';'+csvEscape(t.freeScoreName):''}`);
   rounds.forEach(r=>{
     const rl=r.resultLabel||'En attente';
-    out.push([`R${r.ronde}`,r.phase,r.adversaire,r.adversaireFaction||'—',rl,r.scenario,...(hasFree?[r.free]:[])].map(csvEscape).join(';'));
+    out.push([`R${r.ronde}`,r.phase,r.adversaire,r.adversaireFaction||'—',rl,fmtTotal(r.scenario),...(hasFree?[fmtTotal(r.free)]:[])].map(csvEscape).join(';'));
   });
   return out.join('\n');
 }
@@ -8418,6 +8418,8 @@ function updSecondaryCriteria(k,v){const t=getActiveT();if(!t)return;preserveSwi
 function updScoring(k,v){const t=getActiveT();if(!t)return;if(!t.scoring)t.scoring={win:3,draw:1,loss:0};t.scoring[k]=v;save();}
 
 // EXPORT / IMPORT
+// Totaux décimaux (scénario, score libre, SOS) : arrondi au centième pour l'affichage et les exports uniquement ; le classement est calculé sur les valeurs exactes.
+function fmtTotal(v){return typeof v==='number'&&Number.isFinite(v)?Math.round((v+Number.EPSILON)*100)/100:v;}
 function dlFile(name, content, type) {
   try {
     const bom = type.includes('csv') ? '\uFEFF' : '';
@@ -8499,7 +8501,7 @@ function exportCSV() {
   const s = getStandings(t), hasFree = !!t.freeScoreName;
   const header = `Rang;Joueur;Faction;Points sportifs;Bonus/Malus;Total;Scénario${hasFree ? ';' + csvEscape(t.freeScoreName) : ''};SOS;Compo`;
   const rows = s.map((p, i) =>
-    `${csvEscape(getStandingRankInfo(t,p,i).rankLabel)};${csvEscape(p.name)};${csvEscape(p.faction)};${p.sportsPts};${p.bonusMalus||0};${p.pts};${p.scenario}${hasFree ? ';' + p.free : ''};${p.sos};${p.compo != null ? p.compo : ''}`
+    `${csvEscape(getStandingRankInfo(t,p,i).rankLabel)};${csvEscape(p.name)};${csvEscape(p.faction)};${p.sportsPts};${p.bonusMalus||0};${p.pts};${fmtTotal(p.scenario)}${hasFree ? ';' + fmtTotal(p.free) : ''};${fmtTotal(p.sos)};${p.compo != null ? p.compo : ''}`
   );
   const individualLines = [header, ...rows];
   const lines = isTeamT(t) ? [...teamStandingsCsvLines(t), '', 'Classement individuel', ...individualLines] : individualLines;
@@ -8519,9 +8521,9 @@ function exportPDF() {
       <td>${p.sportsPts}</td>
       <td>${p.bonusMalus||0}</td>
       <td><strong>${p.pts}</strong></td>
-      <td>${p.scenario}</td>
-      ${hasFree ? `<td>${p.free}</td>` : ''}
-      <td>${p.sos}</td>
+      <td>${fmtTotal(p.scenario)}</td>
+      ${hasFree ? `<td>${fmtTotal(p.free)}</td>` : ''}
+      <td>${fmtTotal(p.sos)}</td>
       <td>${p.compo != null ? p.compo : ''}</td>
     </tr>`;}).join('');
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -8621,7 +8623,7 @@ function exportStatsCSV() {
   out.push(`Rang;Joueur;Faction;Points sportifs;Bonus/Malus;Total;V;N;D;Scénario${hasFree?';'+csvEscape(t.freeScoreName):''};SOS;Prix spéciaux`);
   standings.forEach((p,i)=>{
     const awards=(t.awards||[]).filter(a=>a.playerId===p.id).map(a=>a.name).join(', ');
-    out.push([getStandingRankInfo(t,p,i).rankLabel,p.name,p.faction,p.sportsPts,p.bonusMalus||0,p.pts,p.wins,p.draws,p.losses,p.scenario,...(hasFree?[p.free]:[]),p.sos,awards].map(csvEscape).join(';'));
+    out.push([getStandingRankInfo(t,p,i).rankLabel,p.name,p.faction,p.sportsPts,p.bonusMalus||0,p.pts,p.wins,p.draws,p.losses,fmtTotal(p.scenario),...(hasFree?[fmtTotal(p.free)]:[]),fmtTotal(p.sos),awards].map(csvEscape).join(';'));
   });
   const includeDetail = document.getElementById('stats-include-detail') && document.getElementById('stats-include-detail').checked;
   if(includeDetail){
@@ -8691,8 +8693,8 @@ function exportStatsPDF() {
     const awards=(t.awards||[]).filter(a=>a.playerId===p.id).map(a=>a.name).join(', ');
     return `<tr style="${rankInfo.podium?'font-weight:700':''}">
       <td>${rankInfo.medalLabel}</td><td>${escapeHtml(p.name)}</td><td style="color:#4f8ef7">${escapeHtml(p.faction)}</td><td>${p.sportsPts}</td><td style="color:${(p.bonusMalus||0)>=0?'#16a34a':'#dc2626'}">${p.bonusMalus?((p.bonusMalus>0?'+':'')+p.bonusMalus):'—'}</td><td><strong>${p.pts}</strong></td>
-      <td>${p.wins}</td><td>${p.draws}</td><td>${p.losses}</td><td>${p.scenario}</td>${hasFree?`<td>${p.free}</td>`:''}
-      <td>${p.sos}</td><td>${escapeHtml(awards||'—')}</td>
+      <td>${p.wins}</td><td>${p.draws}</td><td>${p.losses}</td><td>${fmtTotal(p.scenario)}</td>${hasFree?`<td>${fmtTotal(p.free)}</td>`:''}
+      <td>${fmtTotal(p.sos)}</td><td>${escapeHtml(awards||'—')}</td>
     </tr>`;
   }).join('');
 
