@@ -100,6 +100,8 @@ import {
   normalizeTeamSettings,
   TEAM_RANKING_ORDERS,
 } from '../teams/team-encounter.mjs';
+import { applyTeamImport, planTeamImport } from '../teams/team-import.mjs';
+export { applyTeamImport, planTeamImport };
 import { calculateTeamStandings } from '../teams/team-standings.mjs';
 import { teamStandingsExportTable } from '../teams/team-export.mjs';
 import {

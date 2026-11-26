@@ -21,6 +21,7 @@ Idéal pour :
 ✨ Fonctionnalités
 
     4 formats d'appariement : système suisse automatique, élimination directe(bracket avec tableau SVG), hybride suisse + élimination directe et composition manuelle des tables
+    Tournois par équipes en système suisse : rencontres entre équipes, points de rencontre et points individuels, trois modes de classement, byes et forfaits d'équipe
     Moteur suisse avancé : évite les revanches, les miroirs de faction, gèreles allégeances, les blocages manuels, la compo et les notes libres
     Gestion complète des joueurs : import CSV, statuts (préinscrit, actif,absent, drop), blocages, bonus/malus
     Scoring personnalisable : barème V/N/D libre, points de scénario, scorelibre (Kill Count...), pénalités
@@ -51,6 +52,18 @@ Aucune installation. Aucune dépendance.
     Lancez la ronde 1 et saisissez les résultats au fil de la journée
     Exportez le classement en CSV ou PDF pour l'afficher
 
+### 🛡️ Tournoi par équipes
+
+    À la création, choisissez « Participants : Par équipes », le nombre de joueurs par équipe et le mode de classement
+    Dans l'onglet Joueurs, créez les équipes puis rattachez chaque joueur à la sienne
+    À chaque ronde, les équipes sont appariées sans revanche ; chaque rencontre oppose les joueurs table par table (bouton « Composer les tables » pour choisir les adversaires)
+    L'équipe qui gagne le plus de parties remporte la rencontre et marque les points de rencontre (3/1/0 par défaut) ; chaque partie rapporte aussi des points individuels au joueur
+    Trois modes de classement : rencontres d'abord (points de rencontre, points individuels, Buchholz), force du calendrier d'abord (points de rencontre, Buchholz, points individuels) ou cumul individuel
+    Bye d'équipe et forfait d'une équipe entière : victoire de rencontre et 6 points individuels pour l'équipe qui en bénéficie ; un joueur absent offre une victoire ordinaire à son adversaire
+    Le classement des équipes figure dans l'onglet Classement et en tête des exports CSV et PDF
+
+    ⚠️ Une sauvegarde contenant un tournoi par équipes ne peut pas être ouverte par une version antérieure au mode équipes.
+
 Un guide complet est intégré dans l'application : onglet ℹ️ Informations(tutoriel, explication du système suisse, glossaire).
 🔒 Confidentialité
 
@@ -79,9 +92,9 @@ La documentation du chantier est conservée dans :
 - [l'architecture du solveur exact](docs/ARCHITECTURE-SOLVEUR-SUISSE.md) ;
 - [le carnet des idées et décisions](IDEES.md).
 
-La phase 2 consacrée au Suisse par équipes reste hors périmètre de la V2.
+Le Suisse par équipes a été ajouté après la V2 : règles et modèle de données dans [le modèle de données équipes](docs/MODELE-DONNEES-EQUIPES.md), étude des modes de classement dans [le comparatif du scoring par équipes](docs/COMPARATIF-SCORING-EQUIPES-2026-09-21.md).
 
-La suite complète de validation (181 tests) s'exécute sans dépendance externe avec Node.js :
+La suite complète de validation s'exécute sans dépendance externe avec Node.js :
 
 ```bash
 node --test tests/*.test.mjs
