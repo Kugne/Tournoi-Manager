@@ -177,6 +177,18 @@
   .badge-danger{background:rgba(231,76,60,0.15);color:var(--danger);}
   .badge-info{background:rgba(79,142,247,0.15);color:var(--accent);}
   .badge-neutral{background:var(--bg2);color:var(--text2);}
+  .data-table tr.team-detail-row{display:none;}
+  .team-row-toggle{display:none;color:var(--text3);}
+  @media (max-width:640px){
+    #classement-wrap table:has(tr.team-row){min-width:0!important;}
+    .data-table:has(tr.team-row) th,.data-table tr.team-row td{padding:5px 4px;font-size:0.72rem;}
+    .data-table:has(tr.team-row) th:nth-child(n+6),.data-table tr.team-row td:nth-child(n+6),tr.team-row .team-row-members,tr.team-row br{display:none;}
+    .data-table tr.team-row{cursor:pointer;}
+    .team-row-toggle{display:inline;}
+    tr.team-row.open .team-row-toggle{display:inline-block;transform:rotate(180deg);}
+    .data-table tr.team-detail-row.open{display:table-row;}
+    .data-table tr.team-detail-row td{display:table-cell;font-size:0.75rem;color:var(--text2);background:var(--bg2);line-height:1.5;}
+  }
   .gs-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
   .gs-name{font-weight:700;font-size:0.95rem;}
   .gs-factions{font-size:0.75rem;color:var(--text3);margin-top:4px;}
@@ -7047,11 +7059,18 @@ function saveTeamBoards(){
   catch(error){toast(error?.message||String(error),'warning',6000);return;}
   closeModal('modal-team-boards');teamBoardsTarget=null;save();renderRounds();toast('Tables mises à jour','success');
 }
+function refreshRoundPendingBadges(t){
+  document.querySelectorAll('#rounds-nav [data-round-pending]').forEach(function(badge){
+    const r=t?.roundsData?.[Number(badge.dataset.roundPending)];if(!r)return;
+    const pending=r.validated?0:r.matches.filter(function(m){return isOpenRoundMatch(t,r,m);}).length;
+    badge.textContent=!r.validated&&pending>0?' ('+pending+')':'';
+  });
+}
 function renderRounds(){
   const t=getActiveT();if(!t)return;
   const nav=document.getElementById('rounds-nav'),content=document.getElementById('rounds-content');
   let navHtml='';
-  for(let i=0;i<t.roundsData.length;i++){const r=t.roundsData[i];const pending=r.validated?0:r.matches.filter(m=>isOpenRoundMatch(t,r,m)).length;navHtml+=`<button class="btn ${r.validated?'btn-secondary':'btn-primary'} btn-sm" onclick="viewRound(${i})">${r.validated?'🔒':'⚔️'} Ronde ${i+1}${!r.validated&&pending>0?` (${pending})`:''}${r.validated?' ✓':''}</button>`;}
+  for(let i=0;i<t.roundsData.length;i++){const r=t.roundsData[i];const pending=r.validated?0:r.matches.filter(m=>isOpenRoundMatch(t,r,m)).length;navHtml+=`<button class="btn ${r.validated?'btn-secondary':'btn-primary'} btn-sm" onclick="viewRound(${i})">${r.validated?'🔒':'⚔️'} Ronde ${i+1}<span data-round-pending="${i}">${!r.validated&&pending>0?` (${pending})`:''}</span>${r.validated?' ✓':''}</button>`;}
   const swissRoundsValidatedCount=t.roundsData.filter(function(r){return r.validated;}).length;
   const isHybridSwissDone = t.pairFormat==='hybrid' && t.hybridPhase==='swiss' && swissRoundsValidatedCount>=t.rounds && (t.roundsData.length===0||t.roundsData[t.roundsData.length-1]?.validated);
   const canStart=t.status!=='finished'&&t.status!=='completed'&&!isHybridSwissDone&&(t.roundsData.length===0||t.roundsData[t.roundsData.length-1]?.validated)&&(isBracketFormat(t)||t.roundsData.length<t.rounds);
@@ -7115,7 +7134,7 @@ function setResult(ri,mi,result){
   if(['administrative_no_show','forfeit_after_start','double_forfeit'].includes(outcome.kind)){
     toast('Effacez d’abord le résultat administratif avant de saisir un résultat sportif.','warning',6000);return;
   }
-  t.roundsData[ri].matches[mi]=TMSwiss.writeMatchOutcome(m,{kind:'played',result:result,started:true});save();renderRoundContent(ri,document.getElementById('rounds-content'));
+  t.roundsData[ri].matches[mi]=TMSwiss.writeMatchOutcome(m,{kind:'played',result:result,started:true});save();renderRoundContent(ri,document.getElementById('rounds-content'));refreshRoundPendingBadges(t);
 }
 function clearResult(ri,mi){
   const t=getActiveT(),m=t.roundsData[ri].matches[mi],outcome=TMSwiss.readMatchOutcome(m);
@@ -7123,7 +7142,7 @@ function clearResult(ri,mi){
     const unavailableId=m.result==='p1'?m.p2:m.p1;
     toast('Cet ancien résultat doit d’abord être qualifié.','warning',6000);openAdministrativeFlow(unavailableId,'absent');return;
   }
-  t.roundsData[ri].matches[mi]=TMSwiss.clearMatchRecordedData(m);save();renderRoundContent(ri,document.getElementById('rounds-content'));
+  t.roundsData[ri].matches[mi]=TMSwiss.clearMatchRecordedData(m);save();renderRoundContent(ri,document.getElementById('rounds-content'));refreshRoundPendingBadges(t);
 }
 function printTableSheets(ri){
   const t=getActiveT();if(!t)return;
@@ -7524,6 +7543,12 @@ function tryCompleteBracketTournament(t){
 }
 
 // CLASSEMENT
+function toggleTeamStandingDetail(row){
+  if(!window.matchMedia||!window.matchMedia('(max-width:640px)').matches)return;
+  const detail=row.nextElementSibling;
+  if(detail&&detail.classList.contains('team-detail-row'))detail.classList.toggle('open');
+  row.classList.toggle('open');
+}
 function renderTeamStandingsHtml(t){
   let standings;
   try{standings=TMSwiss.calculateTeamStandings(t);}
@@ -7537,7 +7562,9 @@ function renderTeamStandingsHtml(t){
     const cells=settings.tiebreaks.map(function(field,index){const value=field==='buchholz'?Math.round(entry[field]*100)/100:entry[field];return '<td>'+(index===0?'<strong>'+value+'</strong>':value)+'</td>';}).join('');
     const dropped=entry.status==='dropped';
     const members=teamMembers(t,entry.id).map(function(p){return escapeHtml(p.name);}).join(', ');
-    return '<tr class="'+(entry.rank<=3?'rank-'+entry.rank:'')+'" style="'+(dropped?'opacity:0.5':'')+'"><td>'+medal+'</td><td><strong>'+(dropped?'<s>'+escapeHtml(entry.name)+'</s>':escapeHtml(entry.name))+'</strong>'+(entry.bonusMalus?' <span title="Bonus/Malus : '+entry.bonusMalus+'">⚖️</span>':'')+'<br><span style="font-size:0.72rem;color:var(--text3)">'+members+'</span></td>'+cells+'<td>'+entry.encounterWins+' / '+entry.encounterDraws+' / '+entry.encounterLosses+'</td><td>'+entry.gameWins+' / '+entry.gameDraws+' / '+entry.gameLosses+'</td></tr>';
+    const records='Rencontres V/N/D : '+entry.encounterWins+' / '+entry.encounterDraws+' / '+entry.encounterLosses+' · Parties V/N/D : '+entry.gameWins+' / '+entry.gameDraws+' / '+entry.gameLosses;
+    return '<tr class="team-row '+(entry.rank<=3?'rank-'+entry.rank:'')+'" style="'+(dropped?'opacity:0.5':'')+'" onclick="toggleTeamStandingDetail(this)"><td>'+medal+'</td><td><strong>'+(dropped?'<s>'+escapeHtml(entry.name)+'</s>':escapeHtml(entry.name))+'</strong>'+(entry.bonusMalus?' <span title="Bonus/Malus : '+entry.bonusMalus+'">⚖️</span>':'')+'<span class="team-row-toggle" aria-hidden="true"> ▾</span><br><span class="team-row-members" style="font-size:0.72rem;color:var(--text3)">'+members+'</span></td>'+cells+'<td>'+entry.encounterWins+' / '+entry.encounterDraws+' / '+entry.encounterLosses+'</td><td>'+entry.gameWins+' / '+entry.gameDraws+' / '+entry.gameLosses+'</td></tr>'
+      +'<tr class="team-detail-row"><td colspan="5"><div>'+(members||'—')+'</div><div>'+records+'</div></td></tr>';
   }).join('');
   return '<div style="font-weight:700;margin-bottom:6px">🛡️ Classement des équipes</div><div style="font-size:0.78rem;color:var(--text3);margin-bottom:8px">Ordre : '+orderLabel+'. Rencontre : '+settings.matchScoring.win+'/'+settings.matchScoring.draw+'/'+settings.matchScoring.loss+'.</div><div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:24px"><table class="data-table" style="min-width:420px"><thead><tr><th>Rang</th><th>Équipe</th>'+head+'<th>Rencontres V/N/D</th><th>Parties V/N/D</th></tr></thead><tbody>'+rows+'</tbody></table></div><div style="font-weight:700;margin-bottom:6px">👤 Classement individuel (indicatif)</div>';
 }
