@@ -59,7 +59,7 @@ Aucune installation. Aucune dépendance.
     À chaque ronde, les équipes sont appariées sans revanche ; chaque rencontre oppose les joueurs table par table (bouton « Composer les tables » pour choisir les adversaires)
     L'équipe qui gagne le plus de parties remporte la rencontre et marque les points de rencontre (3/1/0 par défaut) ; chaque partie rapporte aussi des points individuels au joueur
     Trois modes de classement : rencontres d'abord (points de rencontre, points individuels, Buchholz), force du calendrier d'abord (points de rencontre, Buchholz, points individuels) ou cumul individuel
-    Bye d'équipe et forfait d'une équipe entière : victoire de rencontre et 6 points individuels pour l'équipe qui en bénéficie ; un joueur absent offre une victoire ordinaire à son adversaire
+    Bye d'équipe et forfait d'une équipe entière : victoire de rencontre pour l'équipe qui en bénéficie, et une partie gagnée pour chacun de ses joueurs (comptée aussi au classement individuel) ; un joueur absent offre une victoire ordinaire à son adversaire
     Le classement des équipes figure dans l'onglet Classement et en tête des exports CSV et PDF
 
     ⚠️ Une sauvegarde contenant un tournoi par équipes ne peut pas être ouverte par une version antérieure au mode équipes.

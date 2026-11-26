@@ -6,7 +6,9 @@ import {
   computeEncounterResult,
   DEFAULT_TEAM_SETTINGS,
   normalizeTeamSettings,
+  teamIndividualRounds,
 } from '../src/teams/team-encounter.mjs';
+import { calculateSwissStandings } from '../src/results/swiss-scoring.mjs';
 import { calculateTeamStandings } from '../src/teams/team-standings.mjs';
 import {
   assignEncounterBoards,
@@ -68,14 +70,30 @@ test('un double forfait sur une table compte une défaite des deux côtés', () 
   assert.equal(result.sides.teamB.losses, 2);
 });
 
-test('bye d’équipe : victoire de rencontre et 6 points individuels par défaut (réglage 1A)', () => {
-  const bye = computeEncounterResult({ id: 'X', teamA: 'A', teamB: null }, [], settings());
+test('bye d’équipe : victoire de rencontre et une partie gagnée par joueur (réglage 1A, 26 novembre 2026)', () => {
+  const byeGame = (player, board) => ({
+    ...writeMatchOutcome({ p1: player, p2: null, s1: 0, s2: 0, f1: 0, f2: 0, encounterId: 'X', board, seatSide: 'teamA' },
+      { kind: 'bye', result: null, started: false }),
+    teamBye: true,
+  });
+  const four = [byeGame('a', 1), byeGame('b', 2), byeGame('c', 3), byeGame('d', 4)];
+  const bye = computeEncounterResult({ id: 'X', teamA: 'A', teamB: null }, four, settings());
   assert.equal(bye.kind, 'bye');
   assert.deepEqual(bye.matchPts, { teamA: 3, teamB: 0 });
-  assert.equal(bye.sides.teamA.individualPts, 6);
-  const draw = computeEncounterResult({ id: 'X', teamA: 'A', teamB: null }, [], settings({ byeMatchResult: 'draw', byeIndividualPoints: 3 }));
+  assert.equal(bye.sides.teamA.individualPts, 12);
+  assert.equal(bye.sides.teamA.wins, 4);
+  const three = computeEncounterResult({ id: 'X', teamA: 'A', teamB: null }, four.slice(0, 3), settings());
+  assert.equal(three.sides.teamA.individualPts, 9);
+  const draw = computeEncounterResult({ id: 'X', teamA: 'A', teamB: null }, four, settings({ byeMatchResult: 'draw' }));
   assert.deepEqual(draw.matchPts, { teamA: 1, teamB: 0 });
   assert.equal(draw.winner, 'draw');
+});
+
+test('bye d’équipe enregistré sans parties (ancienne sauvegarde) : forfait fixe conservé', () => {
+  const bye = computeEncounterResult({ id: 'X', teamA: 'A', teamB: null }, [], settings());
+  assert.equal(bye.sides.teamA.individualPts, 6);
+  const custom = computeEncounterResult({ id: 'X', teamA: 'A', teamB: null }, [], settings({ byeIndividualPoints: 3 }));
+  assert.equal(custom.sides.teamA.individualPts, 3);
 });
 
 test('forfait d’une équipe entière : traité comme un bye pour l’adversaire (réglage 3A)', () => {
@@ -83,11 +101,16 @@ test('forfait d’une équipe entière : traité comme un bye pour l’adversair
   const forfeit = computeEncounterResult({ ...encounter, teamForfeit: 'teamA' }, games, settings());
   assert.equal(forfeit.winner, 'teamB');
   assert.deepEqual(forfeit.matchPts, { teamA: 0, teamB: 3 });
-  assert.equal(forfeit.sides.teamB.individualPts, 6);
+  assert.equal(forfeit.sides.teamB.individualPts, 9);
+  assert.equal(forfeit.sides.teamB.wins, 3);
   assert.equal(forfeit.sides.teamA.individualPts, 0);
+  assert.equal(forfeit.sides.teamA.losses, 3);
   const both = computeEncounterResult({ ...encounter, teamForfeit: 'both' }, games, settings());
   assert.deepEqual(both.matchPts, { teamA: 0, teamB: 0 });
   assert.equal(both.winner, null);
+  assert.equal(both.sides.teamA.individualPts + both.sides.teamB.individualPts, 0);
+  const legacy = computeEncounterResult({ ...encounter, teamForfeit: 'teamA' }, [], settings());
+  assert.equal(legacy.sides.teamB.individualPts, 6);
 });
 
 test('les réglages sont validés et complétés', () => {
@@ -117,6 +140,7 @@ const makeTournament = (teamCount, { teamSize = 3, teamSettings = {} } = {}) => 
 const recordEncounter = (round, encounterId, results) => {
   const games = round.matches.filter((match) => match.encounterId === encounterId);
   results.forEach((result, index) => {
+    if (!games[index] || games[index].p2 == null) return;
     const position = round.matches.indexOf(games[index]);
     round.matches[position] = writeMatchOutcome(games[index], { kind: 'played', result, started: true });
   });
@@ -245,7 +269,12 @@ test('appariement : bye à l’équipe la moins bien classée, jamais deux fois'
     const played = playRound(tournament, () => ['p1', 'p1', 'p2']);
     const bye = played.encounters.find((item) => item.teamB == null);
     assert.ok(bye);
-    assert.equal(played.matches.filter((match) => match.encounterId === bye.id).length, 0);
+    const byeGames = played.matches.filter((match) => match.encounterId === bye.id);
+    assert.equal(byeGames.length, 3);
+    assert.ok(byeGames.every((match) => match.bye === true && match.teamBye === true && match.seatSide === 'teamA'));
+    assert.deepEqual(byeGames.map((match) => match.p1), [1, 2, 3].map((board) => `${bye.teamA}-J${board}`));
+    const tables = played.matches.map((match) => match.table);
+    assert.equal(new Set(tables).size, tables.length);
     byes.push(bye.teamA);
   }
   assert.equal(new Set(byes).size, 4);
@@ -263,7 +292,7 @@ test('appariement : une rencontre perdue par forfait d’équipe autorise une no
   tournament.roundsData.push(round);
   const standings = calculateTeamStandings(tournament);
   assert.equal(standings[0].matchPts, 3);
-  assert.equal(standings[0].individualPts, 6);
+  assert.equal(standings[0].individualPts, 9);
   const second = pairTeamRound(tournament, 1);
   assert.equal(second.encounters.length, 1);
   assert.equal(setEncounterTeamForfeit(round, first.encounters[0].id, null).encounters[0].teamForfeit, undefined);
@@ -352,4 +381,35 @@ test('composition des tables d’une rencontre', () => {
   assert.throws(() => assignEncounterBoards(tournament, round, item.id, [
     { p1: rosterA[0], p2: rosterB[0] }, { p1: rosterA[0], p2: rosterB[1] }, { p1: rosterA[2], p2: rosterB[2] },
   ]), /exactement une table/);
+});
+
+test('cohérence : les points individuels d’une équipe égalent la somme de ceux de ses joueurs (bye, forfait, table vide)', () => {
+  const tournament = makeTournament(5, { teamSize: 4 });
+  tournament.players.find((player) => player.id === 'T2-J4').status = 'absent';
+  const results = [['p1', 'p1', 'p2', 'draw'], ['p2', 'draw', 'p1', 'p2'], ['draw', 'draw', 'p1', 'p1']];
+  for (let roundIndex = 0; roundIndex < 3; roundIndex += 1) {
+    const round = playRound(tournament, () => results[roundIndex]);
+    if (roundIndex === 1) {
+      const played = round.encounters.find((item) => item.teamB != null);
+      tournament.roundsData[roundIndex] = setEncounterTeamForfeit(round, played.id, 'teamA');
+    }
+    if (roundIndex === 2) {
+      const played = round.encounters.filter((item) => item.teamB != null)[1];
+      tournament.roundsData[roundIndex] = setEncounterTeamForfeit(round, played.id, 'both');
+    }
+  }
+  const individual = calculateSwissStandings({
+    players: tournament.players,
+    rounds: teamIndividualRounds(tournament.roundsData),
+    scoring: tournament.scoring,
+  });
+  const teams = calculateTeamStandings(tournament);
+  for (const team of teams) {
+    const members = individual.filter((row) => tournament.players.find((player) => player.id === row.id).teamId === team.id);
+    assert.equal(members.reduce((sum, row) => sum + row.pts, 0), team.individualPts, team.id);
+    assert.equal(members.reduce((sum, row) => sum + row.wins, 0), team.gameWins, `${team.id} victoires`);
+  }
+  const byeTeam = tournament.roundsData[0].encounters.find((item) => item.teamB == null).teamA;
+  const byeRows = individual.filter((row) => row.id.startsWith(`${byeTeam}-`));
+  assert.ok(byeRows.every((row) => row.pts >= 3));
 });

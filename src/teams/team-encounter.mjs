@@ -1,4 +1,4 @@
-import { MATCH_OUTCOME_KINDS, readMatchOutcome } from '../results/match-outcome.mjs';
+import { MATCH_OUTCOME_KINDS, readMatchOutcome, writeMatchOutcome } from '../results/match-outcome.mjs';
 
 /**
  * Résultat d'une rencontre d'équipes.
@@ -13,6 +13,11 @@ import { MATCH_OUTCOME_KINDS, readMatchOutcome } from '../results/match-outcome.
  * individuel du joueur présent (`p1`, `p2: null`) avec `seatSide` = côté de
  * ce joueur ('teamA' ou 'teamB'). Elle vaut une victoire par forfait pour ce
  * côté, comme le forfait d'un joueur.
+ *
+ * Bye d'équipe : chaque joueur actif de l'équipe exempte reçoit une partie
+ * de ce type (`seatSide: 'teamA'`, `teamBye: true`) rattachée à la rencontre
+ * de bye. Les points individuels de l'équipe et ceux des joueurs viennent
+ * ainsi des mêmes parties.
  */
 
 export const ENCOUNTER_KINDS = Object.freeze({
@@ -33,10 +38,15 @@ export const TEAM_RANKING_ORDERS = Object.freeze({
 
 /**
  * Réglages par défaut, arbitrés le 25 novembre 2026 :
- * - bye d'équipe : victoire de rencontre et 6 points individuels (2V+1D) ;
+ * - bye d'équipe : victoire de rencontre, et une partie gagnée pour chaque
+ *   joueur de l'équipe (26 novembre 2026). `byeIndividualPoints` ne sert plus
+ *   qu'aux byes enregistrés avant ce changement, sans parties ;
  * - forfait d'un joueur : la table vaut une victoire individuelle ordinaire
  *   (`playerForfeitPoints: null` = barème individuel de victoire) ;
- * - forfait d'une équipe entière : traité comme un bye pour l'adversaire.
+ * - forfait d'une équipe entière : traité comme un bye pour l'adversaire :
+ *   chaque partie de la rencontre devient une victoire administrative de ses
+ *   joueurs (`teamForfeitIndividualPoints` ne sert qu'aux rencontres sans
+ *   parties enregistrées).
  * Les points individuels des parties suivent `tournament.scoring`.
  */
 export const DEFAULT_TEAM_SETTINGS = Object.freeze({
@@ -105,48 +115,70 @@ export const encounterGames = (round, encounterId) => (round?.matches ?? [])
   .sort((left, right) => (left.board ?? 0) - (right.board ?? 0));
 
 /**
- * Calcule une rencontre. `settings` doit venir de normalizeTeamSettings.
- * Renvoie { status: 'pending' | 'complete', kind, winner ('teamA' | 'teamB' |
- * 'draw' | null), sides: { teamA, teamB }, matchPts, beneficiary }.
- * La victoire d'équipe revient à l'équipe qui gagne le plus de parties.
+ * Parties d'une rencontre déclarée forfait d'équipe, telles qu'elles comptent :
+ * - forfait d'un côté : chaque partie devient une victoire administrative non
+ *   jouée du joueur de l'équipe présente ; une table vide du côté présent
+ *   reste une victoire, une table où seul le joueur forfait était présent ne
+ *   compte pas ;
+ * - double forfait : chaque partie devient un double forfait.
+ * Les valeurs neutres de scénario déjà calculées pour la ronde sont reprises.
+ * Les parties enregistrées ne sont pas modifiées.
  */
-export const computeEncounterResult = (encounter, games, settings) => {
-  if (!encounter || encounter.teamA == null) throw new TypeError('Rencontre d’équipes invalide');
-  if (!settings?.tiebreaks) throw new TypeError('Réglages d’équipe normalisés requis');
-  const { matchScoring, gameScoring } = settings;
-  const sides = { teamA: emptySide(), teamB: emptySide() };
-
-  if (encounter.teamB == null) {
-    const result = settings.byeMatchResult;
-    sides.teamA.individualPts = settings.byeIndividualPoints;
-    return {
-      status: 'complete',
-      kind: ENCOUNTER_KINDS.BYE,
-      winner: result === 'win' ? 'teamA' : result === 'draw' ? 'draw' : 'teamB',
-      sides,
-      matchPts: { teamA: matchScoring[result], teamB: 0 },
-      beneficiary: 'teamA',
+export const teamForfeitGames = (games, teamForfeit, neutral = null) => {
+  if (!TEAM_FORFEIT_SIDES.includes(teamForfeit)) throw new TypeError('Forfait d’équipe inconnu');
+  const neutralFields = neutral && Number.isFinite(Number(neutral.scenario))
+    ? { neutralScenario: Number(neutral.scenario), neutralFree: Number(neutral.free) || 0 }
+    : {};
+  return games.flatMap((game) => {
+    const base = {
+      p1: game.p1, p2: game.p2, s1: 0, s2: 0, f1: 0, f2: 0,
+      table: game.table, encounterId: game.encounterId, board: game.board,
     };
-  }
-
-  if (encounter.teamForfeit != null) {
-    if (!TEAM_FORFEIT_SIDES.includes(encounter.teamForfeit)) throw new TypeError('Forfait d’équipe inconnu');
-    if (encounter.teamForfeit === 'both') {
-      return {
-        status: 'complete', kind: ENCOUNTER_KINDS.DOUBLE_TEAM_FORFEIT, winner: null, sides,
-        matchPts: { teamA: matchScoring.loss, teamB: matchScoring.loss }, beneficiary: null,
-      };
+    if (game.p2 == null) {
+      if (teamForfeit === 'both' || game.seatSide === teamForfeit) return [];
+      return [game];
     }
-    const winner = other(encounter.teamForfeit);
-    sides[winner].individualPts = settings.teamForfeitIndividualPoints;
-    return {
-      status: 'complete', kind: ENCOUNTER_KINDS.TEAM_FORFEIT, winner, sides,
-      matchPts: { [winner]: matchScoring.win, [encounter.teamForfeit]: matchScoring.loss },
-      beneficiary: winner,
-    };
-  }
+    if (teamForfeit === 'both') {
+      return [writeMatchOutcome(base, {
+        kind: MATCH_OUTCOME_KINDS.DOUBLE_FORFEIT, result: null, started: false, administrativeReason: 'forfeit',
+      })];
+    }
+    return [writeMatchOutcome({ ...base, ...neutralFields }, {
+      kind: MATCH_OUTCOME_KINDS.ADMINISTRATIVE_NO_SHOW,
+      result: teamForfeit === 'teamA' ? 'p2' : 'p1',
+      started: false,
+      administrativeReason: 'forfeit',
+    })];
+  });
+};
 
-  let pending = games.length === 0;
+/**
+ * Rondes telles que le classement individuel doit les lire : identiques aux
+ * rondes enregistrées, sauf les parties des rencontres déclarées forfait
+ * d'équipe, remplacées par teamForfeitGames.
+ */
+export const teamIndividualRounds = (rounds) => (rounds ?? []).map((round) => {
+  const forfeits = new Map((round?.encounters ?? [])
+    .filter((encounter) => encounter?.teamForfeit != null && encounter.teamB != null)
+    .map((encounter) => [String(encounter.id), encounter.teamForfeit]));
+  if (!forfeits.size) return round;
+  const neutral = round.scoringMeta?.neutralScores;
+  const done = new Set();
+  const matches = [];
+  for (const match of round.matches ?? []) {
+    const id = match?.encounterId == null ? null : String(match.encounterId);
+    if (id == null || !forfeits.has(id)) { matches.push(match); continue; }
+    if (done.has(id)) continue;
+    done.add(id);
+    matches.push(...teamForfeitGames(encounterGames(round, id), forfeits.get(id), neutral));
+  }
+  return { ...round, matches };
+});
+
+/** Ajoute les parties d'une rencontre aux deux côtés ; renvoie true si une partie reste à saisir. */
+const accumulateGames = (sides, games, settings) => {
+  const { gameScoring } = settings;
+  let pending = false;
   for (const game of games) {
     const outcome = readMatchOutcome(game);
     if (outcome.kind === MATCH_OUTCOME_KINDS.BYE) {
@@ -180,6 +212,54 @@ export const computeEncounterResult = (encounter, games, settings) => {
     loser.losses += 1;
     loser.individualPts += gameScoring.loss;
   }
+  return pending;
+};
+
+/**
+ * Calcule une rencontre. `settings` doit venir de normalizeTeamSettings.
+ * Renvoie { status: 'pending' | 'complete', kind, winner ('teamA' | 'teamB' |
+ * 'draw' | null), sides: { teamA, teamB }, matchPts, beneficiary }.
+ * La victoire d'équipe revient à l'équipe qui gagne le plus de parties.
+ */
+export const computeEncounterResult = (encounter, games, settings) => {
+  if (!encounter || encounter.teamA == null) throw new TypeError('Rencontre d’équipes invalide');
+  if (!settings?.tiebreaks) throw new TypeError('Réglages d’équipe normalisés requis');
+  const { matchScoring, gameScoring } = settings;
+  const sides = { teamA: emptySide(), teamB: emptySide() };
+
+  if (encounter.teamB == null) {
+    const result = settings.byeMatchResult;
+    if (games.length) accumulateGames(sides, games, settings);
+    else sides.teamA.individualPts = settings.byeIndividualPoints;
+    return {
+      status: 'complete',
+      kind: ENCOUNTER_KINDS.BYE,
+      winner: result === 'win' ? 'teamA' : result === 'draw' ? 'draw' : 'teamB',
+      sides,
+      matchPts: { teamA: matchScoring[result], teamB: 0 },
+      beneficiary: 'teamA',
+    };
+  }
+
+  if (encounter.teamForfeit != null) {
+    if (!TEAM_FORFEIT_SIDES.includes(encounter.teamForfeit)) throw new TypeError('Forfait d’équipe inconnu');
+    if (games.length) accumulateGames(sides, teamForfeitGames(games, encounter.teamForfeit), settings);
+    if (encounter.teamForfeit === 'both') {
+      return {
+        status: 'complete', kind: ENCOUNTER_KINDS.DOUBLE_TEAM_FORFEIT, winner: null, sides,
+        matchPts: { teamA: matchScoring.loss, teamB: matchScoring.loss }, beneficiary: null,
+      };
+    }
+    const winner = other(encounter.teamForfeit);
+    if (!games.length) sides[winner].individualPts = settings.teamForfeitIndividualPoints;
+    return {
+      status: 'complete', kind: ENCOUNTER_KINDS.TEAM_FORFEIT, winner, sides,
+      matchPts: { [winner]: matchScoring.win, [encounter.teamForfeit]: matchScoring.loss },
+      beneficiary: winner,
+    };
+  }
+
+  const pending = accumulateGames(sides, games, settings) || games.length === 0;
   if (pending) {
     return { status: 'pending', kind: ENCOUNTER_KINDS.PLAYED, winner: null, sides, matchPts: null, beneficiary: null };
   }

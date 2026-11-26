@@ -81,7 +81,9 @@ const encounterIdFor = (roundIndex, table) => `R${roundIndex + 1}-E${table}`;
  * Les équipes sont groupées sur le premier critère du classement (points de
  * rencontre par défaut), les revanches évitées par le solveur exact, et les
  * tables de chaque rencontre opposent les joueurs actifs dans l'ordre
- * d'inscription (modifiable ensuite par assignEncounterBoards).
+ * d'inscription (modifiable ensuite par assignEncounterBoards). Chaque
+ * joueur actif d'une équipe exempte reçoit une partie gagnée (bye individuel
+ * `teamBye`), qui compte pour lui comme pour son équipe.
  * Renvoie { encounters, matches, byeTeamId, standings }.
  */
 export const pairTeamRound = (tournament, roundIndex) => {
@@ -134,7 +136,17 @@ export const pairTeamRound = (tournament, roundIndex) => {
   });
   if (input.byePlayerId != null) {
     const table = encounters.length + 1;
-    encounters.push({ id: encounterIdFor(roundIndex, table), teamA: String(input.byePlayerId), teamB: null, table });
+    const id = encounterIdFor(roundIndex, table);
+    encounters.push({ id, teamA: String(input.byePlayerId), teamB: null, table });
+    const firstTable = matches.reduce((last, game) => Math.max(last, game.table), 0) + 1;
+    activeTeamRoster(tournament, input.byePlayerId).forEach((player, board) => {
+      matches.push({
+        ...emptySeatGame({
+          playerId: player.id, seatSide: 'teamA', table: firstTable + board, encounterId: id, board: board + 1,
+        }),
+        teamBye: true,
+      });
+    });
   }
   return { encounters, matches, byeTeamId: input.byePlayerId, standings };
 };
