@@ -109,6 +109,7 @@ import {
   assignEncounterBoards,
   pairTeamRound,
   setEncounterTeamForfeit,
+  teamRosterIssues,
   teamSwissView,
 } from '../teams/team-swiss.mjs';
 
@@ -125,6 +126,7 @@ export {
   assignEncounterBoards,
   pairTeamRound,
   setEncounterTeamForfeit,
+  teamRosterIssues,
   teamSwissView,
   analyzeApplicationSwissRound,
   applicationPairingSignature,

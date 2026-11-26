@@ -12,6 +12,7 @@ import {
   assignEncounterBoards,
   pairTeamRound,
   setEncounterTeamForfeit,
+  teamRosterIssues,
 } from '../src/teams/team-swiss.mjs';
 
 const settings = (teamSettings = {}) => normalizeTeamSettings({ teamSettings });
@@ -269,10 +270,69 @@ test('appariement : une rencontre perdue par forfait d’équipe autorise une no
   assert.throws(() => setEncounterTeamForfeit(round, first.encounters[0].id, 'personne'), /Forfait/);
 });
 
-test('appariement : refuse une équipe incomplète', () => {
-  const tournament = makeTournament(4);
-  tournament.players[0].status = 'dropped';
-  assert.throws(() => pairTeamRound(tournament, 0), /Équipe 1 compte 2 joueur/);
+test('appariement : une équipe incomplète joue, ses tables vides sont perdues par forfait', () => {
+  const tournament = makeTournament(2);
+  tournament.players.find((player) => player.id === 'T1-J3').status = 'absent';
+  assert.deepEqual(teamRosterIssues(tournament), [{ teamId: 'T1', name: 'Équipe 1', active: 2, expected: 3 }]);
+  const { encounters, matches } = pairTeamRound(tournament, 0);
+  const [item] = encounters;
+  const seat = matches.find((match) => match.board === 3);
+  const present = item.teamA === 'T1' ? 'teamB' : 'teamA';
+  assert.equal(seat.bye, true);
+  assert.equal(seat.p2, null);
+  assert.equal(seat.seatSide, present);
+  assert.equal(seat.p1, `${item[present]}-J3`);
+  assert.equal(seat.table, 3);
+  const round = { encounters, matches, validated: true };
+  const winnerOnBoard1 = item.teamA === 'T1' ? 'p1' : 'p2';
+  for (const board of [1, 2]) {
+    const index = round.matches.findIndex((match) => match.board === board);
+    round.matches[index] = writeMatchOutcome(round.matches[index], { kind: 'played', result: board === 1 ? winnerOnBoard1 : (winnerOnBoard1 === 'p1' ? 'p2' : 'p1'), started: true });
+  }
+  tournament.roundsData.push(round);
+  const byId = Object.fromEntries(calculateTeamStandings(tournament).map((entry) => [entry.id, entry]));
+  const complete = item[present];
+  assert.equal(byId[complete].matchPts, 3, 'la table vide fait basculer la rencontre');
+  assert.equal(byId[complete].individualPts, 6);
+  assert.equal(byId.T1.individualPts, 3);
+  assert.equal(byId[complete].gameWins, 2);
+  assert.equal(byId.T1.gameLosses, 2);
+});
+
+test('appariement : refuse une équipe vide ou en surnombre', () => {
+  const empty = makeTournament(4);
+  empty.players.filter((player) => player.teamId === 'T1').forEach((player) => { player.status = 'dropped'; });
+  assert.throws(() => pairTeamRound(empty, 0), /Équipe 1 n’a aucun joueur actif/);
+  const surplus = makeTournament(4);
+  surplus.players.push({ id: 'T2-J4', name: 'Remplaçant', status: 'active', teamId: 'T2' });
+  assert.throws(() => pairTeamRound(surplus, 0), /Équipe 2 compte 4 joueurs actifs pour 3 places/);
+});
+
+test('composition des tables avec une table vide', () => {
+  const tournament = makeTournament(2);
+  tournament.players.find((player) => player.id === 'T2-J1').status = 'absent';
+  const paired = pairTeamRound(tournament, 0);
+  const round = { ...paired, validated: false };
+  const [item] = round.encounters;
+  const a = (n) => `${item.teamA}-J${n}`;
+  const b = (n) => `${item.teamB}-J${n}`;
+  const rosterB = tournament.players.filter((p) => p.teamId === item.teamB && p.status === 'active').map((p) => p.id);
+  const pairs = item.teamB === 'T2'
+    ? [{ p1: a(1), p2: null }, { p1: a(2), p2: b(3) }, { p1: a(3), p2: b(2) }]
+    : [{ p1: null, p2: b(1) }, { p1: a(2), p2: b(3) }, { p1: a(3), p2: b(2) }];
+  const filtered = pairs.filter((pair) => pair.p1 == null || tournament.players.find((p) => p.id === pair.p1).status === 'active');
+  const next = assignEncounterBoards(tournament, round, item.id, filtered.length === 3 ? filtered : pairs);
+  const games = next.matches.filter((match) => match.encounterId === item.id).sort((x, y) => x.board - y.board);
+  assert.equal(games.length, 3);
+  assert.equal(games[0].bye, true);
+  assert.deepEqual(games.map((game) => game.table), [1, 2, 3]);
+  assert.ok(rosterB.length === 2 || item.teamB !== 'T2');
+  assert.throws(() => assignEncounterBoards(tournament, round, item.id, [{ p1: null, p2: null }, ...pairs.slice(1)]), /exactement une table|vide des deux côtés/);
+});
+
+test('une partie bye sans côté reste interdite dans une rencontre', () => {
+  const bye = writeMatchOutcome({ p1: 'a', p2: null, encounterId: 'E' }, { kind: 'bye', result: null, started: false });
+  assert.throws(() => computeEncounterResult(encounter, [bye], settings()), /ne peut pas être un bye/);
 });
 
 test('composition des tables d’une rencontre', () => {
