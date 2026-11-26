@@ -99,6 +99,7 @@ import {
   encounterGames,
   normalizeTeamSettings,
   TEAM_RANKING_ORDERS,
+  teamIndividualRounds,
 } from '../teams/team-encounter.mjs';
 import { applyTeamImport, planTeamImport } from '../teams/team-import.mjs';
 export { applyTeamImport, planTeamImport };
@@ -120,6 +121,7 @@ export {
   encounterGames,
   normalizeTeamSettings,
   TEAM_RANKING_ORDERS,
+  teamIndividualRounds,
   calculateTeamStandings,
   teamStandingsExportTable,
   activeTeamRoster,

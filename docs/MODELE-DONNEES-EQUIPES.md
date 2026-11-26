@@ -13,7 +13,14 @@ Statut : règles arbitrées le 25 novembre 2026 et mises en œuvre dans
 - `tournament.teamSettings` : `{ teamSize, rankingOrder, matchScoring, byeMatchResult,
   byeIndividualPoints, playerForfeitPoints, teamForfeitIndividualPoints }`, complété par
   `normalizeTeamSettings` (valeurs par défaut : 3 joueurs, rencontres d'abord, 3/1/0, bye
-  et forfait d'équipe = victoire + 6 points individuels, forfait d'un joueur = victoire ordinaire).
+  et forfait d'équipe = victoire de rencontre + une partie gagnée par joueur, forfait d'un joueur =
+  victoire ordinaire). `byeIndividualPoints` et `teamForfeitIndividualPoints` ne servent plus qu'aux
+  rondes enregistrées avant le 26 novembre 2026, sans parties pour le bye ou le forfait.
+- Bye d'équipe : chaque joueur actif de l'équipe exempte reçoit une partie bye
+  `{ p1, p2: null, seatSide: 'teamA', teamBye: true, encounterId }` rattachée à la rencontre de bye.
+- Forfait d'équipe : les parties enregistrées ne sont pas modifiées ; `teamIndividualRounds` les lit
+  comme des victoires administratives (ou doubles forfaits), pour le classement individuel comme pour
+  celui des équipes.
 - `team.status` : `'active'` ou `'dropped'` (équipe retirée des prochaines rondes) ;
   `team.penalties` facultatif, appliqué aux points de rencontre.
 - Les parties individuelles restent dans `round.matches`, au format actuel
