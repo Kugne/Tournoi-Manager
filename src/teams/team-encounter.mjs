@@ -8,6 +8,11 @@ import { MATCH_OUTCOME_KINDS, readMatchOutcome } from '../results/match-outcome.
  * `teamForfeit: 'teamA' | 'teamB' | 'both'` (l'équipe ou les équipes forfait).
  * Ses parties individuelles restent dans `round.matches`, rattachées par
  * `encounterId`, `p1` appartenant à teamA et `p2` à teamB.
+ *
+ * Table vide (équipe incomplète) : la partie est enregistrée comme un bye
+ * individuel du joueur présent (`p1`, `p2: null`) avec `seatSide` = côté de
+ * ce joueur ('teamA' ou 'teamB'). Elle vaut une victoire par forfait pour ce
+ * côté, comme le forfait d'un joueur.
  */
 
 export const ENCOUNTER_KINDS = Object.freeze({
@@ -144,7 +149,19 @@ export const computeEncounterResult = (encounter, games, settings) => {
   let pending = games.length === 0;
   for (const game of games) {
     const outcome = readMatchOutcome(game);
-    if (outcome.kind === MATCH_OUTCOME_KINDS.BYE) throw new TypeError('Une partie de rencontre ne peut pas être un bye');
+    if (outcome.kind === MATCH_OUTCOME_KINDS.BYE) {
+      if (game.seatSide !== 'teamA' && game.seatSide !== 'teamB') {
+        throw new TypeError('Une partie de rencontre ne peut pas être un bye');
+      }
+      const present = sides[game.seatSide];
+      const empty = sides[other(game.seatSide)];
+      present.wins += 1;
+      present.individualPts += settings.playerForfeitPoints;
+      present.forfeitWins += 1;
+      empty.losses += 1;
+      empty.individualPts += gameScoring.loss;
+      continue;
+    }
     if (isPendingGame(outcome)) { pending = true; continue; }
     if (outcome.kind === MATCH_OUTCOME_KINDS.DOUBLE_FORFEIT) {
       for (const side of [sides.teamA, sides.teamB]) { side.losses += 1; side.individualPts += gameScoring.loss; }
