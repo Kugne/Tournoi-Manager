@@ -1,4 +1,4 @@
-# Tournoi Manager V2
+# Tournoi Manager V2.1
 🏆 Tournoi Manager
 
 Licence GPLv3
@@ -64,7 +64,7 @@ Aucune installation. Aucune dépendance.
 
     ⚠️ Une sauvegarde contenant un tournoi par équipes ne peut pas être ouverte par une version antérieure au mode équipes.
 
-Un guide complet est intégré dans l'application : onglet ℹ️ Informations(tutoriel, explication du système suisse, glossaire).
+Un guide complet est intégré dans l'application : onglet ℹ️ Informations (tutoriel, système suisse, Suisse par équipes, glossaire, historique des versions).
 🔒 Confidentialité
 
     Aucune donnée envoyée sur Internet — pas de serveur, pas de compte, pas de tracking
@@ -76,6 +76,10 @@ Un guide complet est intégré dans l'application : onglet ℹ️ Informations(t
 Les retours sont bienvenus ! Ouvrez une issue pour un bug ou une suggestion d'amélioration (précisez votre navigateur et le contexte du tournoi).
 
 Pour contribuer au code : forkez, créez une branche, proposez une pull request.
+
+## Tournoi Manager V2.1
+
+La V2.1 ajoute les tournois par équipes en système suisse : rencontres table par table, points de rencontre et points individuels, Buchholz, trois modes de classement, byes et forfaits d'équipe, équipes incomplètes, import CSV avec colonne Équipe et classement des équipes dans les exports. Elle corrige aussi le compteur de résultats en attente, arrondit les totaux au centième et rend le thème sombre plus lisible. L'historique complet des versions est dans l'onglet ℹ️ Informations → Versions de l'application.
 
 ## Tournoi Manager V2
 

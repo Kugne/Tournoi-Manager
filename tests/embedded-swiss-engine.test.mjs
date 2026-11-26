@@ -52,9 +52,9 @@ test('le script complet du HTML monofichier reste syntaxiquement valide', () => 
   assert.doesNotThrow(() => new vm.Script(scripts[0][1], { filename: 'index.html' }));
 });
 
-test('la livraison finale affiche Tournoi Manager V2', () => {
+test('la livraison affiche Tournoi Manager V2.1', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  assert.match(html, /Version actuelle\s*:\s*<strong>V2<\/strong>/);
+  assert.match(html, /Version actuelle\s*:\s*<strong>V2\.1<\/strong>/);
   assert.doesNotMatch(html, /Version actuelle\s*:\s*<strong>V1\.9\.32<\/strong>/);
 });
 
